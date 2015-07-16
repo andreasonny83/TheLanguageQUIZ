@@ -1,0 +1,176 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-styles/paper-styles.html">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+
+<dom-module id="lq-page-home">
+<style>
+:host {
+	display: block;
+	min-height: 900px;
+	max-width: 1200px;
+	margin: 145px auto 0;
+}
+
+.tile {
+	float: left;
+	vertical-align: top;
+	background-color: var(--lq-primary-color-0);
+	position: relative;
+}
+.tile > .box {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	margin: 0 15px 15px;
+
+	@apply(--shadow-transition);
+	@apply(--shadow-elevation-2dp);
+}
+.tile > .box:hover {
+	@apply(--shadow-elevation-8dp);
+}
+
+#header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 128px;
+	z-index: 999;
+
+	@apply(--shadow-transition);
+}
+#header.fixed {
+	@apply(--shadow-elevation-4dp);
+}
+#header .title {
+	font-size: 24px;
+}
+#header .userPic {
+	background-color:  var(--lq-primary-color-1);
+	border-radius: 50%;
+}
+#header .userName {
+	font-size: 21px;
+	margin-right: 10px;
+}
+/* colors */
+#header {
+	background-color: #ff3366;
+}
+.tile.global > .box {
+	background-color: #f1fafe;
+}
+.tile.highlights > .box {
+	background-color: #fefbe6;
+}
+.tile.private > .box {
+	background-color: #f2ffef;
+}
+.tile.scoreboard > .box {
+	background-color: #ffffff;
+}
+.tile.profile > .box {
+	background-color: #eff1ff;
+}
+.tile.favourites > .box {
+	background-color: #ffebeb;
+}
+.tile.settings > .box {
+	background-color: #dddddd;
+}
+.tile.logout > .box {
+	background-color: #deb3b3;
+}
+
+/* Media queries */
+@media (max-width: 699px) {
+	.tile {
+		width: 100%;
+		height: 300px;
+	}
+}
+
+@media (min-width: 700px) {
+	.tile.small {
+		width: calc(100% / 4);
+		height: calc(100% / 4);
+	}
+	.tile.medium {
+		width: calc(100% / 2);
+		height: calc(100% / 4);
+	}
+	.tile.large {
+		width: calc(100% / 2);
+		height: calc(100% / 2);
+	}
+	.tile.scoreboard {
+		position: absolute;
+		bottom: 0;
+	}
+}
+
+</style>
+<template>
+	<div id="header">
+		<div id="topBar" class="center horizontal layout toolbar-tools style-scope paper-toolbar">
+			<paper-icon-button icon="menu" role="button" tabindex="0" aria-disabled="false" class="x-scope paper-icon-button-0"></paper-icon-button>
+			<span class="title">The LanguageQUIZ</span>
+			<span class="flex"></span>
+			<p class="userName">username</p>
+			<img class="userPic" width="50px" height="50px" src="{{userProfile.profilePic}}">
+		</div>
+		<div id="bottomBar" class="center horizontal layout toolbar-tools style-scope paper-toolbar">
+			<span class="flex"></span>
+			<paper-icon-button icon="refresh" role="button" tabindex="0" aria-disabled="false" class="x-scope paper-icon-button-0">
+		</div>
+	</div>
+
+	<div class="tile small profile"><div class="box"><p>Profile</p></div></div>
+	<div class="tile small favourites"><div class="box"><p>Favourites</p></div></div>
+	<div class="tile small settings"><div class="box"><p>Settings</p></div></div>
+	<div class="tile small logout"><div class="box"><p>Logout</p></div></div>
+	<div class="tile large global"><div class="box"><p>Global collections</p></div></div>
+	<div class="tile medium highlights"><div class="box"><p>Highlights</p></div></div>
+	<div class="tile large private"><div class="box"><p>Private Collections</p></div></div>
+	<div class="tile medium scoreboard"><div class="box"><p>Scoreboard</p></div></div>
+</template>
+<script>
+	Polymer({
+		is: 'lq-page-home',
+
+		properties: {
+			userProfile: {
+				type: Object
+			}
+		},
+
+		ready: function() {
+			this.userProfile = {
+				profilePic: "http://www.phantomshockey.com/wp-content/uploads/2014/07/profile-icon.png",
+			};
+		},
+
+		attached: function() {
+		},
+
+	});
+
+	// Using jQuery to animate the header
+	$( document ).ready( function() {
+		$( window ).scroll( function( pos ) {
+			if (  $( window ).scrollTop() > 0 ) {
+				if( ! $( '#header' ).hasClass( 'fixed' ) ) {
+					$( '#header' ).addClass( 'fixed' );
+				}
+			}
+			else {
+				$( '#header' ).removeClass( 'fixed' );
+			}
+		});
+	});
+</script>
+
+<dom-module>

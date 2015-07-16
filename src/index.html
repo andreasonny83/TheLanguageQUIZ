@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="TheLanguageQUIZ">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="generator" content="TheLanguageQUIZ">
+	<title>TheLanguageQUIZ</title>
+
+	<!-- Chrome for Android theme color -->
+	<meta name="theme-color" content="#303F9F">
+
+	<!-- Web Application Manifest -->
+	<link rel="manifest" href="manifest.json">
+
+	<!-- Tile color for Win8 -->
+	<meta name="msapplication-TileColor" content="#3372DF">
+
+	<!-- Add to homescreen for Chrome on Android -->
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="application-name" content="TheLanguageQUIZ">
+	<link rel="icon" sizes="192x192" href="img/touch/chrome-touch-icon-192x192.png">
+
+	<!-- Add to homescreen for Safari on iOS -->
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-title" content="TheLanguageQUIZ">
+	<link rel="apple-touch-icon" href="img/touch/apple-touch-icon.png">
+
+	<!-- Tile icon for Win8 (144x144) -->
+	<meta name="msapplication-TileImage" content="img/touch/ms-touch-icon-144x144-precomposed.png">
+
+	<!-- Stylesheet -->
+	<link rel="stylesheet" href="css/main.min.css">
+
+	<!-- Polymer -->
+	<script src="components/webcomponentsjs/webcomponents-lite.min.js"></script>
+
+	<!-- Web Components -->
+	<link rel="import" href="elements.html">
+
+	<style>
+	html, body {
+		margin: 0;
+		padding: 0;
+	}
+
+	neon-animated-pages {
+		height: 100%;
+	}
+	</style>
+</head>
+
+<body unresolved class="fullbleed layout vertical">
+	<template is="dom-bind" id="app">
+		<neon-animated-pages id="pages" selected="0">
+			<lq-page-home></lq-page-home>
+			<lq-page-full></lq-page-full>
+		</neon-animated-pages>
+	</template>
+
+	<!-- build:js scripts/app.js -->
+	<script>
+	(function() {
+		var app = document.querySelector( '#app' );
+
+		app.addEventListener( 'dom-change', function() {
+			// auto-binding template is ready.
+			console.log('APP is ready');
+		});
+	})();
+	</script>
+	<!-- endbuild-->
+
+</body>
+</html>

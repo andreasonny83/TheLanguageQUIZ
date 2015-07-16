@@ -1,0 +1,24 @@
+{
+	"name": "TheLanguageQUIZ",
+	"description": "Application",
+	"homepage": "http://www.thelanguagequiz.com",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Andrea SonnY",
+			"email": "andreasonny83@gmail.com"
+		}
+	],
+	"config": {
+		"vendor-dir": "vendor",
+		"optimize-autoloader": true
+	},
+	"require": {
+		"slim/slim": "~2.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"Config\\": "config/"
+		}
+	}
+}
