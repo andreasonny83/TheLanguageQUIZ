@@ -3,7 +3,7 @@
  * Class to handle all db operations
  * This class will have CRUD methods for database tables
  *
- * @author Ravi Tamada
+ * @author andreasonny83@gmail.com
  */
 namespace Config\Database;
 use Config\Database\DB_Connect;
@@ -13,9 +13,12 @@ class DbHandler {
 
 	private $conn;
 
+	private $session;
+
 	function __construct() {
-		$db = new DB_Connect();
-		$this->conn = $db->connect();
+		$db            = new DB_Connect();
+		$this->session = new SecureSessionHandler( 'language_quiz' );
+		$this->conn    = $db->connect();
 	}
 
 	private function check_brute( $user_id ) {
@@ -53,14 +56,14 @@ class DbHandler {
 	 */
 	public function checkLogin( $input_email, $input_password ) {
 		// fetching user by email
-		if ( $stmt = $this->conn->prepare( 'SELECT id, uid, username, email, password, salt FROM LQ_users WHERE email = ? LIMIT 1' ) ) {
+		if ( $stmt = $this->conn->prepare( 'SELECT id, email, password, salt FROM LQ_users WHERE email = ? LIMIT 1' ) ) {
 			$stmt->bind_param( 's', $input_email );
 			$stmt->execute();
 			$stmt->store_result();
-			$stmt->bind_result( $db_id, $db_uid, $db_username, $db_email, $db_password, $db_salt );
+			$stmt->bind_result( $db_id, $db_email, $db_password, $db_salt );
 			$stmt->fetch();
-
 			// Salt the input password with the salt from the database
+			$password = hash( 'sha512', $input_password );
 			$password = hash( 'sha512', $input_password . $db_salt );
 
 			if ( $stmt->num_rows === 1 ) {
@@ -77,16 +80,29 @@ class DbHandler {
 					// the password the user submitted.
 					if ( $db_password === $password ) {
 						// password is correct
-						$session = new SecureSessionHandler( 'language_quiz' );
-						$session->start();
+						$this->session->start();
+						// Generate a new session every time
+						$this->session->refresh();
 
-						$user_browser = $_SERVER['HTTP_USER_AGENT'];
-						// XSS protection as we might print this value
-						$user_id = preg_replace( '/[^0-9]+/', '', $db_id );
-						// XSS protection as we might print this value
-						$username = preg_replace( '/[^a-zA-Z0-9_\-]+/', '', $db_username );
+						$session_id = session_id();
+						$now        = time();
 
-						// $session->put( 'lq_userid', $db_uid );
+						$this->conn->query( "UPDATE LQ_users
+								SET user_session_id='$session_id', session_expiration='$now'
+								WHERE id=$db_id"
+							);
+
+						/**
+						 * TODO
+						 * Will use the following information to store inside the database
+						 * The user agent information
+						**/
+						// $user_agent = $_SERVER['HTTP_USER_AGENT'];
+						// XSS protection as we might print this value
+						// $user_id = preg_replace( '/[^0-9]+/', '', $db_id );
+						// XSS protection as we might print this value
+						// $username = preg_replace( '/[^a-zA-Z0-9_\-]+/', '', $db_username );
+						// $session->put( 'LQ_user_agent', $user_agent );
 						// setcookie( 'lq_userid', $db_uid, time() + ( 86400 * 30 ), '/' ); // 1 day
 
 						return true;
@@ -114,6 +130,17 @@ class DbHandler {
 
 	}
 
+	public function logOut( $user_session ) {
+		$now = time() + 2;
+
+		$this->conn->query( "UPDATE LQ_users
+				SET session_expiration='$now'
+				WHERE user_session_id='$user_session'"
+			);
+
+		$this->session->forget();
+	}
+
 	/**
 	 * Fetching user by email
 	 * @param String $email User email id
@@ -133,18 +160,6 @@ class DbHandler {
 		return $db_uid;
 	}
 
-/**
- * $collections = array(
- * 	'1' => array(
- * 		'id' => '1',
- * 		'name' => 'test',
- * 	),
- * 	'2' => array(
- * 		'id' => '2',
- * 		'name' => 'test2',
- * 	),
- * );
- */
 	public function fetchGlobalCollections( $useruid, $page ) {
 		$collections    = array();
 		$items_per_page = 10;

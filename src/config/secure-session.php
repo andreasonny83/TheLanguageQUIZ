@@ -6,13 +6,14 @@ class SecureSessionHandler extends SessionHandler {
 
 	protected $key, $name, $cookie;
 
-	public function __construct( $key, $name = 'LQ_SESSION', $cookie = [] ) {
+	public function __construct( $key, $name = 'LQ_session', $cookie = [] ) {
 		$this->key    = $key;
 		$this->name   = $name;
 		$this->cookie = $cookie;
 
 		$this->cookie += [
-			'lifetime' => 0,
+			// 'lifetime' => 0,
+			'lifetime' => 1209600, // 2 weeks
 			'path'     => ini_get( 'session.cookie_path' ),
 			'domain'   => ini_get( 'session.cookie_domain' ),
 			'secure'   => isset( $_SERVER['HTTPS'] ),
@@ -48,6 +49,8 @@ class SecureSessionHandler extends SessionHandler {
 	}
 
 	public function forget() {
+		$this->start();
+
 		if ( session_id() === '' ) {
 			return false;
 		}

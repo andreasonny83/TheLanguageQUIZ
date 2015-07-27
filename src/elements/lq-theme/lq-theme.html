@@ -1,17 +1,30 @@
+<link rel="import" href="../polymer/polymer.html">
+
 <style is="custom-style">
 html {
 	-ms-text-size-adjust: 100%;
 	-webkit-text-size-adjust: 100%;
 	font-size: 16px;
 }
-html, body {
-	margin: 0px;
-	padding: 0px;
+body {
+	margin: 0;
+	padding: 0;
 	min-height: 100%;
 	color: #424242;
-	font-family: 'Roboto', sans-serif;
+	font-family: 'Roboto', 'Noto', sans-serif;
 	font-weight: 400;
-	background-color: var(--lq-primary-color-0);
+	font-size: 14px;
+	background-color: var(--lq-primary-1);
+	transition: opacity ease-in 1s;
+}
+body[unresolved] {
+	opacity: 0;
+	display: block;
+	overflow: hidden;
+	position: relative;
+}
+neon-animated-pages {
+	height: 100%;
 }
 h1, h2, h3, h4, h5, h6 {
 	font-weight: 400;
@@ -44,8 +57,31 @@ a:hover {
 	text-decoration: underline;
 }
 
+/**  Palette URL: http://paletton.com/#uid=73c0u0kllll52K6dctbtudvLT5D **/
 :root {
-	--lq-primary-color-0: #999;
-	--lq-primary-color-1: #AAAAAA;
+	--lq-primary-0: #246D5E;
+	--lq-primary-1: #AECEC8;
+	--lq-primary-2: #579589;
+	--lq-primary-3: #054538;
+	--lq-primary-4: #001D17;
+
+	--lq-secondary-1-0: #2C4870;
+	--lq-secondary-1-1: #B3BFD1;
+	--lq-secondary-1-2: #607799;
+	--lq-secondary-1-3: #0B2347;
+	--lq-secondary-1-4: #010D1E;
+
+	--lq-secondary-2-0: #AA8039;
+	--lq-secondary-2-1: #FFF0D7;
+	--lq-secondary-2-2: #E9C589;
+	--lq-secondary-2-3: #6B4708;
+	--lq-secondary-2-4: #2D1C00;
+
+	--lq-complement-0: #AA6539;
+	--lq-complement-1: #FFE7D7;
+	--lq-complement-2: #E9AE89;
+	--lq-complement-3: #6B2F08;
+	--lq-complement-4: #2D1200;
 }
+
 </style>

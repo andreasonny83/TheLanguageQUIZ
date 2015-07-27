@@ -131,7 +131,7 @@
 	<div class="tile small profile"><div class="box"><p>Profile</p></div></div>
 	<div class="tile small favourites"><div class="box"><p>Favourites</p></div></div>
 	<div class="tile small settings"><div class="box"><p>Settings</p></div></div>
-	<div class="tile small logout"><div class="box"><p>Logout</p></div></div>
+	<div class="tile small logout" on-tap="_logout"><div class="box"><p>Logout</p></div></div>
 	<div class="tile large global"><div class="box"><p>Global collections</p></div></div>
 	<div class="tile medium highlights"><div class="box"><p>Highlights</p></div></div>
 	<div class="tile large private"><div class="box"><p>Private Collections</p></div></div>
@@ -155,6 +155,10 @@
 
 		attached: function() {
 		},
+
+		_logout: function() {
+			this.fire( "logout" );
+		}
 
 	});
 

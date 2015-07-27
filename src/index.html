@@ -38,39 +38,82 @@
 
 	<!-- Web Components -->
 	<link rel="import" href="elements.html">
-
-	<style>
-	html, body {
-		margin: 0;
-		padding: 0;
-	}
-
-	neon-animated-pages {
-		height: 100%;
-	}
-	</style>
 </head>
-
 <body unresolved class="fullbleed layout vertical">
 	<template is="dom-bind" id="app">
-		<neon-animated-pages id="pages" selected="0">
-			<lq-page-home></lq-page-home>
+		<neon-animated-pages id="pages" selected="{{page_selected}}">
+			<lq-page-loading></lq-page-loading>
+			<lq-page-home on-logout="_logOut"></lq-page-home>
+			<lq-login on-login="_verifyLogIn"><lq-login>
 			<lq-page-full></lq-page-full>
 		</neon-animated-pages>
+
+		<iron-ajax
+			id="ajax_login"
+			method="POST"
+			url="api/login"
+			handle-as="json"
+			on-response="loginSucceed"
+			on-error="loginFailed">
+		</iron-ajax>
+		<iron-ajax
+			id="ajax_logout"
+			method="GET"
+			url="api/logout"
+			handle-as="json"
+			on-response="logOut">
+		</iron-ajax>
+
+
+		<paper-toast id="toast" text="{{toast_msg}}"></paper-toast>
 	</template>
 
-	<!-- build:js scripts/app.js -->
 	<script>
 	(function() {
-		var app = document.querySelector( '#app' );
+		var app  = document.querySelector( '#app' );
+
+		app.user = {
+			loggedIn: false
+		};
+		app.page_selected = 0;
+		app.toast_msg = "ciao";
+
+		app._verifyLogIn = function( credentials ) {
+			this.page_selected = 0;
+			this.$.ajax_login.body = "email=" + encodeURIComponent( credentials.detail.email ) + '&password=' + encodeURIComponent( credentials.detail.password );
+			this.$.ajax_login.generateRequest();
+		}
+
+		app.loginSucceed = function() {
+			this.page_selected = 1;
+			this.toast_msg = "You are now logged in";
+			this.$.toast.show();
+		}
+
+		app.loginFailed = function() {
+			this.page_selected = 2;
+			this.toast_msg = "Email address or password invalid";
+			this.$.toast.show();
+		}
+
+		app._logOut = function() {
+			this.$.ajax_logout.generateRequest();
+		}
+
+		app.logOut = function() {
+			this.page_selected = 2;
+			this.toast_msg = "You are now logged out";
+			this.$.toast.show();
+		}
 
 		app.addEventListener( 'dom-change', function() {
 			// auto-binding template is ready.
 			console.log('APP is ready');
+			this.page_selected = 2;
 		});
+
 	})();
 	</script>
-	<!-- endbuild-->
 
 </body>
 </html>
