@@ -171,7 +171,16 @@ Polymer({
         reg: {
             type: Object,
             notify: true,
-            value: function() { return {}; }
+            value: function() {
+                return {
+                    name: '',
+                    email: '',
+                    email_confirm: '',
+                    password: '',
+                    password_confirm: '',
+                    lang: "English",
+                };
+            }
         },
 
         animationConfig: {
@@ -203,9 +212,7 @@ Polymer({
         this.$.reg_email_confirm.invalid = false;
         this.$.reg_password.invalid = false;
         this.$.reg_password_confirm.invalid = false;
-        this.reg = {
-            "lang": "English"
-        };
+        this.reg.lang = "English";
     },
 
     _animateHeader: function( e ) {
@@ -288,7 +295,7 @@ Polymer({
                                     "&email="            + encodeURIComponent( this.reg.email ) +
                                     "&email_confirm="    + encodeURIComponent( this.reg.email_confirm ) +
                                     "&password="         + encodeURIComponent( this.reg.password ) +
-                                    "&password_confirm=" + encodeURIComponent( this.reg.password_confirm );
+                                    "&password_confirm=" + encodeURIComponent( this.reg.password_confirm ) +
                                     "&language="         + encodeURIComponent( this.reg.lang );
 
         this.$.ajax_register.generateRequest();
