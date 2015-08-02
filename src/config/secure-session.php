@@ -6,7 +6,7 @@ class SecureSessionHandler extends SessionHandler {
 
 	protected $key, $name, $cookie;
 
-	public function __construct( $key, $name = 'LQ_session', $cookie = [] ) {
+	public function __construct( $key, $name = 'LQ_session', $cookie = array() ) {
 		$this->key    = $key;
 		$this->name   = $name;
 		$this->cookie = $cookie;

@@ -20,6 +20,7 @@
     "polymer": "~1.0.6",
     "paper-elements": "PolymerElements/paper-elements#~1.0.1",
     "neon-animation": "PolymerElements/neon-animation#~1.0.6",
-    "iron-ajax": "PolymerElements/iron-ajax#~1.0.3"
+    "iron-ajax": "PolymerElements/iron-ajax#~1.0.3",
+    "polymer-cookie": "~0.1.2"
   }
 }

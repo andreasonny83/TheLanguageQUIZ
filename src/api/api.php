@@ -5,14 +5,14 @@ use \Config\Database\DbHandler;
 use Config\SecureSessionHandler;
 
 // For debug only
-ini_set( 'display_errors', 1 );
-error_reporting( E_ALL );
+// ini_set( 'display_errors', 1 );
+// error_reporting( E_ALL );
 
 \Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
 
-// For debug only
-$app->config( 'debug', true );
+// $app->config( 'debug', true ); // dev
+$app->config( 'debug', false );
 
 /**
  * Perform an API get status
@@ -51,7 +51,7 @@ $app->post(
 		// Dev only
 		// Sleep 3 seconds before processing the request
 		// to display the loader
-		sleep(2);
+		sleep(1);
 
 		// check for required params
 		verify_required_params( array( 'email', 'password' ) );
@@ -92,26 +92,130 @@ $app->post(
 );
 
 /**
+ * Register a new user
+ */
+$app->post(
+	'/register', function() use ( $app ) {
+		// Dev only
+		// Sleep 3 seconds before processing the request
+		// to display the loader
+		sleep(1);
+
+		// check for required params
+		verify_required_params( array(
+			'name',
+			'email',
+			'email_confirm',
+			'password',
+			'password_confirm',
+			'language'
+		));
+
+		// reading post params
+		$user = array(
+			'name'             => $app->request()->post( 'name' ),
+			'email'            => $app->request()->post( 'email' ),
+			'email_confirm'    => $app->request()->post( 'email_confirm' ),
+			'password'         => $app->request()->post( 'password' ),
+			'password_confirm' => $app->request()->post( 'password_confirm' ),
+			'language'         => $app->request()->post( 'language' ),
+		);
+
+		// prepare the answer
+		$response = array(
+			'request' => 'register'
+		);
+
+		// Sanitize data
+		$user['name']             = filter_var(  $user['name'], FILTER_SANITIZE_STRING );
+		$user['email']            = filter_var(  $user['email'], FILTER_SANITIZE_EMAIL );
+		$user['email_confirm']    = filter_var(  $user['email_confirm'], FILTER_SANITIZE_EMAIL );
+		$user['password']         = filter_var( $user['password'], FILTER_SANITIZE_STRING );
+		$user['password_confirm'] = filter_var( $user['password_confirm'], FILTER_SANITIZE_STRING );
+		$user['language']         = filter_var( $user['language'], FILTER_SANITIZE_STRING );
+
+		//Make sure the 2 emails are the same
+		if ( $user['email'] !== $user['email_confirm'] ) {
+			$response['error']   = true;
+			$response['message'] = 'Email verification failed.';
+			echoRespnse( 401, $response );
+			$app->stop();
+		}
+		//Make sure the 2 paswwords are the same
+		if ( $user['password'] !== $user['password_confirm'] ) {
+			$response['error']   = true;
+			$response['message'] = 'Password verification failed.';
+			echoRespnse( 401, $response );
+			$app->stop();
+		}
+
+		// Validate data
+		if ( ! ( filter_var( $user['email'], FILTER_VALIDATE_EMAIL ) ) ) {
+			$response['error']   = true;
+			$response['message'] = 'Email is not a not valid one';
+			echoRespnse( 401, $response );
+			$app->stop();
+		}
+
+		$db = new DbHandler();
+
+		// Try to register a new user
+		if ( $db->checkRegister( $user ) ) {
+			$response['error']    = false;
+			$response['register'] = true;
+
+			// Log the user in
+			if ( $db->checkLogin( $user['email'], $user['password'] ) ) {
+				$response['error'] = false;
+				$response['login'] = true;
+				echoRespnse( 200, $response );
+				$app->stop();
+			}
+			else {
+				$response['error']   = true;
+				$response['message'] = 'Forbidden';
+				echoRespnse( 401, $response );
+				$app->stop();
+			}
+		}
+		else {
+			$response['error']   = true;
+			$response['message'] = 'Another user with the same email already exists in the database.';
+			echoRespnse( 401, $response );
+			$app->stop();
+		}
+	}
+);
+
+/**
  * Log out
  * terminate the current session
  */
 $app->get(
 	'/logout', function() use ( $app ) {
 		// Dev only
-		// Sleep 3 seconds before processing the request
-		// to display the loader
 		sleep(1);
 
-		$user_session = $_COOKIE["LQ_session"];
+		$user_session = isset( $_COOKIE["LQ_session"] ) ? $_COOKIE["LQ_session"] : '';
 		$db           = new DbHandler();
-
-		$db->logOut( $user_session );
 
 		$response = array(
 			'request' => 'logout'
 		);
 
-		$response['error']   = false;
+		// If the session cookie is not set
+		// terminate the request
+		if ( $user_session === '' ) {
+			$response['error']      = true;
+			$response['logged_out'] = true;
+			$response['message']    = 'Impossible to get the required user information to perform a log out';
+
+			echoRespnse( 200, $response );
+			$app->stop();
+		}
+
+		$db->logOut( $user_session );
+		$response['error']      = false;
 		$response['logged_out'] = true;
 		echoRespnse( 200, $response );
 		$app->stop();

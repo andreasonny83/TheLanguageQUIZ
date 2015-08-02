@@ -56,4 +56,28 @@ In your src/config/db.config.php files, make sure the PATH is pointing to the co
 Now you should be able to render the project from inside your dist/ folder
 
 ## 6. Develop new code ##
-**Further information about how to configure your own environment are present on the Wiki section available at: [https://bitbucket.org/languagequiz/thelanguagequiz/wiki/Home](https://bitbucket.org/languagequiz/thelanguagequiz/wiki/Home)**
+
+### Project variables ###
+There are several Production/Development variables around the project.
+Make sure to set them properly every time you switch environment:
+
+* api/api.php
+
+```
+$app->config( 'debug', false );
+```
+Make sure to set the status to true while in development mode to ensure displaying any error message related to the API. A generic error message will generate while this status is set to false.
+
+* config/db_config.php
+
+This file contains the database information
+make sure to set it properly according to your database information
+
+* index.html
+
+```
+app.api_dir = "http://sonnywebdesign.com/languagequiz/";
+```
+This is a JavaScript variable used to generate all the Ajax request from the main App to the API. Make sure to set it properly according to your environment URL
+
+That's it for now.

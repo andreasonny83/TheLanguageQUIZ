@@ -43,65 +43,94 @@
 	<template is="dom-bind" id="app">
 		<neon-animated-pages id="pages" selected="{{page_selected}}">
 			<lq-page-loading></lq-page-loading>
-			<lq-page-home on-logout="_logOut"></lq-page-home>
-			<lq-login on-login="_verifyLogIn"><lq-login>
+			<lq-page-home
+				api-dir="{{api_dir}}"
+				on-loading="_loading"
+				on-logout="_logOut">
+			</lq-page-home>
+			<lq-login
+				id="LQlogin"
+				api-dir="{{api_dir}}"
+				on-loading="_loading"
+				on-register-succeed="_registerSucceed"
+				on-register-failed="_registerFailed"
+				on-login-succeed="_logInSucceed"
+				on-login-failed="_logInFailed"
+				on-login-redirect="_logInRedirect">
+			<lq-login>
 			<lq-page-full></lq-page-full>
 		</neon-animated-pages>
 
-		<iron-ajax
-			id="ajax_login"
-			method="POST"
-			url="api/login"
-			handle-as="json"
-			on-response="loginSucceed"
-			on-error="loginFailed">
-		</iron-ajax>
-		<iron-ajax
-			id="ajax_logout"
-			method="GET"
-			url="api/logout"
-			handle-as="json"
-			on-response="logOut">
-		</iron-ajax>
-
-
 		<paper-toast id="toast" text="{{toast_msg}}"></paper-toast>
+
+		<polymer-cookie
+			id="user_cookie"
+			name="lq_user_return"
+			value=true
+			time=14
+			format="d">
+		</polymer-cookie>
+
 	</template>
 
 	<script>
 	(function() {
 		var app  = document.querySelector( '#app' );
 
+		// Dev
+		// app.api_dir = "http://localhost:8888/TheLanguageQUIZ/dist/"; // Dev
+		app.api_dir = "http://sonnywebdesign.com/languagequiz/";
+
 		app.user = {
 			loggedIn: false
 		};
 		app.page_selected = 0;
-		app.toast_msg = "ciao";
 
-		app._verifyLogIn = function( credentials ) {
+		/**
+		 * Show the loader while process any API request
+		 */
+		app._loading = function() {
 			this.page_selected = 0;
-			this.$.ajax_login.body = "email=" + encodeURIComponent( credentials.detail.email ) + '&password=' + encodeURIComponent( credentials.detail.password );
-			this.$.ajax_login.generateRequest();
 		}
 
-		app.loginSucceed = function() {
+		/**
+		 * Redirect to the LogIn View
+		 */
+		app._logInRedirect = function() {
+			this.page_selected = 2;
+		}
+
+		app._registerSucceed = function() {
 			this.page_selected = 1;
-			this.toast_msg = "You are now logged in";
+			this.$.user_cookie.createCookie();
+			this.toast_msg = "Welcome! You are now register";
+			this.$.toast.show();
+			this.$.LQlogin.resetFields();
+		}
+
+		app._registerFailed = function() {
+			this.page_selected = 2;
+			this.toast_msg = "Please, check the entered details and try again.";
 			this.$.toast.show();
 		}
 
-		app.loginFailed = function() {
+		app._logInSucceed = function() {
+			this.page_selected = 1;
+			this.$.user_cookie.createCookie();
+			this.toast_msg = "You are now logged in";
+			this.$.toast.show();
+			this.$.LQlogin.resetFields();
+		}
+
+		app._logInFailed = function() {
 			this.page_selected = 2;
 			this.toast_msg = "Email address or password invalid";
 			this.$.toast.show();
 		}
 
 		app._logOut = function() {
-			this.$.ajax_logout.generateRequest();
-		}
-
-		app.logOut = function() {
 			this.page_selected = 2;
+			this.$.user_cookie.eraseCookie();
 			this.toast_msg = "You are now logged out";
 			this.$.toast.show();
 		}
@@ -109,7 +138,18 @@
 		app.addEventListener( 'dom-change', function() {
 			// auto-binding template is ready.
 			console.log('APP is ready');
-			this.page_selected = 2;
+
+			// If a session is already started,
+			// don't ask to log in again
+			var checkUserStatus = this.$.user_cookie.readCookie();
+
+			if ( checkUserStatus !== '' ) {
+				app.page_selected = 1;
+			}
+			else {
+				app.page_selected = 2;
+			}
+
 		});
 
 	})();

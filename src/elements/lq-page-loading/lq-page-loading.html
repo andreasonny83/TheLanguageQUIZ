@@ -3,16 +3,62 @@
 <dom-module id="lq-page-loading">
 <style>
 :host {
+    height: 100%;
+}
+.spinner-box-container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -50px;
+    margin-top: -50px;
+}
+.spinner-box {
+    padding: 50px;
+    text-align: center;
+    background-color: white;
+    border-radius: 50%;
+    @apply(--shadow-elevation-16dp);
+}
+.centered {
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 </style>
 
 <template>
-    <paper-spinner active='{{loading}}'></paper-spinner>
+    <div class="spinner-box-container">
+        <div class="spinner-box centered">
+            <paper-spinner active></paper-spinner>
+        </div>
+    </div>
 </template>
 
 <script>
 Polymer({
     is: 'lq-page-loading',
+
+    behaviors: [
+        Polymer.NeonAnimatableBehavior
+    ],
+
+    properties: {
+        animationConfig: {
+            type: Object,
+            value: function() {
+                return {
+                    'entry': {
+                        name: 'scale-up-animation',
+                        node: this
+                    },
+                    'exit': {
+                        name: 'scale-down-animation',
+                        node: this
+                    }
+                }
+            }
+        }
+    },
 
     ready: function() {
     },

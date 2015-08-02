@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../paper-styles/paper-styles.html">
+
 <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 
 <dom-module id="lq-page-home">
@@ -131,20 +131,53 @@
 	<div class="tile small profile"><div class="box"><p>Profile</p></div></div>
 	<div class="tile small favourites"><div class="box"><p>Favourites</p></div></div>
 	<div class="tile small settings"><div class="box"><p>Settings</p></div></div>
-	<div class="tile small logout" on-tap="_logout"><div class="box"><p>Logout</p></div></div>
+	<div class="tile small logout" on-tap="_logOut"><div class="box"><p>Logout</p></div></div>
 	<div class="tile large global"><div class="box"><p>Global collections</p></div></div>
 	<div class="tile medium highlights"><div class="box"><p>Highlights</p></div></div>
 	<div class="tile large private"><div class="box"><p>Private Collections</p></div></div>
 	<div class="tile medium scoreboard"><div class="box"><p>Scoreboard</p></div></div>
+
+	<iron-ajax
+		id="ajax_logout"
+		method="GET"
+		handle-as="json"
+		on-response="logOut">
+	</iron-ajax>
 </template>
 <script>
 	Polymer({
 		is: 'lq-page-home',
 
+		behaviors: [
+			Polymer.NeonAnimatableBehavior
+		],
+
 		properties: {
+			apiDir: {
+				type: String,
+				reflectToAttribute: true
+			},
+
 			userProfile: {
 				type: Object
+			},
+
+			animationConfig: {
+				type: Object,
+				value: function() {
+					return {
+						'entry': {
+							name: 'fade-in-animation',
+							node: this
+						},
+						'exit': {
+							name: 'fade-out-animation',
+							node: this
+						}
+					}
+				}
 			}
+
 		},
 
 		ready: function() {
@@ -156,7 +189,14 @@
 		attached: function() {
 		},
 
-		_logout: function() {
+		_logOut: function() {
+			this.fire( "loading" );
+			var ajax_url = this.apiDir + "api/logout";
+			this.$.ajax_logout.url = ajax_url;
+			this.$.ajax_logout.generateRequest();
+		},
+
+		logOut: function() {
 			this.fire( "logout" );
 		}
 

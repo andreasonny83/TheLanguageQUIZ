@@ -3,12 +3,12 @@
  * Database login details
  */
 define( 'DB_HOST', 'localhost' );
-define( 'DB_USERNAME', 'root' ); // Dev
-// define( 'DB_USERNAME', 'languageQUIZ' ); // sonnywebdesign.net
-define( 'DB_PASSWORD', 'root' ); // Dev
-// define( 'DB_PASSWORD', 'Nq8Gc%yrvvIl' ); // sonnywebdesign.net
-define( 'DB_NAME', 'jerry_lee' ); // Dev
-// define( 'DB_NAME', 'language_quiz' ); // sonnywebdesign.net
+// define( 'DB_USERNAME', 'root' ); // Dev
+define( 'DB_USERNAME', 'sonny883_lanQuiz' ); // languagequiz.sonnywebdesign.com
+// define( 'DB_PASSWORD', 'root' ); // Dev
+define( 'DB_PASSWORD', 'Nq8Gc%yrvvIl' ); // languagequiz.sonnywebdesign.com
+// define( 'DB_NAME', 'language_quiz' ); // Dev
+define( 'DB_NAME', 'sonny883_language_quiz' ); // languagequiz.sonnywebdesign.com
 
 define( 'SECURE', FALSE ); // FOR DEVELOPMENT ONLY
 
@@ -27,13 +27,5 @@ define( 'MASHAPE_API_PROD', 'wJtEBqFzlgmsh4ZPUdP6Y7PKLDMdp1N1qixjsnOshPPBiTsNFg'
  * Set with your own adress to make everithing working correctly
  * @var array
  */
-define( 'PATH', 'http://localhost:8888/language-quiz/dist' );
-define( 'API_PATH', 'http://localhost:8888/language-quiz/dist/api' );
-// define( 'PATH', 'http://sonnywebdesign.net/languagequiz' ); // sonnywebdesign.net
-// define( 'API_PATH', 'http://sonnywebdesign.net/languagequiz/api' ); // sonnywebdesign.net
-
-// Make sure to display any PHP error and warning
-ini_set( 'display_errors', 1 );
-ini_set( 'display_startup_errors', 1 );
-error_reporting( -1 );
+// define( 'PATH', 'http://localhost:8888/language-quiz/dist' );
 ?>

@@ -62,6 +62,7 @@ class DbHandler {
 			$stmt->store_result();
 			$stmt->bind_result( $db_id, $db_email, $db_password, $db_salt );
 			$stmt->fetch();
+
 			// Salt the input password with the salt from the database
 			$password = hash( 'sha512', $input_password );
 			$password = hash( 'sha512', $input_password . $db_salt );
@@ -112,6 +113,7 @@ class DbHandler {
 						// record this attempt in the database
 						$now = time();
 						$this->conn->query( "INSERT INTO LQ_login_attempts( user_id, time ) VALUES ( '$db_id', '$now' )" );
+
 						return false;
 					}
 				}
@@ -127,19 +129,77 @@ class DbHandler {
 			// can't perform the database request
 			return false;
 		}
+	}
 
+	public function checkRegister( $user ) {
+		if ( $stmt = $this->conn->prepare( 'SELECT id FROM LQ_users WHERE email = ? LIMIT 1' ) ) {
+			$stmt->bind_param( 's', $user['email'] );
+			$stmt->execute();
+			$stmt->bind_result( $db_id );
+			$stmt->fetch();
+
+			if ( $db_id ) {
+				// If a user with the same email already exists in the database
+				// Terminate the request
+				$stmt->close();
+				return false;
+			}
+			else {
+				$now = time();
+				// Until we set an email verification procedure
+				// All new user will automatically verified once created
+				$status = 1;
+				// Create a random salt
+				$random_salt = hash( 'sha512', uniqid( mt_rand( 1, mt_getrandmax() ), true ) );
+				// Create salted password
+				$password    = hash( 'sha512', $user['password'] . $random_salt );
+
+				// Register a new user
+				if ( $stmt = $this->conn->prepare( "INSERT INTO LQ_users(
+					status,
+					username,
+					email,
+					password,
+					salt,
+					registration )
+				VALUES (
+					?, ?, ?, ?, ?, ? )" ) ) {
+					$stmt->bind_param( 'issssi',
+						$status,
+						$user['name'],
+						$user['email'],
+						$password,
+						$random_salt,
+						$now );
+
+					if ( $stmt->execute() ) {
+						// Registration succeed
+						$stmt->close();
+						return true;
+					}
+				}
+			}
+
+			$stmt->close();
+			return false;
+		}
 	}
 
 	public function logOut( $user_session ) {
 		$now = time() + 2;
 
-		$this->conn->query( "UPDATE LQ_users
-				SET session_expiration='$now'
-				WHERE user_session_id='$user_session'"
-			);
+		//Expire the current session
+		if ( $stmt = $this->conn->prepare( "UPDATE LQ_users
+			SET session_expiration = ?
+			WHERE user_session_id = ?" ) ) {
+				$stmt->bind_param( 'ii', $now, $user_session );
+				$stmt->execute();
+		}
 
 		$this->session->forget();
 	}
+
+
 
 	/**
 	 * Fetching user by email

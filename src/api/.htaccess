@@ -1,24 +1,5 @@
-Options All -Indexes
-<IfModule mod_headers.c>
-	#Header add Access-Control-Allow-Origin "*"
-	#Header set Access-Control-Allow-Origin: http://localhost:8888
-	#Header set Access-Control-Allow-Credentials true
-	#Header add Access-Control-Allow-Headers "origin, x-requested-with, content-type"
-	#Header add Access-Control-Allow-Methods "PUT, GET, POST, DELETE, OPTIONS"
-</IfModule>
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteRule ^(.*)$ api.php [QSA,L]
 </IfModule>
-#
-# Old version
-#
-# AllowOverride FileInfo
-# DirectoryIndex index.php index.shtml index.html
-# <IfModule mod_rewrite.c>
-#	RewriteEngine On
-#	RewriteCond %{REQUEST_FILENAME} !-f
-#	RewriteCond %{REQUEST_FILENAME} !-d
-#	RewriteRule ^v1/(.*)$ v1/index.php?request=$1 [QSA,NC,L]
-# </IfModule>
