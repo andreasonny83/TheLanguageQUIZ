@@ -14,9 +14,10 @@
     top: 41px;
     left: 0;
     right: 0;
-    border-radius: 0 0 3px 3px;
     background-color: #fff;
     z-index: 10;
+    max-height: 192px;
+    overflow: auto;
 
     @apply(--shadow-elevation-4dp);
 }
@@ -28,7 +29,7 @@ paper-item {
     cursor: pointer;
 }
 paper-item paper-ripple {
-    color: #4285f4;
+    color: #487CCA;
 }
 .pos {
     display: none;
@@ -36,10 +37,10 @@ paper-item paper-ripple {
 </style>
 <template>
     <template is="dom-repeat" items="[[dataItems]]" as="language" index-as="language_pos">
-        <paper-item on-tap="_itemSelected">
+        <paper-item on-click="_itemSelected">
             <div>[[language]]</div>
             <input class="pos" value="[[language_pos]]">
-            <paper-ripple recenters></paper-ripple>
+            <paper-ripple center></paper-ripple>
         </paper-item>
     </template>
 </template>

@@ -19,12 +19,13 @@
     display: block;
     position: relative;
     height: 40px;
-    border-radius: 3px;
+    background-color: #CCC;
 
     @apply(--shadow-elevation-4dp);
 }
 paper-icon-item {
-    background-color: #fff;
+    background-color: #487CCA;
+    color: #fff;
     cursor: pointer;
 }
 paper-icon-item .selected {
@@ -34,6 +35,9 @@ paper-icon-item .selected {
     margin: 0;
     padding: 0 10px;
 }
+paper-icon-item .selected, paper-icon-item .flex {
+    background-color: rgba(255,255,255, .1);
+}
 paper-icon-item .icon {
     line-height: 40px;
     padding: 0 10px 0;
@@ -42,7 +46,7 @@ paper-icon-item .icon {
 <template>
     <p class="title">{{title}}</p>
     <div class="dropdown-box">
-        <paper-icon-item class="horizontal layout" on-tap="_toggleMenu">
+        <paper-icon-item class="horizontal layout" on-click="_toggleMenu">
             <div class="selected">{{selectedValue}}</div>
             <div class="flex"></div>
             <div class="icon">
@@ -82,6 +86,7 @@ Polymer({
     },
 
     _toggleMenu: function() {
+        console.log('tap');
         this.$.menu.toggle();
     },
 

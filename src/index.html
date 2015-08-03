@@ -40,6 +40,7 @@
 	<link rel="import" href="elements.html">
 </head>
 <body unresolved class="fullbleed layout vertical">
+	<span id="browser-sync-binding"></span>
 	<template is="dom-bind" id="app">
 		<neon-animated-pages id="pages" selected="{{page_selected}}">
 			<lq-page-loading></lq-page-loading>
@@ -78,8 +79,8 @@
 		var app  = document.querySelector( '#app' );
 
 		// Dev
-		// app.api_dir = "http://localhost:8888/TheLanguageQUIZ/dist/"; // Dev
-		app.api_dir = "http://sonnywebdesign.com/languagequiz/";
+		app.api_dir = "http://localhost:8888/TheLanguageQUIZ/dist/"; // Dev
+		// app.api_dir = "http://sonnywebdesign.com/languagequiz/";
 
 		app.user = {
 			loggedIn: false

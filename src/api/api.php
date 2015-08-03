@@ -11,8 +11,8 @@ use Config\SecureSessionHandler;
 \Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
 
-// $app->config( 'debug', true ); // dev
-$app->config( 'debug', false );
+$app->config( 'debug', true ); // Dev
+// $app->config( 'debug', false );
 
 /**
  * Perform an API get status
