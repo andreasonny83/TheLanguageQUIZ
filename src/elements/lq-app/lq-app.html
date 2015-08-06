@@ -1,0 +1,143 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="lq-app">
+<style is="custom-style">
+:host {
+    display: block;
+    height: 100%;
+}
+neon-animated-pages {
+    height: 100%;
+}
+</style>
+
+<template>
+    <neon-animated-pages id="pages" selected="{{page_selected}}">
+        <lq-splashscreen name="splash"></lq-splashscreen>
+        <lq-page-loading name="loading"></lq-page-loading>
+        <lq-page-home
+            api-dir="{{api_dir}}"
+            on-loading="_loading"
+            on-logout="_logOut">
+        </lq-page-home>
+        <lq-login
+            id="login"
+            api-dir="{{api_dir}}"
+            on-loading="_loading"
+            on-register-succeed="_registerSucceed"
+            on-register-failed="_registerFailed"
+            on-login-succeed="_logInSucceed"
+            on-login-failed="_logInFailed"
+            on-login-redirect="_logInRedirect">
+        </lq-login>
+        <lq-page-full></lq-page-full>
+    </neon-animated-pages>
+
+    <paper-toast id="toast" text="{{toast_msg}}"></paper-toast>
+
+    <polymer-cookie
+        id="user_cookie"
+        name="lq_user_return"
+        value=true
+        time=14
+        format="d">
+    </polymer-cookie>
+
+</template>
+
+<script>
+Polymer({
+    is: 'lq-app',
+
+    properties: {
+        page_selected: {
+            type: Number,
+            value: 0
+        }
+    },
+
+    created: function() {
+        this.readyTime = Date.now();
+    },
+
+    ready: function() {
+    },
+
+    attached: function() {
+        // Dev
+        this.api_dir = "http://localhost:8888/TheLanguageQUIZ/dist/"; // Dev
+        // app.api_dir = "http://sonnywebdesign.com/languagequiz/";
+
+        var elapsed = Date.now() - this.readyTime;
+        console.log(elapsed);
+        var t = 1500 - elapsed;
+
+        this.async( this.checkUser, t );
+
+        console.log('APP is ready');
+    },
+
+    checkUser: function() {
+        // If a session is already started,
+        // don't ask to log in again
+        var checkUserStatus = this.$.user_cookie.readCookie();
+
+        if ( checkUserStatus !== '' ) {
+            this.page_selected = 2;
+        }
+        else {
+            this.page_selected = 3;
+        }
+    },
+    /**
+    * Show the loader while process any API request
+    */
+    _loading: function() {
+        this.page_selected = 1;
+    },
+
+    /**
+    * Redirect to the LogIn View
+    */
+    _logInRedirect: function() {
+        this.page_selected = 3;
+    },
+
+    _registerSucceed: function() {
+        this.page_selected = 2;
+        this.$.user_cookie.createCookie();
+        this.toast_msg = "Welcome! You are now register";
+        this.$.toast.show();
+        this.$.login.resetFields();
+    },
+
+    _registerFailed: function() {
+        this.page_selected = 3;
+        this.toast_msg = "Please, check the entered details and try again.";
+        this.$.toast.show();
+    },
+
+    _logInSucceed: function() {
+        this.page_selected = 2;
+        this.$.user_cookie.createCookie();
+        this.toast_msg = "You are now logged in";
+        this.$.toast.show();
+        this.$.login.resetFields();
+    },
+
+    _logInFailed: function() {
+        this.page_selected = 3;
+        this.toast_msg = "Email address or password invalid";
+        this.$.toast.show();
+    },
+
+    _logOut: function() {
+        this.page_selected = 3;
+        this.$.user_cookie.eraseCookie();
+        this.toast_msg = "You are now logged out";
+        this.$.toast.show();
+    }
+
+});
+</script>
+</dom-module>

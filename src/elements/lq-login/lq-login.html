@@ -111,61 +111,52 @@ footer {
 </style>
 
 <template>
-    <paper-scroll-header-panel main condenses keep-condensed-header on-paper-header-transform="_animateHeader">
-        <paper-toolbar id="mainToolbar" class="tall">
-            <!-- Application name -->
-            <div class="middle middle-container center horizontal layout">
-                <div class="app-name">The LanguageQUIZ</div>
-            </div>
-        </paper-toolbar>
+    <div class="hero horizontal-section-container">
 
-        <!-- Main Content -->
-        <div class="hero horizontal-section-container">
-
-            <div class="login horizontal-section flex-4">
-                <h2>Log In</h2>
-                <paper-input id="login_email" required label="E-mail" autofocus type="email" error-message="enter a valid email address" value="{{email}}"></paper-input>
-                <paper-input id="login_password" label="Password" required minlength=6 type="password" error-message="password must be 6 minimum characters" value="{{password}}"></paper-input>
-                <div class="bottom">
-                    <paper-button raised class="colorful custom" on-tap="_verifyLogIn"><iron-icon icon="check"></iron-icon>ok</paper-button>
-                </div>
-            </div>
-
-            <div class="empty-space flex-auto"></div>
-
-                <div class="register horizontal-section flex-5">
-                    <h2>Register</h2>
-                    <paper-input id="reg_name" type="text" label="User name*" required pattern="[a-zA-Z0-9]+" minlength=5 value="{{reg.name}}" error-message="letters and number only. Minimun of 5 charaters"></paper-input>
-                    <paper-input id="reg_email" type="text" label="Email*" required value="{{reg.email}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="enter a valid email address"></paper-input>
-                    <paper-input id="reg_email_confirm" type="text" label="Re-enter email*" required value="{{reg.email_confirm}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="email address doesn't match"></paper-input>
-                    <paper-input id="reg_password" type="password" label="Password*" required pattern=".{6,}" value="{{reg.password}}" error-message="password must be 6 characters minimum."></paper-input>
-                    <paper-input id="reg_password_confirm" type="password" required label="Re-enter password*" minlength=6 value="{{reg.password_confirm}}" error-message="password doesn't match"></paper-input>
-                    <lq-dropdown id="language" title="I speak" selected-value={{reg.lang}}></lq-dropdown>
-                    <div class="bottom">
-                        <paper-button raised class="colorful custom" on-tap="_register">
-                            <iron-icon icon="check"></iron-icon>
-                            Register
-                        </paper-button>
-                    </div>
-                </div>
-
-        </div>
-
-        <div class="horizontal-section-container">
-            <div class="secondary flex">
-                <h2 class='centered'>
-                    some images and product description here
-                </h2>
+        <div class="login horizontal-section flex-4">
+            <h2>Log In</h2>
+            <paper-input id="login_email" required label="E-mail" autofocus type="email" error-message="enter a valid email address" value="{{email}}"></paper-input>
+            <paper-input id="login_password" label="Password" required minlength=6 type="password" error-message="password must be 6 minimum characters" value="{{password}}"></paper-input>
+            <div class="bottom">
+                <paper-button raised class="colorful custom" on-tap="_verifyLogIn"><iron-icon icon="check"></iron-icon>ok</paper-button>
             </div>
         </div>
 
-        <footer>
+        <div class="empty-space flex-auto"></div>
+
+        <div class="register horizontal-section flex-5">
+            <h2>Register</h2>
+            <paper-input id="reg_name" type="text" label="User name*" required pattern="[a-zA-Z0-9]+" minlength=5 value="{{reg.name}}" error-message="letters and number only. Minimun of 5 charaters"></paper-input>
+            <paper-input id="reg_email" type="text" label="Email*" required value="{{reg.email}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="enter a valid email address"></paper-input>
+            <paper-input id="reg_email_confirm" type="text" label="Re-enter email*" required value="{{reg.email_confirm}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="email address doesn't match"></paper-input>
+            <paper-input id="reg_password" type="password" label="Password*" required pattern=".{6,}" value="{{reg.password}}" error-message="password must be 6 characters minimum."></paper-input>
+            <paper-input id="reg_password_confirm" type="password" required label="Re-enter password*" minlength=6 value="{{reg.password_confirm}}" error-message="password doesn't match"></paper-input>
+            <lq-dropdown id="language" title="I speak" selected-value={{reg.lang}}></lq-dropdown>
+            <div class="bottom">
+                <paper-button raised class="colorful custom" on-tap="_register">
+                    <iron-icon icon="check"></iron-icon>
+                    Register
+                </paper-button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="horizontal-section-container">
+        <div class="secondary flex">
+            <h2 class='centered'>
+                some images and product description here
+            </h2>
+        </div>
+    </div>
+
+    <footer>
         <h2 class='centered'>
             Footer
         </h2>
-        </footer>
+    </footer>
 
-    </paper-scroll-header-panel>
 
     <iron-ajax
         id="ajax_login"
@@ -247,6 +238,7 @@ Polymer({
     },
 
     _animateHeader: function( e ) {
+        console.log('test');
         var appName = this.querySelector('.app-name');
         var middleContainer = this.querySelector('.middle-container');
         var detail = e.detail;
