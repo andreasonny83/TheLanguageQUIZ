@@ -1,11 +1,11 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <dom-module id="lq-profile-logo">
-<style is="custom-style">
+<style>
 :host {
+    display: inline-block;
     position: relative;
-    margin-left: 10px;
-    margin-right: 10px;
+    padding: 8px;
     outline: none;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     -webkit-user-select: none;
@@ -14,18 +14,6 @@
     user-select: none;
     cursor: pointer;
     z-index: 0;
-
-    -ms-flex-align: center;
-    -webkit-align-items: center;
-    align-items: center;
-
-    -ms-flex-direction: row;
-    -webkit-flex-direction: row;
-    flex-direction: row;
-
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
 }
 .avatar {
     --iron-icon-height: 40px;
@@ -38,16 +26,81 @@
     line-height: 50px;
     margin-right: 10px;
 }
+.dropdown-content {
+    @apply(--shadow-elevation-4dp);
+}
 </style>
 <template>
-    <span class="userName">User</span>
+    <span class="userName">{{user.username}}</span>
     <iron-icon
-        src="../../img/avatar.jpg"
+        on-tap="_dropdown"
+        src="[[user.pic]]"
         class="avatar">
     </iron-icon>
+    <iron-dropdown
+        id="profileDropdown"
+        horizontal-align="right">
+        <div class="dropdown-content">
+            <paper-menu id="dropdown">
+                <paper-item on-tap="_userProfile">Profile settings</paper-item>
+                <paper-item>Private collections</paper-item>
+                <paper-item on-tap="_userOptions">Options</paper-item>
+                <paper-item on-tap="_logOut">Log Out</paper-item>
+            </paper-menu>
+        </div>
+    </iron-dropdown>
+
+    <iron-ajax
+        id="ajax_logout"
+        method="GET"
+        handle-as="json"
+        on-response="logOut">
+    </iron-ajax>
 </template>
+
 <script>
 Polymer({
-    is: 'lq-profile-logo'
+    is: 'lq-profile-logo',
+
+    properties: {
+        user: {
+            type: Object
+        }
+    },
+
+    ready: function() {
+    },
+
+    _dropdown: function() {
+        this.$.profileDropdown.open();
+    },
+
+    _logOut: function(e) {
+        this.$.profileDropdown.close();
+        lqApp.$.pages.selected = 1; //loading
+        lqApp.$.user_cookie.eraseCookie();
+        lqApp.user = lqApp.userDefault;
+        this.$.ajax_logout.url = apiDir + "api/logout";
+        this.$.ajax_logout.generateRequest();
+    },
+
+    logOut: function() {
+        lqApp.update();
+        lqApp.$.toast.text = "You are now logged out";
+        lqApp.$.toast.show();
+    },
+
+    _userProfile: function() {
+        this.$.profileDropdown.close();
+        lqApp.$.pages.selected = 4; //page-full
+        lqApp.$.lqPageFull.$.fullPage.selected = 1;
+    },
+
+    _userOptions: function() {
+        this.$.profileDropdown.close();
+        lqApp.$.pages.selected = 4; //page-full
+        lqApp.$.lqPageFull.$.fullPage.selected = 2;
+    }
+
 });
 </script>

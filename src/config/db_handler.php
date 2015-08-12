@@ -87,11 +87,15 @@ class DbHandler {
 
 						$session_id = session_id();
 						$now        = time();
+						$lq_user    = hash( 'md5', time() . uniqid() . $db_email );
 
 						$this->conn->query( "UPDATE LQ_users
-								SET user_session_id='$session_id', session_expiration='$now'
+								SET lq_user='$lq_user', user_session_id='$session_id', session_expiration='$now'
 								WHERE id=$db_id"
 							);
+
+						// store the random lq_user into the user's cookie
+						setcookie( 'lq_user', $lq_user, time()+1209600, '/');
 
 						/**
 						 * TODO
@@ -183,6 +187,25 @@ class DbHandler {
 			$stmt->close();
 			return false;
 		}
+	}
+
+	public function getUser( $userId, $userSession ) {
+		if ( $stmt = $this->conn->prepare( 'SELECT
+			user_session_id, username, email, level, rank
+			FROM LQ_users WHERE lq_user = ? LIMIT 1' ) ) {
+			$stmt->bind_param( 's', $userId );
+			$stmt->execute();
+			$stmt->store_result();
+			$stmt->bind_result( $user_session_id, $username, $email, $level, $rank );
+			$stmt->fetch();
+
+			if ( $user_session_id === $userSession ) {
+				return array(
+					"username" => $username,
+				);
+			}
+		}
+
 	}
 
 	public function logOut( $user_session ) {

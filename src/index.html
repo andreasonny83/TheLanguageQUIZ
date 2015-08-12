@@ -8,13 +8,13 @@
 	<title>TheLanguageQUIZ</title>
 
 	<!-- Chrome for Android theme color -->
-	<meta name="theme-color" content="#303F9F">
+	<meta name="theme-color" content="#6C96C3">
 
 	<!-- Web Application Manifest -->
 	<link rel="manifest" href="manifest.json">
 
 	<!-- Tile color for Win8 -->
-	<meta name="msapplication-TileColor" content="#3372DF">
+	<meta name="msapplication-TileColor" content="#6C96C3">
 
 	<!-- Add to homescreen for Chrome on Android -->
 	<meta name="mobile-web-app-capable" content="yes">
@@ -30,6 +30,10 @@
 	<!-- Tile icon for Win8 (144x144) -->
 	<meta name="msapplication-TileImage" content="img/touch/ms-touch-icon-144x144-precomposed.png">
 
+	<script>
+		var readyTime = Date.now();
+	</script>
+
 	<!-- Stylesheet -->
 	<link rel="stylesheet" href="css/main.min.css">
 
@@ -42,7 +46,12 @@
 
 <body unresolved class="fullbleed layout vertical">
     <template is="dom-bind">
-        <lq-app></lq-app>
+        <lq-app id="lqApp"></lq-app>
     </template>
+
+	<script>
+		var apiDir = "http://localhost:8888/TheLanguageQUIZ/dist/"; //Dev
+		// var apiDir = "http://sonnywebdesign.com/languagequiz/";
+	</script>
 </body>
 </html>

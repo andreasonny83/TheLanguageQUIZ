@@ -187,6 +187,31 @@ $app->post(
 	}
 );
 
+$app->post(
+	'/user/:userid', function( $userid ) use ( $app ) {
+		sleep(1);
+		$response = array(
+			'request' => 'user'
+		);
+		$user = array();
+		$db   = new DbHandler();
+
+
+		$userSession = $app->getCookie('LQ_session');
+		$user = $db->getUser( $userid, $userSession );
+
+		if ( !empty( $user ) ) {
+			$response['error'] = false;
+			$response['user']  = $user;
+			echoRespnse( 200, $response );
+			$app->stop();
+		}
+
+		$response['error'] = true;
+		echoRespnse( 400, $response );
+		$app->stop();
+});
+
 /**
  * Log out
  * terminate the current session
