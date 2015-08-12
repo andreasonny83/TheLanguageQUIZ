@@ -74,8 +74,8 @@ Polymer({
 
     update: function() {
         this.user = {
-            'username': '',
-            'pic': ''
+            'username': 'user',
+            'pic': appDir + 'img/avatar.jpg'
         };
 
         this.userCookie = this.$.user_cookie.readCookie();
@@ -84,7 +84,7 @@ Polymer({
 
     cookieUpdate: function() {
         if ( this.userCookie && this.userCookie !== '' ) {
-            this.$.ajax_user.url = apiDir + "api/user/" + this.userCookie;
+            this.$.ajax_user.url = apiDir + "user/" + this.userCookie;
             this.$.ajax_user.generateRequest();
         }
     },

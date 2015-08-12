@@ -273,7 +273,7 @@ Polymer({
 
         lqApp.$.pages.selected = 1; //loading
 
-        var ajax_url = apiDir + "api/register";
+        var ajax_url = apiDir + "register";
         this.$.ajax_register.url = ajax_url;
         this.$.ajax_register.body = "name="              + encodeURIComponent( this.reg.name ) +
                                     "&email="            + encodeURIComponent( this.reg.email ) +
@@ -296,7 +296,7 @@ Polymer({
         if ( this.email.length > 0 && this.password.length > 0 && this.$.login_email.validate() && this.$.login_password.validate() ) {
             lqApp.$.pages.selected = 1; //loading
 
-            var ajax_url = apiDir + "api/login";
+            var ajax_url = apiDir + "login";
             this.$.ajax_login.url = ajax_url;
             this.$.ajax_login.body = "email=" + encodeURIComponent( this.email ) +
                                      "&password=" + encodeURIComponent( this.password );
