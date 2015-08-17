@@ -197,12 +197,40 @@ $app->post(
 		$db   = new DbHandler();
 
 
-		$userSession = $app->getCookie('LQ_session');
+		$userSession = $app->getCookie( 'LQ_session' );
 		$user = $db->getUser( $userid, $userSession );
 
 		if ( !empty( $user ) ) {
 			$response['error'] = false;
 			$response['user']  = $user;
+			echoRespnse( 200, $response );
+			$app->stop();
+		}
+
+		$response['error'] = true;
+		echoRespnse( 400, $response );
+		$app->stop();
+});
+
+$app->get(
+	'/user/:userid/collections/', function( $userid ) use ( $app ) {
+		sleep(2);
+
+		$page     = $app->request()->get( 'page' );
+		$page     = isset( $page ) ? $page : 0;
+		$user     = array();
+		$db       = new DbHandler();
+		$response = array(
+			'request' => 'collections'
+		);
+
+		$userSession = $app->getCookie( 'LQ_session' );
+		$collections = $db->getCollections( $userid, $userSession, $page );
+
+		if ( !empty( $collections ) ) {
+			$response['error'] = false;
+			$response['collections']  = $collections['collections'];
+			$response['loadMore']  = $collections['loadMore'];
 			echoRespnse( 200, $response );
 			$app->stop();
 		}

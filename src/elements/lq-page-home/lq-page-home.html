@@ -33,33 +33,13 @@ paper-toolbar paper-icon-button {
     margin: 0 8px;
 }
 .content {
-    min-height: 1000px;
+    padding: 10px;
+    max-width: 1000px;
+    margin: 0 auto;
 }
-.container {
-    padding: 5px;
+.horizontal-section-container {
     @apply(--layout-horizontal);
-    @apply(--layout-justified);
-    height: 120px;
-}
-.container2 {
-    padding: 0 5px 5px 5px;
-    @apply(--layout-horizontal);
-    @apply(--layout-justified);
-    height: 240px;
-}
-.tile {
-    margin: 10px;
-    text-align: center;
-    @apply(--layout-flex);
-    @apply(--shadow-elevation-2dp);
-}
-.tile_half {
-    margin: 10px;
-    text-align: center;
-    height: 50%;
-    @apply(--layout-self-end);
-    @apply(--layout-flex);
-    @apply(--shadow-elevation-2dp);
+    @apply(--layout-wrap);
 }
 </style>
 
@@ -77,17 +57,41 @@ paper-toolbar paper-icon-button {
 
         <!-- Main Content -->
         <div class="content">
-            <div class="container2">
-                <div class="tile global"><div class="box"><p>Global collections</p></div></div>
-                <div class="tile_half highlights"><div class="box"><p>Highlights</p></div></div>
+            <div class="horizontal-section-container">
+                <lq-tile large>
+                    <p>
+                        test
+                    </p>
+                </lq-tile>
             </div>
-            <div class="container">
-                <div class="tile large private"><div class="box"><p>Private Collections</p></div></div>
-                <div class="tile medium scoreboard"><div class="box"><p>Scoreboard</p></div></div>
+
+            <div class="horizontal-section-container">
+                <template is="dom-repeat" items="[[collections]]" as="collection">
+                    <lq-tile small>
+                        <p>
+                            test
+                        </p>
+                    </lq-tile>
+                </template>
             </div>
         </div>
 
+    <event-infinite-scroll on-reach-bottom="readCollections"></event-infinite-scroll>
+
     </paper-scroll-header-panel>
+
+    <iron-localstorage name="lq-global-collections"
+    id="lqCollections"
+    value="[[collections]]">
+    </iron-localstorage>
+
+    <iron-ajax
+		id="ajax_collections"
+		method="GET"
+		handle-as="json"
+		on-response="getCollections">
+	</iron-ajax>
+
 
 </template>
 
@@ -114,11 +118,55 @@ Polymer({
                     }
                 }
             }
+        },
+
+        collections: {
+            type: Array,
+            value: function() {
+                return [{
+                    uid: "",
+                    name: "",
+                    description: "",
+                    lang: "",
+                    rank: 0,
+                    score: 0,
+                    flash: 0,
+                    taboo: 0
+                }];
+            },
         }
     },
 
     ready: function() {
     },
+
+    readCollections: function() {
+        if ( ! this.busy ) {
+            this.busy = true;
+            this.$.ajax_collections.url = apiDir + "user/" + lqApp.userCookie + "/collections?page=" + collectionPage;
+            this.async( function() {
+                this.$.ajax_collections.generateRequest();
+            });
+        }
+    },
+
+    getCollections: function( e ) {
+        var that = this;
+        collectionPage++;
+
+        if ( e.detail.response && e.detail.response.collections ) {
+            if ( collectionPage !== 0 ) {
+                e.detail.response.collections.forEach(function( collection ) {
+                    that.push( 'collections', collection );
+                });
+            }
+            else {
+                this.collections = e.detail.response.collections;
+            }
+        }
+
+        this.busy = false;
+    }
 
 });
 </script>

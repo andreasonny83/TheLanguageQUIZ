@@ -56,6 +56,9 @@ Polymer({
     },
 
     ready: function() {
+        this.$.lqHome.addEventListener("scroll", function () {
+            console.log('e');
+        });
     },
 
     attached: function() {
@@ -106,6 +109,7 @@ Polymer({
         // don't ask to log in again
         if ( this.userCookie && this.userCookie !== '' ) {
             this.$.pages.selected = 3; //home
+            this.$.lqHome.readCollections();
         }
         else {
             this.$.pages.selected = 2; //login

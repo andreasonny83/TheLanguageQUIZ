@@ -1,0 +1,68 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="lq-tile">
+<style>
+:host {
+    display: block;
+
+}
+:host([small]) {
+    width: calc(33.33%);
+}
+:host([large]) {
+    width: 100%;
+}
+:host([small]) .tile-container {
+    height: 350px;
+}
+:host([large]) .tile-container {
+    height: 200px;
+}
+.tile-container {
+    background-color: white;
+    padding: 24px;
+    margin: 12px;
+    position: relative;
+
+    @apply(--shadow-elevation-2dp);
+}
+iron-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+:host([small]) iron-image {
+    right: 0;
+    height: 260px;
+}
+:host([large]) iron-image {
+    bottom: 0;
+    width: 50%;
+}
+</style>
+
+<template>
+    <div class="tile-container">
+        <iron-image preload src="[[background]]" sizing="cover"></iron-image>
+        <content></content>
+    </div>
+</template>
+
+<script>
+Polymer({
+    is: 'lq-tile',
+
+    properties: {
+        background: {
+            type: String,
+            value: "http://lorempixel.com/600/400"
+        }
+    },
+
+    ready: function() {
+    }
+
+});
+</script>
+
+<dom-module>

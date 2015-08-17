@@ -208,6 +208,47 @@ class DbHandler {
 
 	}
 
+	public function getCollections( $userId, $userSession, $page = 0 ) {
+		$collections    = array();
+		$items_per_page = 10;
+		$page           = $page * $items_per_page;
+		$loadMore       = true;
+
+		if ( $stmt = $this->conn->prepare( 'SELECT
+			uid, name, description, lang, rank, score, flash, taboo
+			FROM LQ_collections
+			WHERE status = 2 LIMIT ?, 10' ) ) {
+			$stmt->bind_param( 'd', $page );
+			$stmt->store_result();
+			$stmt->bind_result( $uid, $name, $description, $lang, $rank, $score, $flash, $taboo );
+			$stmt->execute();
+
+			while( $stmt->fetch() ) {
+				$collections[] = array(
+					'uid'         => $uid,
+					'name'        => $name,
+					'description' => $description,
+					'lang'        => $lang,
+					'rank'        => $rank,
+					'score'       => $score,
+					'flash'       => $flash,
+					'taboo'       => $taboo,
+				);
+			}
+
+			$stmt->close();
+		}
+
+		if ( sizeof( $collections ) < 10 ) {
+			$loadMore = false;
+		}
+
+		return array(
+			'collections' => $collections,
+			'loadMore' => $loadMore
+		);
+	}
+
 	public function logOut( $user_session ) {
 		$now = time() + 2;
 
@@ -223,25 +264,6 @@ class DbHandler {
 	}
 
 
-
-	/**
-	 * Fetching user by email
-	 * @param String $email User email id
-	 */
-	public function getUserUIDByEmail( $email ) {
-		$db_uid = '';
-
-		if ( $stmt = $this->conn->prepare( 'SELECT uid FROM LQ_users WHERE email = ? LIMIT 1' ) ) {
-			$stmt->bind_param( 's', $email );
-			$stmt->store_result();
-			$stmt->bind_result( $db_uid );
-			$stmt->execute();
-			$stmt->fetch();
-			$stmt->close();
-		}
-
-		return $db_uid;
-	}
 
 	public function fetchGlobalCollections( $useruid, $page ) {
 		$collections    = array();
