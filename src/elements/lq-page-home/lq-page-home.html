@@ -1,220 +1,173 @@
 <link rel="import" href="../polymer/polymer.html">
 
-<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-
 <dom-module id="lq-page-home">
 <style>
 :host {
-	display: block;
-	min-height: 900px;
-	max-width: 1200px;
-	margin: 145px auto 0;
+    display: block;
 }
+paper-scroll-header-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: var(--paper-grey-200, #eee);
 
-.tile {
-	float: left;
-	vertical-align: top;
-	background-color: var(--lq-primary-color-0);
-	position: relative;
-}
-.tile > .box {
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	margin: 0 15px 15px;
+    /* background for toolbar when it is at its full size */
+    --paper-scroll-header-panel-full-header: {
+        background-color: var(--lq-primary-0);
+    };
 
-	@apply(--shadow-transition);
-	@apply(--shadow-elevation-2dp);
+    /* background for toolbar when it is condensed */
+    --paper-scroll-header-panel-condensed-header: {
+        background-color: var(--lq-secondary-1-0);
+    };
 }
-.tile > .box:hover {
-	@apply(--shadow-elevation-8dp);
+paper-toolbar {
+    /* custom toolbar height */
+    height: 200px;
+    background-color: transparent;
+    overflow: visible;
 }
-
-#header {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	height: 128px;
-	z-index: 999;
-
-	@apply(--shadow-transition);
+paper-toolbar paper-icon-button {
+    margin: 0 8px;
 }
-#header.fixed {
-	@apply(--shadow-elevation-4dp);
+.content {
+    padding: 10px;
+    max-width: 1100px;
+    margin: 0 auto;
 }
-#header .title {
-	font-size: 24px;
+.horizontal-section-container {
+    @apply(--layout-horizontal);
+    @apply(--layout-wrap);
 }
-#header .userPic {
-	background-color:  var(--lq-primary-color-1);
-	border-radius: 50%;
-}
-#header .userName {
-	font-size: 21px;
-	margin-right: 10px;
-}
-/* colors */
-#header {
-	background-color: #ff3366;
-}
-.tile.global > .box {
-	background-color: #f1fafe;
-}
-.tile.highlights > .box {
-	background-color: #fefbe6;
-}
-.tile.private > .box {
-	background-color: #f2ffef;
-}
-.tile.scoreboard > .box {
-	background-color: #ffffff;
-}
-.tile.profile > .box {
-	background-color: #eff1ff;
-}
-.tile.favourites > .box {
-	background-color: #ffebeb;
-}
-.tile.settings > .box {
-	background-color: #dddddd;
-}
-.tile.logout > .box {
-	background-color: #deb3b3;
-}
-
-/* Media queries */
-@media (max-width: 699px) {
-	.tile {
-		width: 100%;
-		height: 300px;
-	}
-}
-
-@media (min-width: 700px) {
-	.tile.small {
-		width: calc(100% / 4);
-		height: calc(100% / 4);
-	}
-	.tile.medium {
-		width: calc(100% / 2);
-		height: calc(100% / 4);
-	}
-	.tile.large {
-		width: calc(100% / 2);
-		height: calc(100% / 2);
-	}
-	.tile.scoreboard {
-		position: absolute;
-		bottom: 0;
-	}
-}
-
 </style>
+
 <template>
-	<div id="header">
-		<div id="topBar" class="center horizontal layout toolbar-tools style-scope paper-toolbar">
-			<paper-icon-button icon="menu" role="button" tabindex="0" aria-disabled="false" class="x-scope paper-icon-button-0"></paper-icon-button>
-			<span class="title">The LanguageQUIZ</span>
-			<span class="flex"></span>
-			<p class="userName">username</p>
-			<img class="userPic" width="50px" height="50px" src="{{userProfile.profilePic}}">
-		</div>
-		<div id="bottomBar" class="center horizontal layout toolbar-tools style-scope paper-toolbar">
-			<span class="flex"></span>
-			<paper-icon-button icon="refresh" role="button" tabindex="0" aria-disabled="false" class="x-scope paper-icon-button-0">
-		</div>
-	</div>
+    <paper-scroll-header-panel condenses keep-condensed-header header-height="200" condensed-header-height="120">
+        <paper-toolbar>
+            <div class="title">The LanguageQUIZ</div>
+            <div class="flex"></div>
+            <lq-profile-logo id="lqProfile"></lq-profile-logo>
 
-	<div class="tile small profile"><div class="box"><p>Profile</p></div></div>
-	<div class="tile small favourites"><div class="box"><p>Favourites</p></div></div>
-	<div class="tile small settings"><div class="box"><p>Settings</p></div></div>
-	<div class="tile small logout" on-tap="_logOut"><div class="box"><p>Logout</p></div></div>
-	<div class="tile large global"><div class="box"><p>Global collections</p></div></div>
-	<div class="tile medium highlights"><div class="box"><p>Highlights</p></div></div>
-	<div class="tile large private"><div class="box"><p>Private Collections</p></div></div>
-	<div class="tile medium scoreboard"><div class="box"><p>Scoreboard</p></div></div>
+            <paper-icon-button class="bottom social" icon="assessment"></paper-icon-button>
+            <div class="bottom flex"></div>
+            <paper-icon-button class="bottom" icon="favorite"></paper-icon-button>
+        </paper-toolbar>
 
-	<iron-ajax
-		id="ajax_logout"
+        <!-- Main Content -->
+        <div class="content">
+            <div class="horizontal-section-container">
+                <lq-tile large image="http://placehold.it/900x300">
+                    <p>
+                        test
+                    </p>
+                </lq-tile>
+            </div>
+
+            <div class="horizontal-section-container">
+                <template is="dom-repeat" items="[[collections]]" as="collection">
+                    <lq-tile small
+                        title=[[collection.name]]
+                        image="http://placehold.it/350x250">
+                        <p class="description">[[collection.description]]</p>
+                    </lq-tile>
+                </template>
+                <lq-tile id="titleLoading" loading></lq-tile>
+            </div>
+        </div>
+
+    <event-infinite-scroll
+        auto-start
+        scroll-offset="300"
+        loading-delay="500"
+        on-reach-bottom="readCollections">
+    </event-infinite-scroll>
+
+    </paper-scroll-header-panel>
+
+    <iron-localstorage name="lq-global-collections"
+    id="lqCollections"
+    value="[[collections]]">
+    </iron-localstorage>
+
+    <iron-ajax
+		id="ajax_collections"
 		method="GET"
 		handle-as="json"
-		on-response="logOut">
+		on-response="getCollections">
 	</iron-ajax>
+
+
 </template>
+
 <script>
-	Polymer({
-		is: 'lq-page-home',
+Polymer({
+    is: 'lq-page-home',
 
-		behaviors: [
-			Polymer.NeonAnimatableBehavior
-		],
+    behaviors: [
+        Polymer.NeonAnimatableBehavior
+    ],
 
-		properties: {
-			apiDir: {
-				type: String,
-				reflectToAttribute: true
-			},
+    properties: {
+        animationConfig: {
+            type: Object,
+            value: function() {
+                return {
+                    'entry': {
+                        name: 'fade-in-animation',
+                        node: this
+                    },
+                    'exit': {
+                        name: 'fade-out-animation',
+                        node: this
+                    }
+                }
+            }
+        },
 
-			userProfile: {
-				type: Object
-			},
+        collections: {
+            type: Array,
+            value: function() {
+                return [];
+            },
+        }
+    },
 
-			animationConfig: {
-				type: Object,
-				value: function() {
-					return {
-						'entry': {
-							name: 'fade-in-animation',
-							node: this
-						},
-						'exit': {
-							name: 'fade-out-animation',
-							node: this
-						}
-					}
-				}
-			}
+    ready: function() {
+    },
 
-		},
+    readCollections: function() {
+        if ( ! this.busy ) {
+            this.busy = true;
+            this.$.titleLoading.toggleAttribute( 'active', true );
+            this.$.ajax_collections.url = apiDir + "user/" + lqApp.userCookie + "/collections?page=" + collectionPage;
 
-		ready: function() {
-			this.userProfile = {
-				profilePic: "http://www.phantomshockey.com/wp-content/uploads/2014/07/profile-icon.png",
-			};
-		},
+            this.async( function() {
+                this.$.ajax_collections.generateRequest();
+            }, 500);
+        }
+    },
 
-		attached: function() {
-		},
+    getCollections: function( e ) {
+        var that = this;
 
-		_logOut: function() {
-			this.fire( "loading" );
-			var ajax_url = this.apiDir + "api/logout";
-			this.$.ajax_logout.url = ajax_url;
-			this.$.ajax_logout.generateRequest();
-		},
+        if ( e.detail.response && e.detail.response.collections ) {
+            e.detail.response.collections.forEach(function( collection ) {
+                that.push( 'collections', collection );
+            });
 
-		logOut: function() {
-			this.fire( "logout" );
-		}
+            if ( e.detail.response.loadMore ) {
+                collectionPage++;
+                this.busy = false;
+            }
 
-	});
+        }
 
-	// Using jQuery to animate the header
-	$( document ).ready( function() {
-		$( window ).scroll( function( pos ) {
-			if (  $( window ).scrollTop() > 0 ) {
-				if( ! $( '#header' ).hasClass( 'fixed' ) ) {
-					$( '#header' ).addClass( 'fixed' );
-				}
-			}
-			else {
-				$( '#header' ).removeClass( 'fixed' );
-			}
-		});
-	});
+        this.$.titleLoading.toggleAttribute( 'active', false );
+    }
+
+});
 </script>
 
 <dom-module>

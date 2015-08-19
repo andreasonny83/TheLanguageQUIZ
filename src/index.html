@@ -8,13 +8,13 @@
 	<title>TheLanguageQUIZ</title>
 
 	<!-- Chrome for Android theme color -->
-	<meta name="theme-color" content="#303F9F">
+	<meta name="theme-color" content="#6C96C3">
 
 	<!-- Web Application Manifest -->
 	<link rel="manifest" href="manifest.json">
 
 	<!-- Tile color for Win8 -->
-	<meta name="msapplication-TileColor" content="#3372DF">
+	<meta name="msapplication-TileColor" content="#6C96C3">
 
 	<!-- Add to homescreen for Chrome on Android -->
 	<meta name="mobile-web-app-capable" content="yes">
@@ -30,6 +30,10 @@
 	<!-- Tile icon for Win8 (144x144) -->
 	<meta name="msapplication-TileImage" content="img/touch/ms-touch-icon-144x144-precomposed.png">
 
+	<script>
+		var readyTime = Date.now();
+	</script>
+
 	<!-- Stylesheet -->
 	<link rel="stylesheet" href="css/main.min.css">
 
@@ -39,122 +43,18 @@
 	<!-- Web Components -->
 	<link rel="import" href="elements.html">
 </head>
+
 <body unresolved class="fullbleed layout vertical">
-	<span id="browser-sync-binding"></span>
-	<template is="dom-bind" id="app">
-		<neon-animated-pages id="pages" selected="{{page_selected}}">
-			<lq-page-loading></lq-page-loading>
-			<lq-page-home
-				api-dir="{{api_dir}}"
-				on-loading="_loading"
-				on-logout="_logOut">
-			</lq-page-home>
-			<lq-login
-				id="LQlogin"
-				api-dir="{{api_dir}}"
-				on-loading="_loading"
-				on-register-succeed="_registerSucceed"
-				on-register-failed="_registerFailed"
-				on-login-succeed="_logInSucceed"
-				on-login-failed="_logInFailed"
-				on-login-redirect="_logInRedirect">
-			<lq-login>
-			<lq-page-full></lq-page-full>
-		</neon-animated-pages>
-
-		<paper-toast id="toast" text="{{toast_msg}}"></paper-toast>
-
-		<polymer-cookie
-			id="user_cookie"
-			name="lq_user_return"
-			value=true
-			time=14
-			format="d">
-		</polymer-cookie>
-
-	</template>
+    <template is="dom-bind">
+        <lq-app id="lqApp"></lq-app>
+    </template>
 
 	<script>
-	(function() {
-		var app  = document.querySelector( '#app' );
-
-		// Dev
-		app.api_dir = "http://localhost:8888/TheLanguageQUIZ/dist/"; // Dev
-		// app.api_dir = "http://sonnywebdesign.com/languagequiz/";
-
-		app.user = {
-			loggedIn: false
-		};
-		app.page_selected = 0;
-
-		/**
-		 * Show the loader while process any API request
-		 */
-		app._loading = function() {
-			this.page_selected = 0;
-		}
-
-		/**
-		 * Redirect to the LogIn View
-		 */
-		app._logInRedirect = function() {
-			this.page_selected = 2;
-		}
-
-		app._registerSucceed = function() {
-			this.page_selected = 1;
-			this.$.user_cookie.createCookie();
-			this.toast_msg = "Welcome! You are now register";
-			this.$.toast.show();
-			this.$.LQlogin.resetFields();
-		}
-
-		app._registerFailed = function() {
-			this.page_selected = 2;
-			this.toast_msg = "Please, check the entered details and try again.";
-			this.$.toast.show();
-		}
-
-		app._logInSucceed = function() {
-			this.page_selected = 1;
-			this.$.user_cookie.createCookie();
-			this.toast_msg = "You are now logged in";
-			this.$.toast.show();
-			this.$.LQlogin.resetFields();
-		}
-
-		app._logInFailed = function() {
-			this.page_selected = 2;
-			this.toast_msg = "Email address or password invalid";
-			this.$.toast.show();
-		}
-
-		app._logOut = function() {
-			this.page_selected = 2;
-			this.$.user_cookie.eraseCookie();
-			this.toast_msg = "You are now logged out";
-			this.$.toast.show();
-		}
-
-		app.addEventListener( 'dom-change', function() {
-			// auto-binding template is ready.
-			console.log('APP is ready');
-
-			// If a session is already started,
-			// don't ask to log in again
-			var checkUserStatus = this.$.user_cookie.readCookie();
-
-			if ( checkUserStatus !== '' ) {
-				app.page_selected = 1;
-			}
-			else {
-				app.page_selected = 2;
-			}
-
-		});
-
-	})();
+		// var appDir = "http://localhost:8888/TheLanguageQUIZ/dist/"; //Dev
+		// var apiDir = "http://localhost:8888/TheLanguageQUIZ/dist/api/"; //Dev
+		var appDir = "http://sonnywebdesign.com/languagequiz/";
+		var apiDir = "http://sonnywebdesign.com/languagequiz/api/";
+		var collectionPage = 0;
 	</script>
-
 </body>
 </html>

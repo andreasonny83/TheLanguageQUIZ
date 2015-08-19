@@ -5,28 +5,6 @@
 <style>
 :host {
 }
-paper-scroll-header-panel {
-    height: 100%;
-}
-paper-toolbar.tall .app-name {
-    font-size: 40px;
-    font-weight: 300;
-    /* Required for main area's paper-scroll-header-panel custom condensing transformation */
-    -webkit-transform-origin: left center;
-    transform-origin: left center;
-}
-#mainToolbar {
-    background-color: var(--lq-primary-0);
-}
-#mainToolbar .middle-container  {
-    height: 100%;
-    margin-left: 48px;
-}
-
-#mainToolbar:not(.tall) .middle {
-    font-size: 18px;
-    padding-bottom: 0;
-}
 .bottom {
     margin-top: 40px;
     padding-top: 20px;
@@ -78,6 +56,7 @@ paper-button[raised].colorful {
 .flex-section {
     @apply(--layout-flex);
 }
+
 @media (max-width: 639px) {
     .hero {
         padding-left: 5px;
@@ -111,61 +90,51 @@ footer {
 </style>
 
 <template>
-    <paper-scroll-header-panel main condenses keep-condensed-header on-paper-header-transform="_animateHeader">
-        <paper-toolbar id="mainToolbar" class="tall">
-            <!-- Application name -->
-            <div class="middle middle-container center horizontal layout">
-                <div class="app-name">The LanguageQUIZ</div>
-            </div>
-        </paper-toolbar>
+    <div class="hero horizontal-section-container">
 
-        <!-- Main Content -->
-        <div class="hero horizontal-section-container">
-
-            <div class="login horizontal-section flex-4">
-                <h2>Log In</h2>
-                <paper-input id="login_email" required label="E-mail" autofocus type="email" error-message="enter a valid email address" value="{{email}}"></paper-input>
-                <paper-input id="login_password" label="Password" required minlength=6 type="password" error-message="password must be 6 minimum characters" value="{{password}}"></paper-input>
-                <div class="bottom">
-                    <paper-button raised class="colorful custom" on-tap="_verifyLogIn"><iron-icon icon="check"></iron-icon>ok</paper-button>
-                </div>
-            </div>
-
-            <div class="empty-space flex-auto"></div>
-
-                <div class="register horizontal-section flex-5">
-                    <h2>Register</h2>
-                    <paper-input id="reg_name" type="text" label="User name*" required pattern="[a-zA-Z0-9]+" minlength=5 value="{{reg.name}}" error-message="letters and number only. Minimun of 5 charaters"></paper-input>
-                    <paper-input id="reg_email" type="text" label="Email*" required value="{{reg.email}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="enter a valid email address"></paper-input>
-                    <paper-input id="reg_email_confirm" type="text" label="Re-enter email*" required value="{{reg.email_confirm}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="email address doesn't match"></paper-input>
-                    <paper-input id="reg_password" type="password" label="Password*" required pattern=".{6,}" value="{{reg.password}}" error-message="password must be 6 characters minimum."></paper-input>
-                    <paper-input id="reg_password_confirm" type="password" required label="Re-enter password*" minlength=6 value="{{reg.password_confirm}}" error-message="password doesn't match"></paper-input>
-                    <lq-dropdown id="language" title="I speak" selected-value={{reg.lang}}></lq-dropdown>
-                    <div class="bottom">
-                        <paper-button raised class="colorful custom" on-tap="_register">
-                            <iron-icon icon="check"></iron-icon>
-                            Register
-                        </paper-button>
-                    </div>
-                </div>
-
-        </div>
-
-        <div class="horizontal-section-container">
-            <div class="secondary flex">
-                <h2 class='centered'>
-                    some images and product description here
-                </h2>
+        <div class="login horizontal-section flex-4">
+            <h2>Log In</h2>
+            <paper-input id="login_email" required label="E-mail" autofocus type="email" error-message="enter a valid email address" value="{{email}}"></paper-input>
+            <paper-input id="login_password" label="Password" required minlength=6 type="password" error-message="password must be 6 minimum characters" value="{{password}}"></paper-input>
+            <div class="bottom">
+                <paper-button raised class="colorful custom" on-tap="_verifyLogIn"><iron-icon icon="check"></iron-icon>ok</paper-button>
             </div>
         </div>
 
-        <footer>
+        <div class="empty-space flex-auto"></div>
+
+        <div class="register horizontal-section flex-5">
+            <h2>Register</h2>
+            <paper-input id="reg_name" type="text" label="User name*" required pattern="[a-zA-Z0-9]+" minlength=5 value="{{reg.name}}" error-message="letters and number only. Minimun of 5 charaters"></paper-input>
+            <paper-input id="reg_email" type="text" label="Email*" required value="{{reg.email}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="enter a valid email address"></paper-input>
+            <paper-input id="reg_email_confirm" type="text" label="Re-enter email*" required value="{{reg.email_confirm}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="email address doesn't match"></paper-input>
+            <paper-input id="reg_password" type="password" label="Password*" required pattern=".{6,}" value="{{reg.password}}" error-message="password must be 6 characters minimum."></paper-input>
+            <paper-input id="reg_password_confirm" type="password" required label="Re-enter password*" minlength=6 value="{{reg.password_confirm}}" error-message="password doesn't match"></paper-input>
+            <lq-dropdown id="language" title="I speak" selected-value={{reg.lang}}></lq-dropdown>
+            <div class="bottom">
+                <paper-button raised class="colorful custom" on-tap="_register">
+                    <iron-icon icon="check"></iron-icon>
+                    Register
+                </paper-button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="horizontal-section-container">
+        <div class="secondary flex">
+            <h2 class='centered'>
+                some images and product description here
+            </h2>
+        </div>
+    </div>
+
+    <footer>
         <h2 class='centered'>
             Footer
         </h2>
-        </footer>
-
-    </paper-scroll-header-panel>
+    </footer>
 
     <iron-ajax
         id="ajax_login"
@@ -194,11 +163,6 @@ Polymer({
     ],
 
     properties: {
-        apiDir: {
-            type: String,
-            reflectToAttribute: true
-        },
-
         reg: {
             type: Object,
             notify: true,
@@ -243,38 +207,19 @@ Polymer({
         this.$.reg_email_confirm.invalid = false;
         this.$.reg_password.invalid = false;
         this.$.reg_password_confirm.invalid = false;
-        this.reg.lang = "English";
-    },
-
-    _animateHeader: function( e ) {
-        var appName = this.querySelector('.app-name');
-        var middleContainer = this.querySelector('.middle-container');
-        var detail = e.detail;
-        var heightDiff = detail.height - detail.condensedHeight;
-        var yRatio = Math.min(1, detail.y / heightDiff);
-
-        // appName max size when condensed. The smaller the number the smaller the condensed size.
-        var maxMiddleScale = 0.50;
-        var scaleMiddle = Math.max(maxMiddleScale, (heightDiff - detail.y) / (heightDiff / (1-maxMiddleScale))  + maxMiddleScale);
-
-        // Move/translate middleContainer
-        this.transform('translate3d(0,' + yRatio * 100 + '%,0)', middleContainer);
-
-        // Scale middleContainer appName
-        this.transform('scale(' + scaleMiddle + ') translateZ(0)', appName);
     },
 
     /**
      * Reset text fields once logged-in
      */
     resetFields: function() {
-        this.email = '';
+        this.email    = '';
         this.password = '';
-        this.reg = {
-            name: '',
-            email: '',
-            email_confirm: '',
-            password: '',
+        this.reg      = {
+            name:             '',
+            email:            '',
+            email_confirm:    '',
+            password:         '',
             password_confirm: '',
         };
     },
@@ -285,11 +230,14 @@ Polymer({
 
     _verifyEmail: function( email, email_confirm ) {
         this.$.reg_email.validate();
+
         // return error if the value is not matching the element requirements
         this.$.reg_email_confirm.validate();
         if ( this.$.reg_email_confirm.invalid ) return;
+
         // Verify if the entered email match the other one
         this.$.reg_email_confirm.invalid = true;
+
         if ( email === email_confirm ) {
             this.$.reg_email_confirm.invalid = false;
         }
@@ -297,11 +245,15 @@ Polymer({
 
     _verifyPassword: function( password, password_confirm ) {
         this.$.reg_password.validate();
+
         // return error if the value is not matching the element requirements
         this.$.reg_password_confirm.validate();
+
         if ( this.$.reg_password_confirm.invalid ) return;
+
         // Verify if the entered password match the other one
         this.$.reg_password_confirm.invalid = true;
+
         if ( password === password_confirm ) {
             this.$.reg_password_confirm.invalid = false;
         }
@@ -319,8 +271,9 @@ Polymer({
             return;
         }
 
-        this.fire( "loading" );
-        var ajax_url = this.apiDir + "api/register";
+        lqApp.$.pages.selected = 1; //loading
+
+        var ajax_url = apiDir + "register";
         this.$.ajax_register.url = ajax_url;
         this.$.ajax_register.body = "name="              + encodeURIComponent( this.reg.name ) +
                                     "&email="            + encodeURIComponent( this.reg.email ) +
@@ -341,36 +294,45 @@ Polymer({
         this.$.login_password.validate();
 
         if ( this.email.length > 0 && this.password.length > 0 && this.$.login_email.validate() && this.$.login_password.validate() ) {
-            this.fire( "loading" );
-            var ajax_url = this.apiDir + "api/login";
+            lqApp.$.pages.selected = 1; //loading
+
+            var ajax_url = apiDir + "login";
             this.$.ajax_login.url = ajax_url;
             this.$.ajax_login.body = "email=" + encodeURIComponent( this.email ) +
                                      "&password=" + encodeURIComponent( this.password );
+
             this.$.ajax_login.generateRequest();
         }
         else {
-            this.fire( "login-redirect" );
+            lqApp.$.pages.selected = 2; //login
         }
     },
 
     registerSucceed: function() {
-        this.fire( "register-succeed" );
+        lqApp.update();
+        lqApp.$.toast.text = "Welcome! You are now register";
+        lqApp.$.toast.show();
+        this.resetFields();
     },
 
     registerFailed: function() {
-        this.fire( "register-failed" );
+        lqApp.update();
+        lqApp.$.toast.text = "Please, check the entered details and try again.";
+        lqApp.$.toast.show();
     },
 
     loginSucceed: function() {
-        this.fire( "login-succeed" );
+        lqApp.update();
+        this.resetFields();
     },
 
     loginFailed: function() {
-        this.fire( "login-failed" );
+        lqApp.update();
+        lqApp.$.toast.text = "Email address or password invalid";
+        lqApp.$.toast.show();
     },
 
 });
-
 </script>
 
 <dom-module>

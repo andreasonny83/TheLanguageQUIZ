@@ -1,0 +1,123 @@
+<link rel="import" href="../polymer/polymer.html">
+dom-module
+<dom-module id="lq-app">
+<style>
+:host {
+    display: block;
+    height: 100%;
+}
+neon-animated-pages {
+    height: 100%;
+}
+</style>
+
+<template>
+    <neon-animated-pages id="pages" selected=0>
+        <lq-splashscreen id="lqSplash"></lq-splashscreen>
+        <lq-page-loading id="lqLoading"></lq-page-loading>
+        <lq-login id="lqLogin"></lq-login>
+        <lq-page-home id="lqHome"></lq-page-home>
+        <lq-page-full id="lqPageFull"></lq-page-full>
+    </neon-animated-pages>
+
+    <paper-toast id="toast" text=""></paper-toast>
+
+    <polymer-cookie
+        id="user_cookie"
+        name="lq_user"
+        value=true
+        time=14
+        format="d">
+    </polymer-cookie>
+
+    <iron-ajax
+		id="ajax_user"
+		method="POST"
+		handle-as="json"
+        on-error="logOut"
+		on-response="getUser">
+	</iron-ajax>
+
+</template>
+
+<script>
+Polymer({
+    is: 'lq-app',
+
+    properties: {
+        userCookie: {
+            type: String,
+            observer: "cookieUpdate"
+        },
+
+        user: {
+            type: Object,
+            observer: "userUpdate"
+        }
+    },
+
+    attached: function() {
+        var elapsed = Date.now() - readyTime;
+        console.log('Loading time: ' + elapsed);
+        var t = 2500 - elapsed;
+        // Minimum time for displaying the splashscreen
+        // is set to 2 second
+        if ( t < 2000 ) {
+            t = 2000;
+        }
+
+        this.async( this.update, t );
+        console.log('APP is ready');
+    },
+
+    update: function() {
+        this.user = {
+            'username': 'user',
+            'pic': appDir + 'img/avatar.jpg'
+        };
+
+        this.userCookie = this.$.user_cookie.readCookie();
+        this.checkUser();
+    },
+
+    cookieUpdate: function() {
+        if ( this.userCookie && this.userCookie !== '' ) {
+            this.$.ajax_user.url = apiDir + "user/" + this.userCookie;
+            this.$.ajax_user.generateRequest();
+        }
+    },
+
+    getUser: function( e ) {
+        if ( e.detail.response.user ) {
+            this.user = e.detail.response.user;
+            this.$.toast.text = "Welcome back " + this.user.username;
+            this.$.toast.show();
+        }
+    },
+
+    logOut: function() {
+        lqApp.$.user_cookie.eraseCookie();
+        lqApp.update();
+        lqApp.$.toast.text = "You are now logged out";
+        lqApp.$.toast.show();
+    },
+
+    userUpdate: function() {
+        this.$.lqHome.$.lqProfile.user = this.$.lqPageFull.$.lqProfile.user = this.user;
+    },
+
+    checkUser: function() {
+        // If a session is already started,
+        // don't ask to log in again
+        if ( this.userCookie && this.userCookie !== '' ) {
+            this.$.pages.selected = 3; //home
+            this.$.lqHome.readCollections();
+        }
+        else {
+            this.$.pages.selected = 2; //login
+        }
+    },
+
+});
+</script>
+</dom-module>

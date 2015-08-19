@@ -43,8 +43,6 @@ This project uses Polymer. The recommended way to install TheLanguageQuiz is thr
 From a terminal windows, navigate inside the "src" folder (eg. ~/username/thelanguagequiz/src/ ) and install all the bower dependencies running:
 
 ```
-#!python
-
 bower update
 ```
 This updates all packages in bower_components/ to the latest stable version.
@@ -76,8 +74,13 @@ make sure to set it properly according to your database information
 * index.html
 
 ```
-app.api_dir = "http://sonnywebdesign.com/languagequiz/";
+appDir = "http://sonnywebdesign.com/languagequiz/";
+apiDir = "http://sonnywebdesign.com/languagequiz/api/";
 ```
 This is a JavaScript variable used to generate all the Ajax request from the main App to the API. Make sure to set it properly according to your environment URL
+
+----
+There is a Demo version running live according to the latest master branch on: http://sonnywebdesign.com/languagequiz/
+
 
 That's it for now.

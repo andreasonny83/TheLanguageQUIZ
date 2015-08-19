@@ -18,6 +18,8 @@ class DB_Connect {
 		// Connecting to mysql database
 		$this->conn = mysqli_connect( DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME ) or die();
 
+		$this->conn->set_charset( DB_CHARSET );
+
 		// returing connection resource
 		return $this->conn;
 	}

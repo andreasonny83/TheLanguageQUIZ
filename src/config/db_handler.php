@@ -11,8 +11,16 @@ use Config\SecureSessionHandler;
 
 class DbHandler {
 
+	/**
+	 * [$conn description]
+	 * @var [type]
+	 */
 	private $conn;
 
+	/**
+	 * [$session description]
+	 * @var [type]
+	 */
 	private $session;
 
 	function __construct() {
@@ -21,6 +29,11 @@ class DbHandler {
 		$this->conn    = $db->connect();
 	}
 
+	/**
+	 * [check_brute description]
+	 * @param  [type] $user_id [description]
+	 * @return [type]          [description]
+	 */
 	private function check_brute( $user_id ) {
 		// Get timestamp of current time
 		$now = time();
@@ -28,22 +41,19 @@ class DbHandler {
 		// All login attempts are counted from the past hour
 		$valid_attempts = $now - ( 3600 );
 
-		if ( $stmt = $this->conn->prepare( 'SELECT time FROM LQ_login_attempts WHERE user_id = ? AND time > ?' ) ) {
-			$stmt->bind_param( 'ii', $user_id, $valid_attempts );
-			$stmt->execute();
-			$stmt->store_result();
+		// insert query
+		$stmt = $this->conn->prepare( 'SELECT time FROM LQ_login_attempts WHERE user_id = ? AND time > ?' );
+		$stmt->bind_param( 'ii', $user_id, $valid_attempts );
+		$stmt->execute();
+		$stmt->store_result();
 
-			if ( $stmt->num_rows > 5 ) {
-				$stmt->close();
-				return true;
-			}
-			else {
-				$stmt->close();
-				return false;
-			}
+		if ( $stmt->num_rows > 5 ) {
+			// Sospend the user account according to the $valid_attempts time
+			$stmt->close();
+			return true;
 		}
 		else {
-			// can't perform the database request
+			$stmt->close();
 			return false;
 		}
 	}
@@ -56,133 +66,213 @@ class DbHandler {
 	 */
 	public function checkLogin( $input_email, $input_password ) {
 		// fetching user by email
-		if ( $stmt = $this->conn->prepare( 'SELECT id, email, password, salt FROM LQ_users WHERE email = ? LIMIT 1' ) ) {
-			$stmt->bind_param( 's', $input_email );
-			$stmt->execute();
-			$stmt->store_result();
-			$stmt->bind_result( $db_id, $db_email, $db_password, $db_salt );
+		$stmt = $this->conn->prepare( 'SELECT id, email, password, salt FROM LQ_users WHERE email = ? LIMIT 1' );
+		$stmt->bind_param( 's', $input_email );
+		$stmt->execute();
+		$stmt->bind_result( $db_id, $db_email, $db_password, $db_salt );
+		$stmt->store_result();
+
+		if ( $stmt->num_rows === 1 ) {
+			// If 1 and only 1 user if Found
 			$stmt->fetch();
+			$stmt->close();
 
 			// Salt the input password with the salt from the database
 			$password = hash( 'sha512', $input_password );
 			$password = hash( 'sha512', $input_password . $db_salt );
 
-			if ( $stmt->num_rows === 1 ) {
-				$stmt->close();
-				// Found user with the email
-				// Now verify the password
-				if ( $this->check_brute( $db_id ) === true ) {
-					// Account is locked
-					// Send an email to user saying their account is locked
-					return false;
-				}
-				else {
-					// Check if the password in the database matches
-					// the password the user submitted.
-					if ( $db_password === $password ) {
-						// password is correct
-						$this->session->start();
-						// Generate a new session every time
-						$this->session->refresh();
-
-						$session_id = session_id();
-						$now        = time();
-
-						$this->conn->query( "UPDATE LQ_users
-								SET user_session_id='$session_id', session_expiration='$now'
-								WHERE id=$db_id"
-							);
-
-						/**
-						 * TODO
-						 * Will use the following information to store inside the database
-						 * The user agent information
-						**/
-						// $user_agent = $_SERVER['HTTP_USER_AGENT'];
-						// XSS protection as we might print this value
-						// $user_id = preg_replace( '/[^0-9]+/', '', $db_id );
-						// XSS protection as we might print this value
-						// $username = preg_replace( '/[^a-zA-Z0-9_\-]+/', '', $db_username );
-						// $session->put( 'LQ_user_agent', $user_agent );
-						// setcookie( 'lq_userid', $db_uid, time() + ( 86400 * 30 ), '/' ); // 1 day
-
-						return true;
-					}
-					else {
-						// user password is incorrect
-						// record this attempt in the database
-						$now = time();
-						$this->conn->query( "INSERT INTO LQ_login_attempts( user_id, time ) VALUES ( '$db_id', '$now' )" );
-
-						return false;
-					}
-				}
-			}
-			else {
-				// No user exists.
-				$stmt->close();
+			// Check the brute force
+			if ( $this->check_brute( $db_id ) === true ) {
+				// Account is locked
+				/**
+				 * TODO
+				 * Send an email to unlock the accout
+				**/
 				return false;
 			}
-		}
+			else {
+				// Check if the password in the database matches
+				// the password the user submitted.
+				if ( $db_password === $password ) {
+					// password is correct
+					$this->session->start();
+					// Generate a new session every time
+					$this->session->refresh();
 
+					$session_id = session_id();
+					$now        = time();
+					$lq_user    = hash( 'md5', time() . uniqid() . $db_email );
+
+					$stmt = $this->conn->prepare( "UPDATE LQ_users
+							SET lq_user=?, user_session_id=?, session_expiration=?
+							WHERE id=?" );
+					$stmt->bind_param( 'ssii', $lq_user, $session_id, $now, $db_id );
+					$stmt->execute();
+					$stmt->close();
+
+					// store the random lq_user into the user's cookie
+					setcookie( 'lq_user', $lq_user, time()+1209600, '/');
+
+					/**
+					 * TODO
+					 * Will use the following information to store inside the database
+					 * The user agent information
+					**/
+					// $user_agent = $_SERVER['HTTP_USER_AGENT'];
+					// XSS protection as we might print this value
+					// $user_id = preg_replace( '/[^0-9]+/', '', $db_id );
+					// XSS protection as we might print this value
+					// $username = preg_replace( '/[^a-zA-Z0-9_\-]+/', '', $db_username );
+					// $session->put( 'LQ_user_agent', $user_agent );
+					// setcookie( 'lq_userid', $db_uid, time() + ( 86400 * 30 ), '/' ); // 1 day
+					return true;
+				}
+				else {
+					// user password is incorrect
+					// record this attempt in the database
+					$now = time();
+					$stmt = $this->conn->prepare( "INSERT INTO LQ_login_attempts( user_id, time ) VALUES ( ?, ? )" );
+					$stmt->bind_param( 'ii', $db_id, $now );
+					$stmt->execute();
+					$stmt->close();
+
+					return false;
+				}
+			}
+		}
 		else {
-			// can't perform the database request
+			// No user exists.
+			$stmt->close();
 			return false;
 		}
 	}
 
+	/**
+	 * [checkRegister description]
+	 * @param  [type] $user [description]
+	 * @return [type]       [description]
+	 */
 	public function checkRegister( $user ) {
-		if ( $stmt = $this->conn->prepare( 'SELECT id FROM LQ_users WHERE email = ? LIMIT 1' ) ) {
-			$stmt->bind_param( 's', $user['email'] );
-			$stmt->execute();
-			$stmt->bind_result( $db_id );
-			$stmt->fetch();
+		$stmt = $this->conn->prepare( 'SELECT id FROM LQ_users WHERE email = ? LIMIT 1' );
+		$stmt->execute();
+		$stmt->bind_result( $db_id );
+		$stmt->store_result();
 
-			if ( $db_id ) {
-				// If a user with the same email already exists in the database
-				// Terminate the request
-				$stmt->close();
-				return false;
-			}
-			else {
-				$now = time();
-				// Until we set an email verification procedure
-				// All new user will automatically verified once created
-				$status = 1;
-				// Create a random salt
-				$random_salt = hash( 'sha512', uniqid( mt_rand( 1, mt_getrandmax() ), true ) );
-				// Create salted password
-				$password    = hash( 'sha512', $user['password'] . $random_salt );
-
-				// Register a new user
-				if ( $stmt = $this->conn->prepare( "INSERT INTO LQ_users(
-					status,
-					username,
-					email,
-					password,
-					salt,
-					registration )
-				VALUES (
-					?, ?, ?, ?, ?, ? )" ) ) {
-					$stmt->bind_param( 'issssi',
-						$status,
-						$user['name'],
-						$user['email'],
-						$password,
-						$random_salt,
-						$now );
-
-					if ( $stmt->execute() ) {
-						// Registration succeed
-						$stmt->close();
-						return true;
-					}
-				}
-			}
-
+		if ( $stmt->num_rows > 0 ) {
 			$stmt->close();
+			// If a user with the same email already exists in the database
+			// Terminate the request
 			return false;
 		}
+		else {
+			// create the new user
+			$stmt->close();
+			// Until we set an email verification procedure
+			// All new user will automatically verified once created
+			$status = 1;
+			$now    = time();
+
+			// Create a salted password
+			$random_salt = hash( 'sha512', uniqid( mt_rand( 1, mt_getrandmax() ), true ) );
+			$password    = hash( 'sha512', $user['password'] . $random_salt );
+
+			// Register a new user
+			$this->conn->prepare( "INSERT INTO LQ_users(
+				status, username, email, password, salt, registration )
+				VALUES ( ?, ?, ?, ?, ?, ? )" );
+
+			$stmt->bind_param( 'issssi',
+				$status, $user['name'], $user['email'], $password, $random_salt, $now );
+
+			$result = $stmt->execute();
+			$stmt->close();
+
+			if ( $result ) {
+				// Registration succeed
+				return true;
+			}
+			else {
+				// can't perform the database request
+				return false;
+			}
+		}
+	}
+
+	/**
+	 * [getUser description]
+	 * @param  [type] $userId      [description]
+	 * @param  [type] $userSession [description]
+	 * @return [type]              [description]
+	 */
+	public function getUser( $userId, $userSession ) {
+		$stmt = $this->conn->prepare( 'SELECT
+			user_session_id, username, email, level, rank
+			FROM LQ_users WHERE lq_user = ? LIMIT 1' );
+		$stmt->bind_param( 's', $userId );
+		$stmt->execute();
+		$stmt->bind_result( $user_session_id, $username, $email, $level, $rank );
+		$stmt->store_result();
+		$stmt->fetch();
+		$stmt->close();
+
+		if ( $user_session_id === $userSession ) {
+			return array(
+				"username" => $username,
+			);
+		}
+		else {
+			return false;
+		}
+	}
+
+	/**
+	 * [getCollections description]
+	 * @param  [type]  $userId      [description]
+	 * @param  [type]  $userSession [description]
+	 * @param  integer $page        [description]
+	 * @return [type]               [description]
+	 */
+	public function getCollections( $userId, $userSession, $page = 0 ) {
+		$collections    = array();
+		$items_per_page = 10;
+		$page           = $page * $items_per_page;
+		$loadMore       = true;
+
+		$stmt = $this->conn->prepare( 'SELECT
+			uid, name, description, lang, rank, score, flash, taboo
+			FROM LQ_collections
+			WHERE status = 2 LIMIT ?, 10' );
+		$stmt->bind_param( 'd', $page );
+		$stmt->execute();
+		$stmt->bind_result( $uid, $name, $description, $lang, $rank, $score, $flash, $taboo );
+		$stmt->store_result();
+
+		while( $stmt->fetch() ) {
+
+			$collections[] = array(
+				'uid'         => $uid,
+				'name'        => $name,
+				'description' => $description,
+				'lang'        => $lang,
+				'rank'        => $rank,
+				'score'       => $score,
+				'flash'       => $flash,
+				'taboo'       => $taboo,
+			);
+		}
+
+		$stmt->close();
+
+		// disable loading further collections
+		// if we already reached the end of the table
+		if ( sizeof ( $collections ) < 10 ) {
+			$loadMore = false;
+		}
+
+		return array(
+			'collections' => $collections,
+			'loadMore' => $loadMore
+		);
 	}
 
 	public function logOut( $user_session ) {
@@ -200,25 +290,6 @@ class DbHandler {
 	}
 
 
-
-	/**
-	 * Fetching user by email
-	 * @param String $email User email id
-	 */
-	public function getUserUIDByEmail( $email ) {
-		$db_uid = '';
-
-		if ( $stmt = $this->conn->prepare( 'SELECT uid FROM LQ_users WHERE email = ? LIMIT 1' ) ) {
-			$stmt->bind_param( 's', $email );
-			$stmt->store_result();
-			$stmt->bind_result( $db_uid );
-			$stmt->execute();
-			$stmt->fetch();
-			$stmt->close();
-		}
-
-		return $db_uid;
-	}
 
 	public function fetchGlobalCollections( $useruid, $page ) {
 		$collections    = array();
