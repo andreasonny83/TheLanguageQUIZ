@@ -11,8 +11,8 @@ use Config\SecureSessionHandler;
 \Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
 
-$app->config( 'debug', true ); // Dev
-// $app->config( 'debug', false );
+// $app->config( 'debug', true ); // Dev
+$app->config( 'debug', false );
 
 /**
  * Perform an API get status
@@ -213,7 +213,7 @@ $app->post(
 });
 
 $app->get(
-	'/user/:userid/collections/', function( $userid ) use ( $app ) {
+	'/user/:userid/collections/', 'authenticate', function( $userid ) use ( $app ) {
 		sleep(2);
 
 		$page     = $app->request()->get( 'page' );
@@ -227,7 +227,7 @@ $app->get(
 		$userSession = $app->getCookie( 'LQ_session' );
 		$collections = $db->getCollections( $userid, $userSession, $page );
 
-		if ( !empty( $collections ) ) {
+		if ( ! empty( $collections['collections'] ) ) {
 			$response['error'] = false;
 			$response['collections']  = $collections['collections'];
 			$response['loadMore']  = $collections['loadMore'];
@@ -236,7 +236,8 @@ $app->get(
 		}
 
 		$response['error'] = true;
-		echoRespnse( 400, $response );
+		$response['loadMore']  = $collections['loadMore'];
+		echoRespnse( 200, $response );
 		$app->stop();
 });
 
@@ -311,38 +312,6 @@ function verify_required_params( $required_fields ) {
 }
 
 /**
- * Adding Middle Layer to authenticate every request
- * Checking if the request has valid api key in the 'Authorization' header
- */
-function authenticate( \Slim\Route $route ) {
-	// Getting request headers
-	$headers  = apache_request_headers();
-	$response = array();
-	$app = \Slim\Slim::getInstance();
-
-	if ( isset( $headers['X-API-KEY'] ) ) {
-
-		// get the api key
-		$api_key = $headers['X-API-KEY'];
-		// validating api key
-		if ( $api_key !== '612e648bf9594adb50844cad6895f2cf' ) {
-			// api key is not present in users table
-			$response['error']   = true;
-			$response['message'] = 'Access Denied. Invalid Api key';
-			echoRespnse( 401, $response );
-			$app->stop();
-		}
-	}
-	else {
-		// api key is missing in header
-		$response['error']   = true;
-		$response['message'] = 'Api key is misssing';
-		echoRespnse( 401, $response );
-		$app->stop();
-	}
-}
-
-/**
  * Echoing json response to client
  * @param String $status_code Http response code
  * @param Int $response Json response
@@ -359,76 +328,37 @@ function echoRespnse( $status_code, $response ) {
 	echo json_encode( $response );
 }
 
-
-//--- OLD LANGUAGE QUIZ
-// Functins to be replaced according to the new app
-
-
 /**
- * Used to get the username when the user is logging in
- * using Google+
-*/
-$app->post(
-	'/getuseruid', 'authenticate', function() use ( $app ) {
-		$email    = $app->request()->post( 'email' );
+ * Adding Middle Layer to authenticate every request
+ * Checking if the request has valid api key in the 'Authorization' header
+ */
+function authenticate( \Slim\Route $route ) {
+	// Getting request headers
+	$headers  = apache_request_headers();
+	$response = array();
+	$app = \Slim\Slim::getInstance();
 
-		$response = array();
-		$db       = new DbHandler();
-
-		$response['error']   = false;
-		$response['user'] = $db->getUserUIDByEmail( $email );
-		echoRespnse( 200, $response );
-		$app->stop();
-	}
-);
-
-$app->post(
-	'/user/:useruid/collection/new', function( $useruid ) use ( $app ) {
-		$collection    = $app->request()->post('collection');
-
-		$response = array();
-		$db       = new DbHandler();
-
-		$response['error']   = false;
-		$response['collection_uid'] = $db->newCollection( $collection );
-
-		echoRespnse( 200, $response );
-		$app->stop();
-	}
-);
-
-$app->get(
-	'/user/:useruid/collections/globals', function( $useruid ) use ( $app ) {
-		$page = $app->request()->get( 'page' );
-
-		$response = array();
-		$db       = new DbHandler();
-
-		$response['collections'] = $db->fetchGlobalCollections( $useruid, $page );
-
-		$response['error']   = false;
-		// $response['collections'][$page] = $response;
-
-		echoRespnse( 200, $response );
-		$app->stop();
-	}
-);
-
-$app->get(
-	'/user/:useruid/collections/', function( $useruid ) use ( $app ) {
-		$page = $app->request()->get( 'page' );
-
-		$response = array();
-		$db       = new DbHandler();
-
-		$response['collections'] = $db->fetchPrivateCollections( $useruid );
-
-		$response['error']   = false;
-
-		echoRespnse( 200, $response );
-		$app->stop();
-	}
-);
+	// if ( isset( $headers['X-API-KEY'] ) ) {
+	//
+	// 	// get the api key
+	// 	$api_key = $headers['X-API-KEY'];
+	// 	// validating api key
+	// 	if ( $api_key !== '612e648bf9594adb50844cad6895f2cf' ) {
+	// 		// api key is not present in users table
+	// 		$response['error']   = true;
+	// 		$response['message'] = 'Access Denied. Invalid Api key';
+	// 		echoRespnse( 401, $response );
+	// 		$app->stop();
+	// 	}
+	// }
+	// else {
+	// 	// api key is missing in header
+	// 	$response['error']   = true;
+	// 	$response['message'] = 'Api key is misssing';
+	// 	echoRespnse( 401, $response );
+	// 	$app->stop();
+	// }
+}
 
 $app->run();
 ?>

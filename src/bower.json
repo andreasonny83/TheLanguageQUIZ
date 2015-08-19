@@ -23,6 +23,5 @@
     "iron-ajax": "PolymerElements/iron-ajax#~1.0.3",
     "iron-localstorage": "PolymerElements/iron-localstorage#~1.0.4",
     "polymer-cookie": "~0.1.2",
-    "event-infinite-scroll": "~0.0.4"
   }
 }

@@ -34,6 +34,7 @@ neon-animated-pages {
 		id="ajax_user"
 		method="POST"
 		handle-as="json"
+        on-error="logOut"
 		on-response="getUser">
 	</iron-ajax>
 
@@ -53,12 +54,6 @@ Polymer({
             type: Object,
             observer: "userUpdate"
         }
-    },
-
-    ready: function() {
-        this.$.lqHome.addEventListener("scroll", function () {
-            console.log('e');
-        });
     },
 
     attached: function() {
@@ -98,6 +93,13 @@ Polymer({
             this.$.toast.text = "Welcome back " + this.user.username;
             this.$.toast.show();
         }
+    },
+
+    logOut: function() {
+        lqApp.$.user_cookie.eraseCookie();
+        lqApp.update();
+        lqApp.$.toast.text = "You are now logged out";
+        lqApp.$.toast.show();
     },
 
     userUpdate: function() {

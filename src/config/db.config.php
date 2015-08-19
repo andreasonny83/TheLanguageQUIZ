@@ -3,12 +3,13 @@
  * Database login details
  */
 define( 'DB_HOST', 'localhost' );
-define( 'DB_USERNAME', 'root' ); // Dev
-// define( 'DB_USERNAME', 'sonny883_lanQuiz' );
-define( 'DB_PASSWORD', 'root' ); // Dev
-// define( 'DB_PASSWORD', 'Nq8Gc%yrvvIl' );
-define( 'DB_NAME', 'language_quiz' ); // Dev
-// define( 'DB_NAME', 'sonny883_language_quiz' );
+
+define( 'DB_NAME', 'language_quiz' ); //Dev
+define( 'DB_USERNAME', 'root' ); //Dev
+define( 'DB_PASSWORD', 'root' ); //Dev
+
+define( 'DB_CHARSET', 'utf8' );
+define( 'DB_COLLATION', 'utf8_unicode_ci' );
 
 define( 'SECURE', FALSE ); // FOR DEVELOPMENT ONLY
 

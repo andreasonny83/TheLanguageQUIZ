@@ -34,7 +34,7 @@ paper-toolbar paper-icon-button {
 }
 .content {
     padding: 10px;
-    max-width: 1000px;
+    max-width: 1100px;
     margin: 0 auto;
 }
 .horizontal-section-container {
@@ -58,7 +58,7 @@ paper-toolbar paper-icon-button {
         <!-- Main Content -->
         <div class="content">
             <div class="horizontal-section-container">
-                <lq-tile large>
+                <lq-tile large image="http://placehold.it/900x300">
                     <p>
                         test
                     </p>
@@ -67,16 +67,22 @@ paper-toolbar paper-icon-button {
 
             <div class="horizontal-section-container">
                 <template is="dom-repeat" items="[[collections]]" as="collection">
-                    <lq-tile small>
-                        <p>
-                            test
-                        </p>
+                    <lq-tile small
+                        title=[[collection.name]]
+                        image="http://placehold.it/350x250">
+                        <p class="description">[[collection.description]]</p>
                     </lq-tile>
                 </template>
+                <lq-tile id="titleLoading" loading></lq-tile>
             </div>
         </div>
 
-    <event-infinite-scroll on-reach-bottom="readCollections"></event-infinite-scroll>
+    <event-infinite-scroll
+        auto-start
+        scroll-offset="300"
+        loading-delay="500"
+        on-reach-bottom="readCollections">
+    </event-infinite-scroll>
 
     </paper-scroll-header-panel>
 
@@ -123,16 +129,7 @@ Polymer({
         collections: {
             type: Array,
             value: function() {
-                return [{
-                    uid: "",
-                    name: "",
-                    description: "",
-                    lang: "",
-                    rank: 0,
-                    score: 0,
-                    flash: 0,
-                    taboo: 0
-                }];
+                return [];
             },
         }
     },
@@ -143,29 +140,31 @@ Polymer({
     readCollections: function() {
         if ( ! this.busy ) {
             this.busy = true;
+            this.$.titleLoading.toggleAttribute( 'active', true );
             this.$.ajax_collections.url = apiDir + "user/" + lqApp.userCookie + "/collections?page=" + collectionPage;
+
             this.async( function() {
                 this.$.ajax_collections.generateRequest();
-            });
+            }, 500);
         }
     },
 
     getCollections: function( e ) {
         var that = this;
-        collectionPage++;
 
         if ( e.detail.response && e.detail.response.collections ) {
-            if ( collectionPage !== 0 ) {
-                e.detail.response.collections.forEach(function( collection ) {
-                    that.push( 'collections', collection );
-                });
+            e.detail.response.collections.forEach(function( collection ) {
+                that.push( 'collections', collection );
+            });
+
+            if ( e.detail.response.loadMore ) {
+                collectionPage++;
+                this.busy = false;
             }
-            else {
-                this.collections = e.detail.response.collections;
-            }
+
         }
 
-        this.busy = false;
+        this.$.titleLoading.toggleAttribute( 'active', false );
     }
 
 });
