@@ -11,8 +11,8 @@ use Config\SecureSessionHandler;
 \Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
 
-// $app->config( 'debug', true ); // Dev
-$app->config( 'debug', false );
+$app->config( 'debug', true ); // Dev
+// $app->config( 'debug', false );
 
 /**
  * Perform an API get status
@@ -218,14 +218,13 @@ $app->get(
 
 		$page     = $app->request()->get( 'page' );
 		$page     = isset( $page ) ? $page : 0;
-		$user     = array();
 		$db       = new DbHandler();
 		$response = array(
 			'request' => 'collections'
 		);
 
 		$userSession = $app->getCookie( 'LQ_session' );
-		$collections = $db->getCollections( $userid, $userSession, $page );
+		$collections = $db->getCollections( 0, $userid, $page );
 
 		if ( ! empty( $collections['collections'] ) ) {
 			$response['error'] = false;

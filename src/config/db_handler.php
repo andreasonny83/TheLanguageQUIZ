@@ -99,19 +99,25 @@ class DbHandler {
 					// Generate a new session every time
 					$this->session->refresh();
 
-					$session_id = session_id();
-					$now        = time();
-					$lq_user    = hash( 'md5', time() . uniqid() . $db_email );
+					$session_id       = session_id();
+					$now              = time();
+					$user_token       = hash( 'md5', time() . uniqid() . $db_email );
+
+					// Expire the user token after 1 hour and the session after 2 weeks
+					$token_expiration_time   = time() + 3600;
+					$session_expiration_time = time() + 1209600;
+					$token_expiration = date( 'Y-m-d H:i:s', $time_expiration );
 
 					$stmt = $this->conn->prepare( "UPDATE LQ_users
-							SET lq_user=?, user_session_id=?, session_expiration=?
+							SET user_token=?, user_session_id=?, session_expiration=?, token_expiration=?
 							WHERE id=?" );
-					$stmt->bind_param( 'ssii', $lq_user, $session_id, $now, $db_id );
+
+					$stmt->bind_param( 'ssiii', $user_token, $session_id, $session_expiration_time, $token_expiration, $db_id );
 					$stmt->execute();
 					$stmt->close();
 
-					// store the random lq_user into the user's cookie
-					setcookie( 'lq_user', $lq_user, time()+1209600, '/');
+					// store the user token into the user's cookie and expire in 1 hour
+					setcookie( 'lq_user', $user_token, $time_expiration, '/' );
 
 					/**
 					 * TODO
@@ -227,21 +233,33 @@ class DbHandler {
 
 	/**
 	 * [getCollections description]
-	 * @param  [type]  $userId      [description]
-	 * @param  [type]  $userSession [description]
-	 * @param  integer $page        [description]
-	 * @return [type]               [description]
+	 * @collectionType	boolean		global, private
+	 * @userId			integer		the user uid
+	 * @page			integer		the page to load. Each page contains 10 collections
+	 * @return			array		return the collections, if any, and other informations
 	 */
-	public function getCollections( $userId, $userSession, $page = 0 ) {
+	public function getCollections( $collectionType, $userId, $page = 0 ) {
 		$collections    = array();
 		$items_per_page = 10;
 		$page           = $page * $items_per_page;
 		$loadMore       = true;
 
-		$stmt = $this->conn->prepare( 'SELECT
-			uid, name, description, lang, rank, score, flash, taboo
-			FROM LQ_collections
-			WHERE status = 2 LIMIT ?, 10' );
+		// Prepare to read the global collections
+		if ( ! $collectionType ) {
+			$stmt = $this->conn->prepare( 'SELECT
+				uid, name, description, lang, rank, score, flash, taboo
+				FROM LQ_collections
+				WHERE status = 2 LIMIT ?, 10' );
+		}
+
+		// Otherwise read the user private collections
+		else {
+			// Still Work In Progress
+			$stmt = $this->conn->prepare( 'SELECT
+				uid, name, description, lang, rank, score, flash, taboo
+				FROM LQ_collections
+				WHERE status = 2 LIMIT ?, 10' );
+		}
 		$stmt->bind_param( 'd', $page );
 		$stmt->execute();
 		$stmt->bind_result( $uid, $name, $description, $lang, $rank, $score, $flash, $taboo );

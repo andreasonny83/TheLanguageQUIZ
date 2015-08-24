@@ -138,7 +138,7 @@ Polymer({
     },
 
     readCollections: function() {
-        if ( ! this.busy ) {
+        if ( ! this.busy && lqApp.userCookie ) {
             this.busy = true;
             this.$.titleLoading.toggleAttribute( 'active', true );
             this.$.ajax_collections.url = apiDir + "user/" + lqApp.userCookie + "/collections?page=" + collectionPage;
