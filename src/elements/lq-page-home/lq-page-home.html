@@ -88,12 +88,13 @@ paper-toolbar paper-icon-button {
 
     <iron-localstorage name="lq-global-collections"
     id="lqCollections"
-    value="[[collections]]">
+    value="{{collections}}">
     </iron-localstorage>
 
     <iron-ajax
 		id="ajax_collections"
 		method="GET"
+        headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
 		handle-as="json"
 		on-response="getCollections">
 	</iron-ajax>
@@ -127,18 +128,18 @@ Polymer({
         },
 
         collections: {
-            type: Array,
-            value: function() {
-                return [];
-            },
+            type: Object,
+            value: []
         }
+
     },
 
-    ready: function() {
+    attached: function() {
+        this.$.lqCollections.save();
     },
 
     readCollections: function() {
-        if ( ! this.busy ) {
+        if ( ! this.busy && lqApp.userCookie ) {
             this.busy = true;
             this.$.titleLoading.toggleAttribute( 'active', true );
             this.$.ajax_collections.url = apiDir + "user/" + lqApp.userCookie + "/collections?page=" + collectionPage;
