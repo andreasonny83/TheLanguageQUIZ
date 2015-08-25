@@ -24,7 +24,7 @@ neon-animated-pages {
 
     <polymer-cookie
         id="user_cookie"
-        name="lq_user"
+        name="lq_user_id"
         value=true
         time=14
         format="d">
@@ -33,6 +33,7 @@ neon-animated-pages {
     <iron-ajax
 		id="ajax_user"
 		method="POST"
+        headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
 		handle-as="json"
         on-error="logOut"
 		on-response="getUser">

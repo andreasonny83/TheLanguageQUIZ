@@ -27,22 +27,6 @@ $app->get(
 );
 
 /**
- * Perform a POST test
- * and reply some test string if the API are alive
- */
-$app->post(
-	'/test', function() {
-		$app = \Slim\Slim::getInstance();
-		$response = '{"Hello"}';
-
-		$app->contentType( 'application/json' );
-
-		echoRespnse( 200, $response );
-		exit;
-	}
-);
-
-/**
  * Try to perform a user log in
  * If the user is authenticated, then start the session cookie
  */
@@ -62,9 +46,11 @@ $app->post(
 		$response = array(
 			'request' => 'login'
 		);
+
 		// Sanitize data
 		$email    = filter_var(  $email, FILTER_SANITIZE_EMAIL );
 		$password = filter_var( $password, FILTER_SANITIZE_STRING );
+
 		// Validate data
 		if ( ! ( filter_var( $email, FILTER_VALIDATE_EMAIL ) ) ) {
 			$response['error']   = true;
@@ -76,15 +62,32 @@ $app->post(
 		$db = new DbHandler();
 
 		// check for correct email and password
-		if ( $db->checkLogin( $email, $password ) ) {
-			$response['error'] = false;
-			$response['login'] = true;
-			echoRespnse( 200, $response );
-			$app->stop();
+		if ( $db_uid = $db->checkUserExisits( $email ) ) {
+			// Check the brute force
+			if ( $db->checkBrute( $db_uid ) ) {
+				// Account is locked
+				$response['error'] = true;
+				$response['message'] = 'Accout locked';
+				echoRespnse( 401, $response );
+				$app->stop();
+			}
+
+			if ( $db->checkUserLogin( $email, $password ) ) {
+				$response['error'] = false;
+				$response['login'] = true;
+				echoRespnse( 200, $response );
+				$app->stop();
+			}
+			else {
+				$response['error']   = true;
+				$response['message'] = 'Password wrong';
+				echoRespnse( 401, $response );
+				$app->stop();
+			}
 		}
 		else {
 			$response['error']   = true;
-			$response['message'] = 'Forbidden';
+			$response['message'] = 'User not found';
 			echoRespnse( 401, $response );
 			$app->stop();
 		}
@@ -141,10 +144,19 @@ $app->post(
 			echoRespnse( 401, $response );
 			$app->stop();
 		}
-		//Make sure the 2 paswwords are the same
+
+		//Make sure the 2 passwords are the same
 		if ( $user['password'] !== $user['password_confirm'] ) {
 			$response['error']   = true;
 			$response['message'] = 'Password verification failed.';
+			echoRespnse( 401, $response );
+			$app->stop();
+		}
+
+		//Make sure the user has selected a language
+		if ( $user['language'] === 'undefined' || $user['language'] === '' ) {
+			$response['error']   = true;
+			$response['message'] = 'The language is missing.';
 			echoRespnse( 401, $response );
 			$app->stop();
 		}
@@ -188,7 +200,7 @@ $app->post(
 );
 
 $app->post(
-	'/user/:userid', function( $userid ) use ( $app ) {
+	'/user/:userid', 'authenticate', function( $userUID ) use ( $app ) {
 		sleep(1);
 		$response = array(
 			'request' => 'user'
@@ -196,9 +208,7 @@ $app->post(
 		$user = array();
 		$db   = new DbHandler();
 
-
-		$userSession = $app->getCookie( 'LQ_session' );
-		$user = $db->getUser( $userid, $userSession );
+		$user = $db->getUser( $userUID );
 
 		if ( !empty( $user ) ) {
 			$response['error'] = false;
@@ -223,7 +233,6 @@ $app->get(
 			'request' => 'collections'
 		);
 
-		$userSession = $app->getCookie( 'LQ_session' );
 		$collections = $db->getCollections( 0, $userid, $page );
 
 		if ( ! empty( $collections['collections'] ) ) {
@@ -311,6 +320,50 @@ function verify_required_params( $required_fields ) {
 }
 
 /**
+ * Adding Middle Layer to authenticate every request
+ * Checking if the request has valid api key in the 'Authorization' header
+ */
+function authenticate( \Slim\Route $route ) {
+	// Getting request headers
+	$headers  = apache_request_headers();
+	$response = array();
+	$app = \Slim\Slim::getInstance();
+
+	$user = array();
+	$db   = new DbHandler();
+
+	$userSession = $app->getCookie( 'LQ_session' );
+	$userUID     = $app->getCookie( 'lq_user_id' );
+
+	if ( isset( $headers['LQ-API-KEY'] ) ) {
+	// 	// get the api key
+		$api_key = $headers['LQ-API-KEY'];
+	// 	// validating api key
+		if ( $api_key !== '406cc6ed2c7471d7593461264c0db966' ) {
+	// 		// api key is not present in users table
+			$response['error']   = true;
+			$response['message'] = 'Access Denied. Invalid Api key';
+			echoRespnse( 401, $response );
+			$app->stop();
+		}
+		if ( ! $db->authenticate( $userUID, $userSession ) ) {
+			// authentication failed
+			$response['error']   = true;
+			$response['message'] = 'Authentication failed';
+			echoRespnse( 401, $response );
+			$app->stop();
+		}
+	}
+	else {
+		// api key is missing in header
+		$response['error']   = true;
+		$response['message'] = 'Api key is misssing';
+		echoRespnse( 401, $response );
+		$app->stop();
+	}
+}
+
+/**
  * Echoing json response to client
  * @param String $status_code Http response code
  * @param Int $response Json response
@@ -325,38 +378,6 @@ function echoRespnse( $status_code, $response ) {
 	$app->contentType( 'application/json' );
 
 	echo json_encode( $response );
-}
-
-/**
- * Adding Middle Layer to authenticate every request
- * Checking if the request has valid api key in the 'Authorization' header
- */
-function authenticate( \Slim\Route $route ) {
-	// Getting request headers
-	$headers  = apache_request_headers();
-	$response = array();
-	$app = \Slim\Slim::getInstance();
-
-	// if ( isset( $headers['X-API-KEY'] ) ) {
-	//
-	// 	// get the api key
-	// 	$api_key = $headers['X-API-KEY'];
-	// 	// validating api key
-	// 	if ( $api_key !== '612e648bf9594adb50844cad6895f2cf' ) {
-	// 		// api key is not present in users table
-	// 		$response['error']   = true;
-	// 		$response['message'] = 'Access Denied. Invalid Api key';
-	// 		echoRespnse( 401, $response );
-	// 		$app->stop();
-	// 	}
-	// }
-	// else {
-	// 	// api key is missing in header
-	// 	$response['error']   = true;
-	// 	$response['message'] = 'Api key is misssing';
-	// 	echoRespnse( 401, $response );
-	// 	$app->stop();
-	// }
 }
 
 $app->run();
