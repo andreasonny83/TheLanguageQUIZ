@@ -28,13 +28,16 @@ module.exports = function(grunt) {
 				src: ['<%= project.dist %>/img/']
 			},
 			php: {
-				src: ['<%= project.dist %>/*.*', '<%= project.dist %>/config/']
-			},
-			composer: {
-				src: ['<%= project.dist %>/vendor/']
+				src: ['<%= project.dist %>/*.*']
 			},
 			components: {
 				src: ['<%= project.dist %>/components/']
+			},
+			api: {
+				src: ['<%= project.dist %>/api/*.*', '<%= project.dist %>/api/config/*.*']
+			},
+			composer: {
+				src: ['<%= project.dist %>/api/vendor/']
 			},
 			components_after: {
 				src: ['<%= project.dist %>/components/*/demo/', '<%= project.dist %>/components/*/test/']
@@ -42,9 +45,6 @@ module.exports = function(grunt) {
 			elements: {
 				src: ['<%= project.dist %>/components/lq-*']
 			},
-			api: {
-				src: ['<%= project.dist %>/api']
-			}
 		},
 
 		sass: {
@@ -87,9 +87,9 @@ module.exports = function(grunt) {
 					},
 					{
 						expand: true,
-						cwd: '<%= project.dev %>/config/',
-						src: '**',
-						dest: '<%= project.dist %>/config/',
+						cwd: '<%= project.dev %>/',
+						src: '.htaccess',
+						dest: '<%= project.dist %>/',
 					}
 				]
 			},
@@ -138,9 +138,9 @@ module.exports = function(grunt) {
 				files: [
 					{
 						expand: true,
-						cwd: '<%= project.dev %>/vendor/',
+						cwd: '<%= project.dev %>/api/vendor/',
 						src: '**',
-						dest: '<%= project.dist %>/vendor/',
+						dest: '<%= project.dist %>/api/vendor/',
 					}
 				]
 			},
@@ -169,12 +169,18 @@ module.exports = function(grunt) {
 					{
 						expand: true,
 						cwd: '<%= project.dev %>/api/',
-						src: '**',
+						src: '*.*',
 						dest: '<%= project.dist %>/api/',
 					},
 					{
 						src: '<%= project.dev %>/api/.htaccess',
 						dest: '<%= project.dist %>/api/.htaccess',
+					},
+					{
+						expand: true,
+						cwd: '<%= project.dev %>/api/config/',
+						src: '**',
+						dest: '<%= project.dist %>/api/config/',
 					}
 				]
 			}
@@ -189,6 +195,10 @@ module.exports = function(grunt) {
 			gruntfile: {
 				files: ['Gruntfile.js'],
 				tasks: ['jshint']
+			},
+			htaccess: {
+				files: ['<%= project.dev %>/.htaccess'],
+				tasks: ['copy:main']
 			},
 			fonts: {
 				files: ['<%= project.dev %>/fonts/**/*'],
@@ -208,13 +218,9 @@ module.exports = function(grunt) {
 				tasks: ['clean:scripts', 'copy:js']
 			},
 			files: {
-				files: ['<%= project.dev %>/*', '<%= project.dev %>/config/**/*'],
+				files: ['<%= project.dev %>/*'],
 				tasks: ['clean:php', 'copy:main']
 				// tasks: ['clean:php', 'jshint', 'copy:main']
-			},
-			composer: {
-				files: ['<%= project.dev %>/vendor/**/*'],
-				tasks: ['clean:composer', 'copy:composer']
 			},
 			components: {
 				files: ['<%= project.dev %>/bower_components/**/*'],
@@ -225,9 +231,13 @@ module.exports = function(grunt) {
 				tasks: ['clean:elements', 'copy:elements']
 			},
 			api: {
-				files: ['<%= project.dev %>/api/**/*', '<%= project.dev %>/api/.htaccess'],
+				files: ['<%= project.dev %>/api/*', '<%= project.dev %>/api/config/*', '<%= project.dev %>/api/.htaccess'],
 				tasks: ['clean:api', 'copy:api']
-			}
+			},
+			composer: {
+				files: ['<%= project.dev %>/api/vendor/**/*'],
+				tasks: ['clean:composer', 'copy:composer']
+			},
 		}
 	});
 

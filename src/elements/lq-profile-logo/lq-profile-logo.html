@@ -78,6 +78,7 @@ Polymer({
         this.$.profileDropdown.close();
         lqApp.$.pages.selected = 1; //loading
         lqApp.$.user_cookie.eraseCookie();
+        lqApp.$.lqHome.cleanCollection();
         lqApp.user = lqApp.userDefault;
         this.$.ajax_logout.url = apiDir + "logout";
         this.$.ajax_logout.generateRequest();
@@ -103,3 +104,4 @@ Polymer({
 
 });
 </script>
+</dom-module>

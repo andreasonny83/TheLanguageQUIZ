@@ -1,8 +1,8 @@
 <?php
-require_once dirname( dirname( __FILE__ ) ) . '/vendor/autoload.php';
+require_once dirname( __FILE__ ) . '/vendor/autoload.php';
 use \Slim\Slim;
 use \Config\Database\DbHandler;
-use Config\SecureSessionHandler;
+use \Config\SecureSessionHandler;
 
 // For debug only
 // ini_set( 'display_errors', 1 );
@@ -11,8 +11,8 @@ use Config\SecureSessionHandler;
 \Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
 
-$app->config( 'debug', true ); // Dev
-// $app->config( 'debug', false );
+// $app->config( 'debug', true ); // Dev
+$app->config( 'debug', false );
 
 /**
  * Perform an API get status
@@ -175,9 +175,8 @@ $app->post(
 		if ( $db->checkRegister( $user ) ) {
 			$response['error']    = false;
 			$response['register'] = true;
-
 			// Log the user in
-			if ( $db->checkLogin( $user['email'], $user['password'] ) ) {
+			if ( $db->checkUserLogin( $user['email'], $user['password'] ) ) {
 				$response['error'] = false;
 				$response['login'] = true;
 				echoRespnse( 200, $response );
@@ -335,9 +334,9 @@ function authenticate( \Slim\Route $route ) {
 	$userSession = $app->getCookie( 'LQ_session' );
 	$userUID     = $app->getCookie( 'lq_user_id' );
 
-	if ( isset( $headers['LQ-API-KEY'] ) ) {
+	if ( isset( $headers['lq-api-key'] ) ) {
 	// 	// get the api key
-		$api_key = $headers['LQ-API-KEY'];
+		$api_key = $headers['lq-api-key'];
 	// 	// validating api key
 		if ( $api_key !== '406cc6ed2c7471d7593461264c0db966' ) {
 	// 		// api key is not present in users table

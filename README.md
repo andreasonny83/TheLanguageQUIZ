@@ -32,7 +32,7 @@ Composer needs to run from inside your development project directory (src).
 First of all, make sure you have installed Composer on your machine and Grunt watch is running in the background:
 1. From inside your terminal window, reach the project root directory (eg. /user/root/the-language-quiz/ )
 2. Then run: grunt watch
-3. Open a new terminal window/tab and navigate inside your source file folder (eg. /user/root/the-language-quiz/src )
+3. Open a new terminal window/tab and navigate inside your API folder (eg. /user/root/the-language-quiz/src/api )
 4. Now launch: composer install
 This will create the composer.lock and will install all the libraries required in the project
 

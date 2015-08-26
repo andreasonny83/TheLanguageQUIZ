@@ -5,46 +5,19 @@
 :host {
     display: block;
 }
-paper-scroll-header-panel {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+paper-header-panel {
     background-color: var(--paper-grey-200, #eee);
-
-    /* background for toolbar when it is at its full size */
-    --paper-scroll-header-panel-full-header: {
-        background-color: var(--lq-primary-0);
-    };
-
-    /* background for toolbar when it is condensed */
-    --paper-scroll-header-panel-condensed-header: {
-        background-color: var(--lq-secondary-1-0);
-    };
 }
 paper-toolbar {
-    /* custom toolbar height */
-    height: 200px;
-    background-color: transparent;
-    overflow: visible;
-}
-paper-toolbar paper-icon-button {
-    margin: 0 8px;
+    background-color: var(--lq-primary-0);
 }
 .content {
     min-height: 1000px;
 }
-.container {
-    padding: 5px;
-    @apply(--layout-horizontal);
-    @apply(--layout-justified);
-    height: 120px;
-}
 </style>
 <template>
-    <paper-scroll-header-panel condenses keep-condensed-header header-height="200" condensed-header-height="120">
-        <paper-toolbar>
+    <paper-header-panel mode="waterfall">
+        <paper-toolbar class="medium-tall">
             <paper-icon-button icon="arrow-back" on-tap="goBack"></paper-icon-button>
             <div class="title">The LanguageQUIZ</div>
             <div class="flex"></div>

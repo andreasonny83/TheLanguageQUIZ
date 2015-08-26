@@ -8,7 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'Config\\Database\\DB_Connect' => $baseDir . '/config/connect.php',
     'Config\\Database\\DbHandler' => $baseDir . '/config/db_handler.php',
-    'Config\\SecureSessionHandler' => $baseDir . '/config/secure-session.php',
+    'Config\\SecureSessionHandler' => $baseDir . '/config/secure_session.php',
     'Slim\\Environment' => $vendorDir . '/slim/slim/Slim/Environment.php',
     'Slim\\Exception\\Pass' => $vendorDir . '/slim/slim/Slim/Exception/Pass.php',
     'Slim\\Exception\\Stop' => $vendorDir . '/slim/slim/Slim/Exception/Stop.php',

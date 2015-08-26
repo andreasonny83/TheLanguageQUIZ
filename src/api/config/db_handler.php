@@ -6,8 +6,8 @@
  * @author andreasonny83@gmail.com
  */
 namespace Config\Database;
-use Config\Database\DB_Connect;
-use Config\SecureSessionHandler;
+use \Config\Database\DB_Connect;
+use \Config\SecureSessionHandler;
 
 class DbHandler {
 
@@ -127,8 +127,7 @@ class DbHandler {
 			$stmt = $this->conn->prepare( "UPDATE LQ_users
 					SET session_id=?, session_expiration=?
 					WHERE user_uid=?" );
-
-			$stmt->bind_param( 'sii', $session_id, $session_expiration, $db_uid );
+			$stmt->bind_param( 'sis', $session_id, $session_expiration, $db_uid );
 			$stmt->execute();
 			$stmt->close();
 

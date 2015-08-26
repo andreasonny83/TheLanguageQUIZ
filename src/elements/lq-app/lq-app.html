@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
-dom-module
+
 <dom-module id="lq-app">
 <style>
 :host {
@@ -12,7 +12,7 @@ neon-animated-pages {
 </style>
 
 <template>
-    <neon-animated-pages id="pages" selected=0>
+    <neon-animated-pages id="pages" selected="0">
         <lq-splashscreen id="lqSplash"></lq-splashscreen>
         <lq-page-loading id="lqLoading"></lq-page-loading>
         <lq-login id="lqLogin"></lq-login>
@@ -33,7 +33,7 @@ neon-animated-pages {
     <iron-ajax
 		id="ajax_user"
 		method="POST"
-        headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
+        headers='{"lq-api-key": "406cc6ed2c7471d7593461264c0db966"}'
 		handle-as="json"
         on-error="logOut"
 		on-response="getUser">
@@ -98,6 +98,7 @@ Polymer({
 
     logOut: function() {
         lqApp.$.user_cookie.eraseCookie();
+        lqApp.$.lqHome.cleanCollection();
         lqApp.update();
         lqApp.$.toast.text = "You are now logged out";
         lqApp.$.toast.show();
@@ -112,6 +113,7 @@ Polymer({
         // don't ask to log in again
         if ( this.userCookie && this.userCookie !== '' ) {
             this.$.pages.selected = 3; //home
+            this.$.lqHome.cleanCollection();
             this.$.lqHome.readCollections();
         }
         else {
