@@ -201,15 +201,11 @@ Polymer({
     ],
 
     ready: function() {
-        this.$.reg_name.invalid = false;
-        this.$.reg_email.invalid = false;
-        this.$.reg_email_confirm.invalid = false;
-        this.$.reg_password.invalid = false;
-        this.$.reg_password_confirm.invalid = false;
+        this.resetFields();
     },
 
     /**
-     * Reset text fields once logged-in
+     * Reset text fields and hide text fields errors
      */
     resetFields: function() {
         this.email    = '';
@@ -221,6 +217,12 @@ Polymer({
             password:         '',
             password_confirm: '',
         };
+
+        this.$.reg_name.invalid = false;
+        this.$.reg_email.invalid = false;
+        this.$.reg_email_confirm.invalid = false;
+        this.$.reg_password.invalid = false;
+        this.$.reg_password_confirm.invalid = false;
     },
 
     _verifyName() {
@@ -272,8 +274,8 @@ Polymer({
 
         lqApp.$.pages.selected = 1; //loading
 
-        var ajax_url = apiDir + "register";
-        this.$.ajax_register.url = ajax_url;
+        var ajax_url              = apiDir + "register";
+        this.$.ajax_register.url  = ajax_url;
         this.$.ajax_register.body = "name="              + encodeURIComponent( this.reg.name ) +
                                     "&email="            + encodeURIComponent( this.reg.email ) +
                                     "&email_confirm="    + encodeURIComponent( this.reg.email_confirm ) +
@@ -295,8 +297,8 @@ Polymer({
         if ( this.email.length > 0 && this.password.length > 0 && this.$.login_email.validate() && this.$.login_password.validate() ) {
             lqApp.$.pages.selected = 1; //loading
 
-            var ajax_url = apiDir + "login";
-            this.$.ajax_login.url = ajax_url;
+            var ajax_url           = apiDir + "login";
+            this.$.ajax_login.url  = ajax_url;
             this.$.ajax_login.body = "email=" + encodeURIComponent( this.email ) +
                                      "&password=" + encodeURIComponent( this.password );
 
@@ -329,9 +331,7 @@ Polymer({
         lqApp.update();
         lqApp.$.toast.text = "Email address or password invalid";
         lqApp.$.toast.show();
-    },
-
+    }
 });
 </script>
-
 </dom-module>

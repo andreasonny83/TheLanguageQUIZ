@@ -25,15 +25,14 @@ neon-animated-pages {
     <polymer-cookie
         id="user_cookie"
         name="lq_user_id"
-        value=true
-        time=14
+        time="14"
         format="d">
     </polymer-cookie>
 
     <iron-ajax
 		id="ajax_user"
 		method="POST"
-        headers='{"lq-api-key": "406cc6ed2c7471d7593461264c0db966"}'
+        headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
 		handle-as="json"
         on-error="logOut"
 		on-response="getUser">
@@ -72,11 +71,16 @@ Polymer({
     },
 
     update: function() {
+        // when update is triggered
+        // we load a clean view like the app has been reloaded
         this.user = {
             'username': 'user',
             'pic': appDir + 'img/avatar.jpg'
         };
 
+        collectionPage = 0;
+        this.$.lqHome.busy = false;
+        this.$.lqHome.cleanCollection();
         this.userCookie = this.$.user_cookie.readCookie();
         this.checkUser();
     },
@@ -99,6 +103,7 @@ Polymer({
     logOut: function() {
         lqApp.$.user_cookie.eraseCookie();
         lqApp.$.lqHome.cleanCollection();
+        this.$.lqHome.busy = true;
         lqApp.update();
         lqApp.$.toast.text = "You are now logged out";
         lqApp.$.toast.show();
@@ -113,7 +118,6 @@ Polymer({
         // don't ask to log in again
         if ( this.userCookie && this.userCookie !== '' ) {
             this.$.pages.selected = 3; //home
-            this.$.lqHome.cleanCollection();
             this.$.lqHome.readCollections();
         }
         else {

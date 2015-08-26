@@ -274,7 +274,7 @@ class DbHandler {
 				WHERE status = 2 LIMIT ?, 10' );
 		}
 
-		$stmt->bind_param( 'd', $page );
+		$stmt->bind_param( 'i', $page );
 		$stmt->execute();
 		$stmt->bind_result( $uid, $name, $description, $lang, $rank, $score, $flash, $taboo );
 		$stmt->store_result();
@@ -327,7 +327,7 @@ class DbHandler {
 		$page           = $page * $items_per_page;
 
 		if ( $stmt = $this->conn->prepare( 'SELECT uid, name, description, lang, rank, score, flash, taboo FROM LQ_collections WHERE status = 2 LIMIT ?, 10' ) ) {
-			$stmt->bind_param( 'd', $page );
+			$stmt->bind_param( 'i', $page );
 			$stmt->store_result();
 			$stmt->bind_result( $uid, $name, $description, $lang, $rank, $score, $flash, $taboo );
 			$stmt->execute();
@@ -369,7 +369,7 @@ class DbHandler {
 		$collections = array();
 
 		if ( $stmt = $this->conn->prepare( 'SELECT uid, name, description, lang, rank, score, flash, taboo, favourite FROM LQ_collections INNER JOIN LQ_users_rel ON lq_collection_uid = uid WHERE lq_user_uid = ? AND permission = 9' ) ) {
-			$stmt->bind_param( 'd', $useruid );
+			$stmt->bind_param( 'i', $useruid );
 			$stmt->store_result();
 			$stmt->bind_result( $uid, $name, $description, $lang, $rank, $score, $flash, $taboo, $favourite );
 			$stmt->execute();
@@ -398,7 +398,7 @@ class DbHandler {
 		$uid = uniqid();
 
 		if ( $stmt = $this->conn->prepare( 'INSERT INTO LQ_collections(uid, name, description, lang, status) VALUES (? ? ? ? ?)' ) ) {
-			$stmt->bind_param( 'ssssd', $uid, 'test', 'testdescript', '', 0 );
+			$stmt->bind_param( 'ssssi', $uid, 'test', 'testdescript', '', 0 );
 			$stmt->execute();
 			return $uid;
 		}

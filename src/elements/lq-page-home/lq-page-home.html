@@ -69,7 +69,7 @@ paper-toolbar {
     <iron-ajax
 		id="ajax_collections"
 		method="GET"
-        headers='{"lq-api-key": "406cc6ed2c7471d7593461264c0db966"}'
+        headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
 		handle-as="json"
 		on-response="getCollections">
 	</iron-ajax>
@@ -105,6 +105,11 @@ Polymer({
         collections: {
             type: Object,
             value: []
+        },
+
+        busy: {
+            type: Boolean,
+            value: false
         }
 
     },

@@ -224,7 +224,6 @@ $app->post(
 $app->get(
 	'/user/:userid/collections/', 'authenticate', function( $userid ) use ( $app ) {
 		sleep(2);
-
 		$page     = $app->request()->get( 'page' );
 		$page     = isset( $page ) ? $page : 0;
 		$db       = new DbHandler();
@@ -334,9 +333,11 @@ function authenticate( \Slim\Route $route ) {
 	$userSession = $app->getCookie( 'LQ_session' );
 	$userUID     = $app->getCookie( 'lq_user_id' );
 
-	if ( isset( $headers['lq-api-key'] ) ) {
+	$header  = array_change_key_case( $headers, CASE_UPPER );
+	$api_key = isset( $header['LQ-API-KEY'] ) ? $header['LQ-API-KEY'] : '';
+
+	if ( isset( $api_key ) ) {
 	// 	// get the api key
-		$api_key = $headers['lq-api-key'];
 	// 	// validating api key
 		if ( $api_key !== '406cc6ed2c7471d7593461264c0db966' ) {
 	// 		// api key is not present in users table
