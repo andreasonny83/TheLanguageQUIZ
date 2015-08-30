@@ -94,6 +94,8 @@ Polymer({
         this.$.profileDropdown.close();
         lqApp.$.pages.selected = 4; //page-full
         lqApp.$.lqPageFull.$.fullPage.selected = 1;
+        lqApp.$.lqPageFull.$$( '#lqUserProfile' ).fetchProfile();
+        lqApp.$.lqPageFull.$$( '#lqUserProfile' ).fetchAvatar();
     },
 
     _userOptions: function() {

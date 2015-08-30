@@ -22,6 +22,6 @@
     "paper-elements": "PolymerElements/paper-elements#~1.0.5",
     "neon-elements": "PolymerElements/neon-elements#~1.0.0",
     "event-infinite-scroll": "~0.1.0",
-    "polymer-cookie": "~0.1.2"
+    "polymer-cookie": "~0.1.2",
   }
 }

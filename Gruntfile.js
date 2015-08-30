@@ -98,8 +98,18 @@ module.exports = function(grunt) {
 					{
 						expand: true,
 						cwd: '<%= project.dev %>/img/',
-						src: ['**'],
+						src: '**',
 						dest: '<%= project.dist %>/img/'
+					}
+				]
+			},
+			avatars: {
+				files: [
+					{
+						expand: true,
+						cwd: '<%= project.dev %>/avatars/',
+						src: '**',
+						dest: '<%= project.dist %>/avatars/'
 					}
 				]
 			},

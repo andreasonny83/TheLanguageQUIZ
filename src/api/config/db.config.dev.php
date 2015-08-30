@@ -4,9 +4,9 @@
  */
 define( 'DB_HOST', 'localhost' );
 
-define( 'DB_NAME', 'sonny883_language_quiz' );  //Prod
-define( 'DB_USERNAME', 'sonny883_LanQuiz' ); //Prod
-define( 'DB_PASSWORD', 'Sq8Gc%yrvvIla' ); //Prod
+define( 'DB_NAME', 'language_quiz' );
+define( 'DB_USERNAME', 'root' );
+define( 'DB_PASSWORD', 'root' );
 
 define( 'DB_CHARSET', 'utf8' );
 define( 'DB_COLLATION', 'utf8_unicode_ci' );
