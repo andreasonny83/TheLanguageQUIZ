@@ -4,9 +4,10 @@ node_modules
 bower_components
 *.css.map
 composer.lock
-src/config/db.config.prod.php
 dist
-src/index.prod.html
 src/index.html
+src/index.prod.html
+src/api/.htaccess
 src/api/prod.htaccess
+src/api/config/db.config.php
 src/api/config/db.config.prod.php
