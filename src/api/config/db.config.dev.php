@@ -16,17 +16,6 @@ define( 'SECURE', FALSE ); // FOR DEVELOPMENT ONLY
 define( 'CAN_REGISTER', 'any' );
 define( 'DEFAULT_ROLE', 'member' );
 
-/**
- * API Key for using the Mashape service
- * https://www.mashape.com
- */
-define( 'MASHAPE_API_DEMO', 'UJwV8Yw9nzmshuNjBFVutMGNPJk3p1B3nrljsnYKe3dHcBi5mW' );
-define( 'MASHAPE_API_PROD', 'wJtEBqFzlgmsh4ZPUdP6Y7PKLDMdp1N1qixjsnOshPPBiTsNFg' );
-
-/**
- * The project url
- * Set with your own adress to make everithing working correctly
- * @var array
- */
-// define( 'PATH', 'http://localhost:8888/language-quiz/dist' );
+define( 'APP_DIR', 'http://localhost:8888/TheLanguageQUIZ/dist/' );
+define( 'APP_ENV', 'development' );
 ?>

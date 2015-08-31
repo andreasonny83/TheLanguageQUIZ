@@ -273,23 +273,29 @@ class DbHandler {
 	}
 
 	public function getUserAvatar( $userUID ) {
-		$stmt = $this->conn->prepare( 'SELECT
-			avatar
-			FROM LQ_users_data WHERE user_uid = ? LIMIT 1' );
-		$stmt->bind_param( 's', $userUID );
-		$stmt->execute();
-		$stmt->bind_result( $avatar );
-		$stmt->store_result();
-		$stmt->fetch();
-		$stmt->close();
-		if ( isset ( $avatar ) ) {
-			return array(
-				"avatar" => $avatar
-			);
-		}
-		else {
+		if ( ! $userUID ) {
 			return false;
 		}
+
+		if ( $stmt = $this->conn->prepare( 'SELECT
+			avatar
+			FROM LQ_users_data WHERE user_uid = ? LIMIT 1' ) )
+		{
+			$stmt->bind_param( 's', $userUID );
+			$stmt->execute();
+			$stmt->bind_result( $avatar );
+			$stmt->store_result();
+			$stmt->fetch();
+			$stmt->close();
+
+			if ( isset ( $avatar ) ) {
+				return array(
+					"avatar" => $avatar
+				);
+			}
+		}
+
+		return false;
 	}
 
 	public function updateUserProfile( $userUID, $username, $email ) {

@@ -5,6 +5,8 @@ bower_components
 *.css.map
 composer.lock
 dist
+src/.htaccess
+src/prod.htaccess
 src/index.html
 src/index.prod.html
 src/api/.htaccess

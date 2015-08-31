@@ -7,9 +7,7 @@ use \Config\SecureSessionHandler;
 
 \Slim\Slim::registerAutoloader();
 
-$_ENV['SLIM_MODE'] = 'production';
-// define( 'APP_DIR', 'http://localhost:8888/TheLanguageQUIZ/dist/' ); //Dev
-define( 'APP_DIR', 'http://localhost:8888/TheLanguageQUIZ/dist/' ); //Prod
+$_ENV['SLIM_MODE'] = APP_ENV;
 
 $app = new \Slim\Slim();
 $app->setName( 'LQ_API' );
@@ -362,7 +360,7 @@ $app->get(
 
 		$profile = $db->getUserAvatar( $userUID );
 
-		if ( !empty( $profile ) ) {
+		if ( ! empty( $profile ) ) {
 			$response['error']   = false;
 			$response['profile'] = $profile;
 			$response['msg']     = 'Avatar updated.';
@@ -420,13 +418,13 @@ $app->post(
 
 		$file_ext = $mime_types[$file_type];
 		$name     = 'avatar-' . $userUID;
-		move_uploaded_file( $file['tmp_name'], '../avatars/' . $name );
+		move_uploaded_file( $file['tmp_name'], '../img/avatars/' . $name );
 
 		// Sanitize data
 		$db = new DbHandler();
 
 		// Try to update the user details
-		$file_path = APP_DIR . 'avatars/' . $name;
+		$file_path = APP_DIR . 'img/avatars/' . $name;
 
 		if ( $db->updateUserAvatar( $file_path, $userUID ) ) {
 			$response['error'] = false;
