@@ -1,337 +1,300 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <dom-module id="lq-login">
+<style include="lq-theme"></style>
 <style>
 :host {
-}
-.bottom {
-    margin-top: 40px;
-    padding-top: 20px;
-    text-align: right;
-    border-top: 1px solid rgb(117, 117, 117);
-}
-paper-button {
-    margin-bottom: 24px;
-}
-paper-button[raised].colorful {
-    background: #487CCA;
-    color: #fff;
+	overflow: auto;
+	background-color: var(--lq-primary-1);
 }
 .hero {
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 50px;
-    margin-bottom: 50px;
-    padding-left: 20px;
-    padding-right: 20px;
+	padding: 50px;
 }
-.horizontal-section-container {
-    @apply(--layout-horizontal);
-    @apply(--layout-center-justified);
-    @apply(--layout-wrap);
+.register {
+	margin-bottom: 50px;
 }
+paper-card {
+	@apply(--layout-horizontal);
+	@apply(--layout-justified);
 
-.vertical-section-container {
-    @apply(--layout-vertical);
-    @apply(--layout-center-justified);
-    @apply(--layout-wrap);
+	--paper-card-actions: {
+		text-align: right;
+		@apply(--layout-center);
+	}
 }
-.horizontal-section {
-    background-color: white;
-    padding: 24px;
-    margin-right: 24px;
-    margin-bottom: 24px;
-    min-width: 200px;
-
-    @apply(--shadow-elevation-2dp);
+.bottom {
+	margin-top: 40px;
+	padding-top: 20px;
+	text-align: right;
+	border-top: 1px solid rgb(117, 117, 117);
 }
-.vertical-section {
-    background-color: white;
-    padding: 24px;
-
-    @apply(--shadow-elevation-2dp);
+paper-button {
+	margin-bottom: 24px;
 }
-.flex-section {
-    @apply(--layout-flex);
-}
-
-@media (max-width: 639px) {
-    .hero {
-        padding-left: 5px;
-        padding-right: 5px;
-    }
-    .empty-space {
-        display: none;
-    }
-    .register {
-        margin-right: 0;
-    }
+paper-button[raised].colorful {
+	background: #487CCA;
+	color: #fff;
 }
 .centered {
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
+	max-width: 400px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
 }
-.login {
-    height: 280px;
-    margin-right: 0;
-}
-
 .secondary {
-    height: 500px;
-    background-color: #fff;
+	height: 500px;
+	background-color: #fff;
 }
 footer {
-    height: 200px;
+	height: 200px;
+}
+@media (max-width: 639px) {
 }
 </style>
 
 <template>
-    <div class="hero horizontal-section-container">
+	<div class="horizontal-section-container hero">
+		<paper-card heading="Log In">
+			<div class="card-content">
+				<paper-input id="login_email" required label="E-mail" autofocus type="email" error-message="enter a valid email address" value="{{email}}"></paper-input>
+				<paper-input id="login_password" label="Password" required minlength=6 type="password" error-message="password must be 6 minimum characters" value="{{password}}"></paper-input>
+			</div>
+			<div class="card-actions">
+				<paper-button on-tap="login">
+					<iron-icon icon="check"></iron-icon>
+					ok
+				</paper-button>
+			</div>
+		</paper-card>
 
-        <div class="login horizontal-section flex-4">
-            <h2>Log In</h2>
-            <paper-input id="login_email" required label="E-mail" autofocus type="email" error-message="enter a valid email address" value="{{email}}"></paper-input>
-            <paper-input id="login_password" label="Password" required minlength=6 type="password" error-message="password must be 6 minimum characters" value="{{password}}"></paper-input>
-            <div class="bottom">
-                <paper-button raised class="colorful custom" on-tap="_verifyLogIn"><iron-icon icon="check"></iron-icon>ok</paper-button>
-            </div>
-        </div>
+	</div>
+	<div class="horizontal-section-container register">
+		<paper-card heading="Register">
+			<div class="card-content">
+				<paper-input id="reg_name" type="text" label="User name*" required pattern="[a-zA-Z0-9]+" minlength=5 value="{{reg.name}}" error-message="letters and number only. Minimun of 5 charaters"></paper-input>
+				<paper-input id="reg_email" type="text" label="Email*" required value="{{reg.email}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="enter a valid email address"></paper-input>
+				<paper-input id="reg_email_confirm" type="text" label="Re-enter email*" required value="{{reg.email_confirm}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="email address doesn't match"></paper-input>
+				<paper-input id="reg_password" type="password" label="Password*" required pattern=".{6,}" value="{{reg.password}}" error-message="password must be 6 characters minimum."></paper-input>
+				<paper-input id="reg_password_confirm" type="password" required label="Re-enter password*" minlength=6 value="{{reg.password_confirm}}" error-message="password doesn't match"></paper-input>
+				<lq-dropdown id="language" title="I speak" selected-value={{reg.lang}}></lq-dropdown>
+			</div>
+			<div class="card-actions">
+				<paper-button on-tap="register">
+					<iron-icon icon="check"></iron-icon>
+					Register
+				</paper-button>
+			</div>
+		</paper-card>
+	</div>
 
-        <div class="empty-space flex-auto"></div>
+	<div class="horizontal-section-container">
+		<div class="secondary flex">
+			<h2 class='centered'>
+				some images and product description here
+			</h2>
+		</div>
+	</div>
 
-        <div class="register horizontal-section flex-5">
-            <h2>Register</h2>
-            <paper-input id="reg_name" type="text" label="User name*" required pattern="[a-zA-Z0-9]+" minlength=5 value="{{reg.name}}" error-message="letters and number only. Minimun of 5 charaters"></paper-input>
-            <paper-input id="reg_email" type="text" label="Email*" required value="{{reg.email}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="enter a valid email address"></paper-input>
-            <paper-input id="reg_email_confirm" type="text" label="Re-enter email*" required value="{{reg.email_confirm}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="email address doesn't match"></paper-input>
-            <paper-input id="reg_password" type="password" label="Password*" required pattern=".{6,}" value="{{reg.password}}" error-message="password must be 6 characters minimum."></paper-input>
-            <paper-input id="reg_password_confirm" type="password" required label="Re-enter password*" minlength=6 value="{{reg.password_confirm}}" error-message="password doesn't match"></paper-input>
-            <lq-dropdown id="language" title="I speak" selected-value={{reg.lang}}></lq-dropdown>
-            <div class="bottom">
-                <paper-button raised class="colorful custom" on-tap="_register">
-                    <iron-icon icon="check"></iron-icon>
-                    Register
-                </paper-button>
-            </div>
+	<footer>
+		<h2 class='centered'>
+			Footer
+		</h2>
+	</footer>
 
-        </div>
+	<iron-ajax
+		id="ajax_login"
+		method="POST"
+		handle-as="json"
+		on-response="loginSucceed"
+		on-error="loginFailed">
+	</iron-ajax>
 
-    </div>
-
-    <div class="horizontal-section-container">
-        <div class="secondary flex">
-            <h2 class='centered'>
-                some images and product description here
-            </h2>
-        </div>
-    </div>
-
-    <footer>
-        <h2 class='centered'>
-            Footer
-        </h2>
-    </footer>
-
-    <iron-ajax
-        id="ajax_login"
-        method="POST"
-        handle-as="json"
-        on-response="loginSucceed"
-        on-error="loginFailed">
-    </iron-ajax>
-
-    <iron-ajax
-        id="ajax_register"
-        method="POST"
-        handle-as="json"
-        on-response="registerSucceed"
-        on-error="registerFailed">
-    </iron-ajax>
+	<iron-ajax
+		id="ajax_register"
+		method="POST"
+		handle-as="json"
+		on-response="registerSucceed"
+		on-error="registerFailed">
+	</iron-ajax>
 
 </template>
 
 <script>
 Polymer({
-    is: 'lq-login',
+	is: 'lq-login',
 
-    behaviors: [
-        Polymer.NeonAnimatableBehavior
-    ],
+	behaviors: [
+		Polymer.NeonAnimatableBehavior
+	],
 
-    properties: {
-        reg: {
-            type: Object,
-            notify: true,
-            value: function() {
-                return {
-                    name: '',
-                    email: '',
-                    email_confirm: '',
-                    password: '',
-                    password_confirm: '',
-                    lang: "English",
-                };
-            }
-        },
+	properties: {
+		reg: {
+			type: Object,
+			notify: true,
+			value: function() {
+				return {
+					name: '',
+					email: '',
+					email_confirm: '',
+					password: '',
+					password_confirm: '',
+					lang: "English",
+				};
+			}
+		},
 
-        animationConfig: {
-            type: Object,
-            value: function() {
-                return {
-                    'entry': {
-                        name: 'fade-in-animation',
-                        node: this
-                    },
-                    'exit': {
-                        name: 'fade-out-animation',
-                        node: this
-                    }
-                }
-            }
-        },
-    },
+		animationConfig: {
+			type: Object,
+			value: function() {
+				return {
+					'entry': {
+						name: 'fade-in-animation',
+						node: this
+					},
+					'exit': {
+						name: 'fade-out-animation',
+						node: this
+					}
+				}
+			}
+		},
+	},
 
-    observers: [
-      '_verifyName( reg.name )',
-      '_verifyEmail( reg.email, reg.email_confirm )',
-      '_verifyPassword( reg.password, reg.password_confirm )'
-    ],
+	observers: [
+	  '_verifyName( reg.name )',
+	  '_verifyEmail( reg.email, reg.email_confirm )',
+	  '_verifyPassword( reg.password, reg.password_confirm )'
+	],
 
-    ready: function() {
-        this.resetFields();
-    },
+	ready: function() {
+		this.resetFields();
+	},
 
-    /**
-     * Reset text fields and hide text fields errors
-     */
-    resetFields: function() {
-        this.email    = '';
-        this.password = '';
-        this.reg      = {
-            name:             '',
-            email:            '',
-            email_confirm:    '',
-            password:         '',
-            password_confirm: '',
-        };
+	/**
+	 * Reset text fields and hide text fields errors
+	 */
+	resetFields: function() {
+		this.email    = '';
+		this.password = '';
+		this.reg      = {
+			name:             '',
+			email:            '',
+			email_confirm:    '',
+			password:         '',
+			password_confirm: '',
+		};
 
-        this.$.reg_name.invalid = false;
-        this.$.reg_email.invalid = false;
-        this.$.reg_email_confirm.invalid = false;
-        this.$.reg_password.invalid = false;
-        this.$.reg_password_confirm.invalid = false;
-    },
+		this.$.reg_name.invalid = false;
+		this.$.reg_email.invalid = false;
+		this.$.reg_email_confirm.invalid = false;
+		this.$.reg_password.invalid = false;
+		this.$.reg_password_confirm.invalid = false;
+	},
 
-    _verifyName() {
-        this.$.reg_name.validate();
-    },
+	_verifyName() {
+		this.$.reg_name.validate();
+	},
 
-    _verifyEmail: function( email, email_confirm ) {
-        this.$.reg_email.validate();
+	_verifyEmail: function( email, email_confirm ) {
+		this.$.reg_email.validate();
 
-        // return error if the value is not matching the element requirements
-        this.$.reg_email_confirm.validate();
-        if ( this.$.reg_email_confirm.invalid ) return;
+		// return error if the value is not matching the element requirements
+		this.$.reg_email_confirm.validate();
+		if ( this.$.reg_email_confirm.invalid ) return;
 
-        // Verify if the entered email match the other one
-        this.$.reg_email_confirm.invalid = true;
+		// Verify if the entered email match the other one
+		this.$.reg_email_confirm.invalid = true;
 
-        if ( email === email_confirm ) {
-            this.$.reg_email_confirm.invalid = false;
-        }
-    },
+		if ( email === email_confirm ) {
+			this.$.reg_email_confirm.invalid = false;
+		}
+	},
 
-    _verifyPassword: function( password, password_confirm ) {
-        this.$.reg_password.validate();
+	_verifyPassword: function( password, password_confirm ) {
+		this.$.reg_password.validate();
 
-        // return error if the value is not matching the element requirements
-        this.$.reg_password_confirm.validate();
+		// return error if the value is not matching the element requirements
+		this.$.reg_password_confirm.validate();
 
-        if ( this.$.reg_password_confirm.invalid ) return;
+		if ( this.$.reg_password_confirm.invalid ) return;
 
-        // Verify if the entered password match the other one
-        this.$.reg_password_confirm.invalid = true;
+		// Verify if the entered password match the other one
+		this.$.reg_password_confirm.invalid = true;
 
-        if ( password === password_confirm ) {
-            this.$.reg_password_confirm.invalid = false;
-        }
-    },
+		if ( password === password_confirm ) {
+			this.$.reg_password_confirm.invalid = false;
+		}
+	},
 
-    _register: function() {
-        this.reg.lang = this.$.language.selectedValue;
-        this.$.reg_name.validate();
-        this.$.reg_email.validate();
-        this.$.reg_email_confirm.validate();
-        this.$.reg_password.validate();
-        this.$.reg_password_confirm.validate();
+	register: function() {
+		this.reg.lang = this.$.language.selectedValue;
+		this.$.reg_name.validate();
+		this.$.reg_email.validate();
+		this.$.reg_email_confirm.validate();
+		this.$.reg_password.validate();
+		this.$.reg_password_confirm.validate();
 
-        if ( this.$.reg_name.invalid || this.$.reg_email.invalid || this.$.reg_email_confirm.invalid || this.$.reg_password.invalid || this.$.reg_password_confirm.invalid ) {
-            return;
-        }
+		if ( this.$.reg_name.invalid || this.$.reg_email.invalid || this.$.reg_email_confirm.invalid || this.$.reg_password.invalid || this.$.reg_password_confirm.invalid ) {
+			return;
+		}
 
-        lqApp.$.pages.selected = 1; //loading
+		lqApp.$.pages.selected = 1; //loading
 
-        var ajax_url              = apiDir + "register";
-        this.$.ajax_register.url  = ajax_url;
-        this.$.ajax_register.body = "name="              + encodeURIComponent( this.reg.name ) +
-                                    "&email="            + encodeURIComponent( this.reg.email ) +
-                                    "&email_confirm="    + encodeURIComponent( this.reg.email_confirm ) +
-                                    "&password="         + encodeURIComponent( this.reg.password ) +
-                                    "&password_confirm=" + encodeURIComponent( this.reg.password_confirm ) +
-                                    "&language="         + encodeURIComponent( this.reg.lang );
+		var ajax_url              = apiDir + "register";
+		this.$.ajax_register.url  = ajax_url;
+		this.$.ajax_register.body = "name="              + encodeURIComponent( this.reg.name ) +
+									"&email="            + encodeURIComponent( this.reg.email ) +
+									"&email_confirm="    + encodeURIComponent( this.reg.email_confirm ) +
+									"&password="         + encodeURIComponent( this.reg.password ) +
+									"&password_confirm=" + encodeURIComponent( this.reg.password_confirm ) +
+									"&language="         + encodeURIComponent( this.reg.lang );
 
-        this.$.ajax_register.generateRequest();
-    },
+		this.$.ajax_register.generateRequest();
+	},
 
-    /**
-     * Verify text fields
-     * then send the Ajax request to the API
-     */
-    _verifyLogIn: function() {
-        this.$.login_email.validate();
-        this.$.login_password.validate();
+	/**
+	 * Verify text fields
+	 * then send the Ajax request to the API
+	 */
+	login: function() {
+		this.$.login_email.validate();
+		this.$.login_password.validate();
 
-        if ( this.email.length > 0 && this.password.length > 0 && this.$.login_email.validate() && this.$.login_password.validate() ) {
-            lqApp.$.pages.selected = 1; //loading
+		if ( this.email.length > 0 && this.password.length > 0 && this.$.login_email.validate() && this.$.login_password.validate() ) {
+			lqApp.$.pages.selected = 1; //loading
 
-            var ajax_url           = apiDir + "login";
-            this.$.ajax_login.url  = ajax_url;
-            this.$.ajax_login.body = "email=" + encodeURIComponent( this.email ) +
-                                     "&password=" + encodeURIComponent( this.password );
+			var ajax_url           = apiDir + "login";
+			this.$.ajax_login.url  = ajax_url;
+			this.$.ajax_login.body = "email=" + encodeURIComponent( this.email ) +
+									 "&password=" + encodeURIComponent( this.password );
 
-            this.$.ajax_login.generateRequest();
-        }
-        else {
-            lqApp.$.pages.selected = 2; //login
-        }
-    },
+			this.$.ajax_login.generateRequest();
+		}
+		else {
+			lqApp.$.pages.selected = 2; //login
+		}
+	},
 
-    registerSucceed: function() {
-        lqApp.update();
-        lqApp.$.toast.text = "Welcome! You are now register";
-        lqApp.$.toast.show();
-        this.resetFields();
-    },
+	registerSucceed: function() {
+		lqApp.update();
+		fireToast( "Welcome! You are now register" );
+		this.resetFields();
+	},
 
-    registerFailed: function() {
-        lqApp.update();
-        lqApp.$.toast.text = "Please, check the entered details and try again.";
-        lqApp.$.toast.show();
-    },
+	registerFailed: function() {
+		lqApp.update();
+		fireToast( "Please, check the entered details and try again." );
+	},
 
-    loginSucceed: function() {
-        lqApp.update();
-        this.resetFields();
-    },
+	loginSucceed: function() {
+		lqApp.update();
+		this.resetFields();
+	},
 
-    loginFailed: function() {
-        lqApp.update();
-        lqApp.$.toast.text = "Email address or password invalid";
-        lqApp.$.toast.show();
-    }
+	loginFailed: function() {
+		lqApp.update();
+		fireToast( "Email address or password invalid" );
+	}
 });
 </script>
 </dom-module>

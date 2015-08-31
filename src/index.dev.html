@@ -45,14 +45,31 @@
 </head>
 
 <body unresolved class="fullbleed layout vertical">
-    <template is="dom-bind">
-        <lq-app id="lqApp"></lq-app>
-    </template>
+	<template is="dom-bind">
+		<lq-app id="lqApp"></lq-app>
+	</template>
 
 	<script>
 		var appDir = "http://localhost:8888/TheLanguageQUIZ/dist/";
 		var apiDir = "http://localhost:8888/TheLanguageQUIZ/dist/api/";
 		var collectionPage = 0;
+
+		/**
+		 * Fire a toast message
+		 * If busy, queue the request and retry after 500 milliseconds.
+		 * @param String message
+		 */
+		function fireToast( message ) {
+			if ( ! lqApp.$.toast.visible ) {
+				lqApp.$.toast.text = message;
+				lqApp.$.toast.show();
+			}
+			else {
+				setTimeout( function() {
+					fireToast( message );
+				}, 500);
+			}
+		}
 	</script>
 </body>
 </html>

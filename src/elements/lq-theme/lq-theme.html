@@ -1,54 +1,6 @@
-<style is="custom-style">
-html, body {
-	height: 100%;
-	margin: 0;
-}
-html {
-	-ms-text-size-adjust: 100%;
-	-webkit-text-size-adjust: 100%;
-	font-size: 16px;
-}
-body {
-	margin: 0;
-	padding: 0;
-	min-height: 100%;
-	color: #424242;
-	font-family: 'Roboto', 'Noto', sans-serif;
-	font-weight: 400;
-	font-size: 14px;
-	background-color: var(--lq-primary-1);
-}
-h1, h2, h3, h4, h5, h6 {
-	font-weight: 400;
-	margin: 0px;
-	padding: 0px;
-	line-height: 1em;
-}
-h1 {
-	font-size: 50px;
-	margin: 30px 0px;
-}
-h2 {
-	color: #424242;
-	font-size: 35px;
-	margin: 20px 0px;
-}
-h3 {
-	font-size: 25px;
-	margin: 15px 0px;
-}
-h4 {
-	font-size: 20px;
-}
-a, a:active, a:visited, a:focus {
-	color: #424242;
-	text-decoration: none;
-}
-a:hover {
-	color: #424242;
-	text-decoration: underline;
-}
-
+<dom-module id="lq-theme">
+<template>
+<style>
 /**  Palette URL:
 http://paletton.com/#uid=73c0u1kllll52K6dctbtudvLT5Dklllla5qNfIo3qYiCxMfTkllllmwHjlWsIkKdYka6-kllll0bpeaMnivUjo+shr
 **/
@@ -76,51 +28,85 @@ http://paletton.com/#uid=73c0u1kllll52K6dctbtudvLT5Dklllla5qNfIo3qYiCxMfTkllllmw
 	--lq-complement-2: #E9AE89;
 	--lq-complement-3: #6B2F08;
 	--lq-complement-4: #2D1200;
-}
 
-:root {
 	--lq-tile-height: 250px;
 }
+body {
+	background-color: var(--lq-primary-1);
+}
+neon-animated-pages {
+	height: 100%;
+}
+.horizontal-section-container {
+	@apply(--layout-horizontal);
+	@apply(--layout-center-justified);
+	@apply(--layout-wrap);
+}
+.vertical-section-container {
+	@apply(--layout-vertical);
+	@apply(--layout-center-justified);
+	@apply(--layout-wrap);
+}
+.horizontal-section {
+	background-color: white;
+	padding: 24px;
+	margin-right: 24px;
+	margin-bottom: 24px;
+	min-width: 200px;
 
-  /* Material Design Adaptive Breakpoints */
-  /*
-    Below you'll find CSS media queries based on the breakpoint guidance
-    published by the Material Design team. You can choose to use, customise
-    or remove these breakpoints based on your needs.
+	@apply(--shadow-elevation-2dp);
+}
+.vertical-section {
+	background-color: white;
+	padding: 24px;
 
-    http://www.google.com/design/spec/layout/adaptive-ui.html#adaptive-ui-breakpoints
-   */
+	@apply(--shadow-elevation-2dp);
+}
+.flex-section {
+	@apply(--layout-flex);
+}
 
-  /* mobile-small */
-  @media all and (min-width: 0) and (max-width: 360px) and (orientation: portrait) { }
-  /* mobile-large */
-  @media all and (min-width: 361px) and (orientation: portrait) { }
-  /* mobile-small-landscape */
-  @media all and (min-width: 0) and (max-width: 480px) and (orientation: landscape) { }
-  /* mobile-large-landscape */
-  @media all and (min-width: 481px) and (orientation: landscape) { }
-  /* tablet-small-landscape */
-  @media all and (min-width: 600px) and (max-width: 960px) and (orientation: landscape) { }
-  /* tablet-large-landscape */
-  @media all and (min-width: 961px) and (orientation: landscape) { }
-  /* tablet-small */
-  @media all and (min-width: 600px) and (orientation: portrait) { }
-  /* tablet-large */
-  @media all and (min-width: 601px) and (max-width: 840px) and (orientation : portrait) { }
-  /* desktop-x-small-landscape */
-  @media all and (min-width: 0) and (max-width: 480px) and (orientation: landscape) { }
-  /* desktop-x-small */
-  @media all and (min-width: 0) and (max-width: 480px) and (max-aspect-ratio: 4/3) { }
-  /* desktop-small-landscape */
-  @media all and (min-width: 481px) and (max-width: 840px) and (orientation: landscape) { }
-  /* desktop-small */
-  @media all and (min-width: 481px) and (max-width: 840px) and (max-aspect-ratio: 4/3) { }
-  /* desktop-medium-landscape */
-  @media all and (min-width: 841px) and (max-width: 1280px) and (orientation: landscape) { }
-  /* desktop-medium */
-  @media all and (min-width: 841px) and (max-width: 1280px) and (max-aspect-ratio: 4/3) { }
-  /* desktop-large */
-  @media all and (min-width: 1281px) and (max-width: 1600px) { }
-  /* desktop-xlarge */
-  @media all and (min-width: 1601px) and (max-width: 1920px) { }
+/* Material Design Adaptive Breakpoints */
+/*
+Below you'll find CSS media queries based on the breakpoint guidance
+published by the Material Design team. You can choose to use, customise
+or remove these breakpoints based on your needs.
+
+http://www.google.com/design/spec/layout/adaptive-ui.html#adaptive-ui-breakpoints
+*/
+
+/* mobile-small */
+@media all and (min-width: 0) and (max-width: 360px) and (orientation: portrait) { }
+/* mobile-large */
+@media all and (min-width: 361px) and (orientation: portrait) { }
+/* mobile-small-landscape */
+@media all and (min-width: 0) and (max-width: 480px) and (orientation: landscape) { }
+/* mobile-large-landscape */
+@media all and (min-width: 481px) and (orientation: landscape) { }
+/* tablet-small-landscape */
+@media all and (min-width: 600px) and (max-width: 960px) and (orientation: landscape) { }
+/* tablet-large-landscape */
+@media all and (min-width: 961px) and (orientation: landscape) { }
+/* tablet-small */
+@media all and (min-width: 600px) and (orientation: portrait) { }
+/* tablet-large */
+@media all and (min-width: 601px) and (max-width: 840px) and (orientation : portrait) { }
+/* desktop-x-small-landscape */
+@media all and (min-width: 0) and (max-width: 480px) and (orientation: landscape) { }
+/* desktop-x-small */
+@media all and (min-width: 0) and (max-width: 480px) and (max-aspect-ratio: 4/3) { }
+/* desktop-small-landscape */
+@media all and (min-width: 481px) and (max-width: 840px) and (orientation: landscape) { }
+/* desktop-small */
+@media all and (min-width: 481px) and (max-width: 840px) and (max-aspect-ratio: 4/3) { }
+/* desktop-medium-landscape */
+@media all and (min-width: 841px) and (max-width: 1280px) and (orientation: landscape) { }
+/* desktop-medium */
+@media all and (min-width: 841px) and (max-width: 1280px) and (max-aspect-ratio: 4/3) { }
+/* desktop-large */
+@media all and (min-width: 1281px) and (max-width: 1600px) { }
+/* desktop-xlarge */
+@media all and (min-width: 1601px) and (max-width: 1920px) { }
 </style>
+</template>
+</dom-module>

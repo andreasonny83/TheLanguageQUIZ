@@ -1,28 +1,34 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <dom-module id="lq-splashscreen">
-<style is="custom-style">
+<style>
 :host {
-    display: block;
-    height: 100%;
+	display: block;
+	height: 100%;
+	background-color: var(--lq-primary-1);
 }
-neon-animated-pages {
-    height: 100%;
+.primary, .secondary {
+	display: block;
+	text-align: center;
+	font-size: 30px;
 }
-h1, h2 {
-    text-align: center;
+.primary {
+	font-weight: 700;
+	line-height: 100px;
+}
+.secondary {
+	font-weight: 400;
 }
 </style>
 
 <template>
-    <h1>TheLanguageQUIZ is rendering</h1>
-    <h2>Please wait...</h2>
+	<span class="primary">TheLanguageQUIZ is rendering</span>
+	<span class="secondary">Please wait...</span>
 </template>
 
 <script>
 Polymer({
-    is: 'lq-splashscreen',
-
+	is: 'lq-splashscreen'
 });
 </script>
 </dom-module>

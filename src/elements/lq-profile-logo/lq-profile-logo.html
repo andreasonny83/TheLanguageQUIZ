@@ -86,8 +86,7 @@ Polymer({
 
     logOut: function() {
         lqApp.update();
-        lqApp.$.toast.text = "You are now logged out";
-        lqApp.$.toast.show();
+        fireToast( "You are now logged out" );
     },
 
     _userProfile: function() {

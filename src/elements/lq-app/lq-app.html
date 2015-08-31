@@ -1,12 +1,10 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <dom-module id="lq-app">
+<style include="lq-theme"></style>
 <style>
 :host {
     display: block;
-    height: 100%;
-}
-neon-animated-pages {
     height: 100%;
 }
 </style>
@@ -20,7 +18,7 @@ neon-animated-pages {
         <lq-page-full id="lqPageFull"></lq-page-full>
     </neon-animated-pages>
 
-    <paper-toast id="toast" text=""></paper-toast>
+    <paper-toast id="toast"></paper-toast>
 
     <polymer-cookie
         id="user_cookie"
@@ -95,8 +93,7 @@ Polymer({
     getUser: function( e ) {
         if ( e.detail.response.user ) {
             this.user = e.detail.response.user;
-            this.$.toast.text = "Welcome back " + this.user.username;
-            this.$.toast.show();
+            fireToast( "Welcome back " + this.user.username );
         }
     },
 
@@ -105,8 +102,7 @@ Polymer({
         lqApp.$.lqHome.cleanCollection();
         this.$.lqHome.busy = true;
         lqApp.update();
-        lqApp.$.toast.text = "You are now logged out";
-        lqApp.$.toast.show();
+        fireToast( "You are now logged out" );
     },
 
     userUpdate: function() {

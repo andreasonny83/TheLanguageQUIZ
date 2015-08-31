@@ -185,8 +185,7 @@ Polymer({
         }
         // show a toast if any
         if ( e.detail.response && e.detail.response.msg ) {
-            lqApp.$.toast.text = e.detail.response.msg;
-            lqApp.$.toast.show();
+            fireToast( e.detail.response.msg );
         }
 
         this.$.spinner.active = false;
@@ -206,8 +205,7 @@ Polymer({
 
         // show a toast if any
         if ( e.detail.response && e.detail.response.msg ) {
-            lqApp.$.toast.text = e.detail.response.msg;
-            lqApp.$.toast.show();
+            fireToast( e.detail.response.msg );
         }
 
         this.$.avatar_spinner.active = false;
@@ -216,8 +214,7 @@ Polymer({
     updateFailed: function( e ) {
         // show a toast if any
         if ( e.detail.request.xhr.response && e.detail.request.xhr.response.msg ) {
-            lqApp.$.toast.text = e.detail.request.xhr.response.msg;
-            lqApp.$.toast.show();
+            fireToast( e.detail.request.xhr.response.msg );
         }
 
         this.$.spinner.active        = false;
