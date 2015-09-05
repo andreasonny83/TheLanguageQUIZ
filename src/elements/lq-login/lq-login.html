@@ -1,9 +1,10 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <dom-module id="lq-login">
-<style include="lq-theme"></style>
 <style>
 :host {
+	display: block;
+	height: 100%;
 	overflow: auto;
 	background-color: var(--lq-primary-1);
 }
@@ -168,6 +169,7 @@ Polymer({
 
 	ready: function() {
 		this.resetFields();
+		lqApp.update();
 	},
 
 	/**
@@ -238,7 +240,8 @@ Polymer({
 			return;
 		}
 
-		lqApp.$.pages.selected = 1; //loading
+		// lqApp.$.pages.selected = 1; //loading
+		document.querySelector('app-router').go('/');
 
 		var ajax_url              = apiDir + "register";
 		this.$.ajax_register.url  = ajax_url;
@@ -261,7 +264,8 @@ Polymer({
 		this.$.login_password.validate();
 
 		if ( this.email.length > 0 && this.password.length > 0 && this.$.login_email.validate() && this.$.login_password.validate() ) {
-			lqApp.$.pages.selected = 1; //loading
+			document.querySelector( 'app-router' ).go( '/' );
+			// lqApp.$.pages.selected = 1; //loading
 
 			var ajax_url           = apiDir + "login";
 			this.$.ajax_login.url  = ajax_url;
@@ -271,14 +275,13 @@ Polymer({
 			this.$.ajax_login.generateRequest();
 		}
 		else {
-			lqApp.$.pages.selected = 2; //login
+			document.querySelector( 'app-router' ).go( '/#login' );
 		}
 	},
 
 	registerSucceed: function() {
 		lqApp.update();
 		fireToast( "Welcome! You are now register" );
-		this.resetFields();
 	},
 
 	registerFailed: function() {
@@ -288,7 +291,6 @@ Polymer({
 
 	loginSucceed: function() {
 		lqApp.update();
-		this.resetFields();
 	},
 
 	loginFailed: function() {

@@ -1,19 +1,22 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../lq-theme/lq-shared-styles.html">
 
 <dom-module id="lq-app">
 <template>
-	<style>
+	<style include="lq-shared-styles">
 	:host {
 		display: block;
 		height: 100%;
 	}
 	</style>
 
-	<app-router mode="hash">
-		<app-route path="/login" import="components/lq-login/lq-login.html"></app-route>
-		<app-route path="/logout" import="components/lq-login/lq-logout.html"></app-route>
-		<app-route path="/home" import="components/lq-page-home/lq-page-home.html"></app-route>
-	</app-router>
+	<neon-animated-pages id="pages" selected="0">
+		<lq-splashscreen id="lqSplash"></lq-splashscreen>
+		<lq-page-loading id="lqLoading"></lq-page-loading>
+		<lq-login id="lqLogin"></lq-login>
+		<lq-page-home id="lqHome"></lq-page-home>
+		<lq-page-full id="lqPageFull"></lq-page-full>
+	</neon-animated-pages>
 
 	<paper-toast id="toast"></paper-toast>
 
@@ -73,33 +76,14 @@ Polymer({
 			'pic': appDir + 'img/avatar.jpg'
 		};
 
+		collectionPage = 0;
+		this.$.lqHome.busy = false;
+		this.$.lqHome.cleanCollection();
 		this.userCookie = this.$.user_cookie.readCookie();
-		this.async( function() {
-			this.checkUser();
-			console.log('update');
-		}, 500 );
-	},
-
-	checkUser: function() {
-		console.log('checking user');
-		// If a session is already started,
-		// don't ask to log in again
-		if ( this.userCookie && this.userCookie !== '' ) {
-			console.log('home');
-			document.querySelector( 'app-router' ).go( '/home', { replace: true} );
-		}
-		else {
-			console.log('login');
-			document.querySelector( 'app-router' ).go( '/login', { replace: true} );
-		}
-	},
-
-	userUpdate: function() {
-		// this.$.lqHome.$.lqProfile.user = this.$.lqPageFull.$.lqProfile.user = this.user;
+		this.checkUser();
 	},
 
 	cookieUpdate: function() {
-		console.log('updating cookies');
 		if ( this.userCookie && this.userCookie !== '' ) {
 			this.$.ajax_user.url = apiDir + "user/" + this.userCookie;
 			this.$.ajax_user.generateRequest();
@@ -107,22 +91,35 @@ Polymer({
 	},
 
 	getUser: function( e ) {
-		console.log('getUser');
 		if ( e.detail.response.user ) {
-			console.log('getUser, user information updated');
 			this.user = e.detail.response.user;
 			fireToast( "Welcome back " + this.user.username );
-			document.querySelector( 'app-router' ).go( '/home', { replace: true} );
 		}
 	},
 
 	logOut: function() {
 		lqApp.$.user_cookie.eraseCookie();
 		lqApp.$.lqHome.cleanCollection();
+		this.$.lqHome.busy = true;
 		lqApp.update();
 		fireToast( "You are now logged out" );
 	},
 
+	userUpdate: function() {
+		this.$.lqHome.$.lqProfile.user = this.$.lqPageFull.$.lqProfile.user = this.user;
+	},
+
+	checkUser: function() {
+		// If a session is already started,
+		// don't ask to log in again
+		if ( this.userCookie && this.userCookie !== '' ) {
+			this.$.pages.selected = 3; //home
+			this.$.lqHome.readCollections();
+		}
+		else {
+			this.$.pages.selected = 2; //login
+		}
+	},
 
 });
 </script>

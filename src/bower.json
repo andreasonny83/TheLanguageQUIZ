@@ -17,11 +17,12 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#~1.1.1",
-    "iron-elements": "PolymerElements/iron-elements#~1.0.3",
-    "paper-elements": "PolymerElements/paper-elements#~1.0.5",
-    "neon-elements": "PolymerElements/neon-elements#~1.0.0",
+    "app-router": "~2.6.1",
     "event-infinite-scroll": "~0.1.0",
+    "iron-elements": "PolymerElements/iron-elements#~1.0.3",
+    "neon-elements": "PolymerElements/neon-elements#~1.0.0",
+    "paper-elements": "PolymerElements/paper-elements#~1.0.5",
+    "polymer": "Polymer/polymer#~1.1.1",
     "polymer-cookie": "~0.1.2"
   }
 }

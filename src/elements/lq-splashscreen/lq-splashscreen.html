@@ -1,27 +1,27 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../lq-theme/lq-shared-styles.html">
 
 <dom-module id="lq-splashscreen">
-<style>
-:host {
-	display: block;
-	height: 100%;
-	background-color: var(--lq-primary-1);
-}
-.primary, .secondary {
-	display: block;
-	text-align: center;
-	font-size: 30px;
-}
-.primary {
-	font-weight: 700;
-	line-height: 100px;
-}
-.secondary {
-	font-weight: 400;
-}
-</style>
-
 <template>
+	<style include="lq-shared-styles">
+	:host {
+		display: block;
+		height: 100%;
+	}
+	.primary, .secondary {
+		display: block;
+		text-align: center;
+		font-size: 30px;
+	}
+	.primary {
+		font-weight: 700;
+		line-height: 100px;
+	}
+	.secondary {
+		font-weight: 400;
+	}
+	</style>
+
 	<span class="primary">TheLanguageQUIZ is rendering</span>
 	<span class="secondary">Please wait...</span>
 </template>

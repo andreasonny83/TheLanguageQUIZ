@@ -1,158 +1,190 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../event-infinite-scroll/event-infinite-scroll.html">
+<link rel="import" href="../lq-tile/lq-tile.html">
+<link rel="import" href="../lq-dropdown/lq-dropdown.html">
+<link rel="import" href="../lq-profile-logo/lq-profile-logo.html">
 
 <dom-module id="lq-page-home">
-<style>
-:host {
-    display: block;
-}
-paper-header-panel {
-    background-color: var(--paper-grey-200, #eee);
-}
-paper-toolbar {
-    background-color: var(--lq-primary-0);
-}
-.content {
-    padding: 10px;
-    max-width: 1100px;
-    margin: 0 auto;
-}
-.horizontal-section-container {
-    @apply(--layout-horizontal);
-    @apply(--layout-wrap);
-}
-</style>
-
 <template>
-    <paper-header-panel mode="waterfall">
-        <paper-toolbar class="medium-tall">
-            <div class="title">The LanguageQUIZ</div>
-            <div class="flex"></div>
-            <lq-profile-logo id="lqProfile"></lq-profile-logo>
+	<style>
+	paper-scroll-header-panel {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background-color: var(--paper-grey-200, #eee);
+	}
+	paper-toolbar {
+		height: 130px;
+		background-color: var(--lq-primary-0);
+	}
+	paper-toolbar.tall .title {
+		font-size: 24px;
+		line-height: 64px;
+	}
+	.content {
+		height: 5000px;
+	}
+	</style>
 
-            <paper-icon-button class="bottom social" icon="assessment"></paper-icon-button>
-            <div class="bottom flex"></div>
-            <paper-icon-button class="bottom" icon="favorite"></paper-icon-button>
-        </paper-toolbar>
+	<!-- Main Area -->
+	<paper-scroll-header-panel condenses header-height="300" condensed-header-height="64">
 
-        <!-- Main Content -->
-        <div class="content">
-            <div class="horizontal-section-container">
-                <lq-tile large image="http://placehold.it/900x300"></lq-tile>
-            </div>
+		<!-- Main Toolbar -->
+		<paper-toolbar class="tall">
 
-            <div class="horizontal-section-container">
-                <template is="dom-repeat" items="[[collections]]" as="collection">
-                    <lq-tile small
-                        title=[[collection.name]]
-                        image="http://placehold.it/350x250">
-                        <p class="description">[[collection.description]]</p>
-                    </lq-tile>
-                </template>
-                <lq-tile id="titleLoading" loading></lq-tile>
-            </div>
-        </div>
+			<paper-icon-button class="social" icon="assessment"></paper-icon-button>
+			<div class="flex"></div>
+			<paper-icon-button icon="search"></paper-icon-button>
+			<paper-icon-button icon="more-vert"></paper-icon-button>
 
-        <event-infinite-scroll
-            auto-start
-            scroll-offset="300"
-            loading-delay="500"
-            on-reach-bottom="readCollections">
-        </event-infinite-scroll>
+			<div class="bottom title">The LanguageQUIZ</div>
+			<div class="bottom flex"></div>
+			<paper-icon-button class="bottom favorite" icon="favorite"></paper-icon-button>
 
-    </paper-header-panel>
+		</paper-toolbar>
 
-    <iron-localstorage name="lq-global-collections"
-    id="lqCollections"
-    value="{{collections}}">
-    </iron-localstorage>
+		<!-- Main Content -->
+		<div class="content">
 
-    <iron-ajax
+			<iron-pages attr-for-selected="data-route" selected="{{route}}">
+
+				<!-- Home Page -->
+				<section data-route="home">
+					<div class="horizontal-section-container">
+						<lq-tile large image="http://placehold.it/900x300"></lq-tile>
+					</div>
+
+					<div class="horizontal-section-container">
+						<template is="dom-repeat" items="[[collections]]" as="collection">
+							<lq-tile small
+								title=[[collection.name]]
+								image="http://placehold.it/350x250">
+								<p class="description">[[collection.description]]</p>
+							</lq-tile>
+						</template>
+						<lq-tile id="titleLoading" loading></lq-tile>
+					</div>
+					<event-infinite-scroll
+						id="infinite_scroll"
+						auto-start
+						scroll-offset="300"
+						loading-delay="500"
+						on-reach-bottom="readCollections">
+					</event-infinite-scroll>
+				</section>
+
+			</iron-pages>
+		</div>
+	</paper-scroll-header-panel>
+
+	<iron-localstorage name="lq-global-collections"
+		id="lqCollections"
+		value="{{collections}}">
+	</iron-localstorage>
+
+	<iron-ajax
 		id="ajax_collections"
 		method="GET"
-        headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
+		headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
 		handle-as="json"
 		on-response="getCollections">
 	</iron-ajax>
 
-
 </template>
 
 <script>
+addEventListener('paper-header-transform', function( e ) {
+	var favorite         = document.querySelector( '.favorite' );
+	var y                = e.detail.y;
+	var condensed_height = e.detail.condensedHeight;
+	var expanded_height  = e.detail.height - condensed_height;
+	var header_height    = expanded_height - e.detail.y;
+	var span;
+
+	if ( header_height > 0 && expanded_height > condensed_height ) {
+		span = 80 - Math.round( header_height / expanded_height * 80 );
+		Polymer.Base.transform( 'translateX(-' + span + 'px)', favorite );
+	}
+});
+
 Polymer({
-    is: 'lq-page-home',
+	is: 'lq-page-home',
 
-    behaviors: [
-        Polymer.NeonAnimatableBehavior
-    ],
+	properties: {
+		animationConfig: {
+			type: Object,
+			value: function() {
+				return {
+					'entry': {
+						name: 'fade-in-animation',
+						node: this
+					},
+					'exit': {
+						name: 'fade-out-animation',
+						node: this
+					}
+				}
+			}
+		},
 
-    properties: {
-        animationConfig: {
-            type: Object,
-            value: function() {
-                return {
-                    'entry': {
-                        name: 'fade-in-animation',
-                        node: this
-                    },
-                    'exit': {
-                        name: 'fade-out-animation',
-                        node: this
-                    }
-                }
-            }
-        },
+		collections: {
+			type: Object,
+			value: []
+		},
 
-        collections: {
-            type: Object,
-            value: []
-        },
+		collectionPage: {
+			type: Number,
+			value: 0
+		}
+	},
 
-        busy: {
-            type: Boolean,
-            value: false
-        }
+	attached: function() {
+		// this.cleanCollection();
+	},
 
-    },
+	cleanCollection: function() {
+		this.collections = [];
+		this.$.lqCollections.save();
+		this.readCollections();
+	},
 
-    attached: function() {
-        this.cleanCollection();
-    },
+	readCollections: function() {
+		// this.busy = this.$.infinite_scroll.getAttribute( 'busy' );
+		// if ( busy ) {
+			// console.log('waiting');
+			// return;
+		// }
 
-    cleanCollection: function() {
-        this.collections = [];
-        this.$.lqCollections.save();
-    },
+		console.log('reading collections');
+		// this.$.infinite_scroll.toggleAttribute( 'busy', true );
+		if ( lqApp.userCookie ) {
+			this.$.titleLoading.toggleAttribute( 'active', true );
+			this.$.ajax_collections.url = apiDir + "user/" + lqApp.userCookie + "/collections?page=" + this.collectionPage;
 
-    readCollections: function() {
-        if ( ! this.busy && lqApp.userCookie ) {
-            this.busy = true;
-            this.$.titleLoading.toggleAttribute( 'active', true );
-            this.$.ajax_collections.url = apiDir + "user/" + lqApp.userCookie + "/collections?page=" + collectionPage;
+			this.async( function() {
+				this.$.ajax_collections.generateRequest();
+			}, 500);
+		}
+	},
 
-            this.async( function() {
-                this.$.ajax_collections.generateRequest();
-            }, 500);
-        }
-    },
+	getCollections: function( e ) {
+		var that = this;
 
-    getCollections: function( e ) {
-        var that = this;
+		if ( e.detail.response && e.detail.response.collections ) {
+			e.detail.response.collections.forEach(function( collection ) {
+				that.push( 'collections', collection );
+			});
 
-        if ( e.detail.response && e.detail.response.collections ) {
-            e.detail.response.collections.forEach(function( collection ) {
-                that.push( 'collections', collection );
-            });
+			if ( e.detail.response.loadMore ) {
+				this.collectionPage++;
+				this.$.infinite_scroll.toggleAttribute( 'busy', false );
+			}
+		}
 
-            if ( e.detail.response.loadMore ) {
-                collectionPage++;
-                this.busy = false;
-            }
-
-        }
-
-        this.$.titleLoading.toggleAttribute( 'active', false );
-    }
-
+		this.$.titleLoading.toggleAttribute( 'active', false );
+	}
 });
 </script>
 
