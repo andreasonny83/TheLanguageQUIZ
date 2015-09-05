@@ -13,7 +13,7 @@ To install Grunt, you must first [download and install node.js](https://nodejs.o
 Then, from the command line:
 
 1. ``Install grunt-cli globally with npm install -g grunt-cli``.
-2. Navigate to the project root directory (eg. ~/home/the-language-quiz/), then run npm install. npm will look at the package.json file and automatically install the necessary local dependencies listed there.
+2. Navigate to the project root directory (eg. ~/home/the-language-quiz/), then run `sudo npm install`. npm will look at the package.json file and automatically install the necessary local dependencies listed there.
 
 When completed, you'll be able to run the various Grunt commands provided from the command line.
 
