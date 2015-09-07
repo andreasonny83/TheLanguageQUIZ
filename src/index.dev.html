@@ -41,37 +41,42 @@
 	<script src="components/webcomponentsjs/webcomponents-lite.min.js"></script>
 
 	<!-- Web Components -->
-	<link rel="import" href="elements.html">
+	<link rel="import" href="elements.html" async>
 </head>
 
-<body unresolved class="fullbleed layout vertical">
-	<span id="browser-sync-binding"></span>
+<body class="fullbleed layout vertical">
+	<div id="browser-sync-binding">
+		<span class="primary">TheLanguageQUIZ is rendering</span>
+		<span class="secondary">Please wait...</span>
+	</div>
 
 	<template is="dom-bind">
 		<lq-app id="lqApp"></lq-app>
 	</template>
 
 	<script>
-		var appDir = "http://localhost:8888/TheLanguageQUIZ/dist/";
-		var apiDir = "http://localhost:8888/TheLanguageQUIZ/dist/api/";
-		var collectionPage = 0;
+	var appDir = "http://localhost:8888/TheLanguageQUIZ/dist/";
+	var apiDir = "http://localhost:8888/TheLanguageQUIZ/dist/api/";
+	var collectionPage = 0;
 
-		/**
-		 * Fire a toast message
-		 * If busy, queue the request and retry after 500 milliseconds.
-		 * @param String message
-		 */
-		function fireToast( message ) {
-			if ( ! lqApp.$.toast.visible ) {
-				lqApp.$.toast.text = message;
-				lqApp.$.toast.show();
-			}
-			else {
-				setTimeout( function() {
-					fireToast( message );
-				}, 500);
-			}
+	/**
+	 * Fire a toast message
+	 * If busy, queue the request and retry after 500 milliseconds.
+	 * @param String message
+	 */
+	function fireToast( message ) {
+		var toast = document.querySelector( '#toast' );
+
+		if ( ! toast.visible ) {
+			toast.text = message;
+			toast.show();
 		}
+		else {
+			setTimeout( function() {
+				fireToast( message );
+			}, 500);
+		}
+	}
 	</script>
 </body>
 </html>

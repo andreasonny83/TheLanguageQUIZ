@@ -9,10 +9,12 @@
 	}
 	</style>
 
-	<app-router mode="hash">
+	<app-router id="router" mode="hash">
+		<app-route path="/" import="components/lq-login/lq-login.html"></app-route>
 		<app-route path="/login" import="components/lq-login/lq-login.html"></app-route>
 		<app-route path="/logout" import="components/lq-login/lq-logout.html"></app-route>
-		<app-route path="/home" import="components/lq-page-home/lq-page-home.html"></app-route>
+		<app-route path="/:uid/home" import="components/lq-page-home/lq-page-home.html"></app-route>
+		<app-route path="*" redirect="/login"></app-route>
 	</app-router>
 
 	<paper-toast id="toast"></paper-toast>
@@ -52,6 +54,9 @@ Polymer({
 	},
 
 	attached: function() {
+		var splash = document.querySelector( '#browser-sync-binding' );
+		Polymer.Base.toggleAttribute( 'unresolved', true, splash );
+
 		var elapsed = Date.now() - readyTime;
 		console.log('Loading time: ' + elapsed);
 		var t = 2500 - elapsed;
@@ -61,11 +66,13 @@ Polymer({
 			t = 2000;
 		}
 
-		this.async( this.update, t );
+		// this.async( this.update, t );
 		console.log('APP is ready');
 	},
 
 	update: function() {
+		console.log('update');
+
 		// when update is triggered
 		// we load a clean view like the app has been reloaded
 		this.user = {
@@ -76,21 +83,21 @@ Polymer({
 		this.userCookie = this.$.user_cookie.readCookie();
 		this.async( function() {
 			this.checkUser();
-			console.log('update');
 		}, 500 );
 	},
 
 	checkUser: function() {
-		console.log('checking user');
+		console.log( 'checkUser' );
+		var uid    = document.querySelector( 'lq-page-home' ) ? document.querySelector( 'lq-page-home' ).uid : '';
+		var router = document.querySelector( 'app-router' );
 		// If a session is already started,
 		// don't ask to log in again
 		if ( this.userCookie && this.userCookie !== '' ) {
-			console.log('home');
-			document.querySelector( 'app-router' ).go( '/home', { replace: true} );
+			console.log('going home');
+			router.go( '/' + this.userCookie + '/home', { replace: true} );
 		}
 		else {
-			console.log('login');
-			document.querySelector( 'app-router' ).go( '/login', { replace: true} );
+			router.go( '/login', { replace: true} );
 		}
 	},
 
@@ -112,14 +119,12 @@ Polymer({
 			console.log('getUser, user information updated');
 			this.user = e.detail.response.user;
 			fireToast( "Welcome back " + this.user.username );
-			document.querySelector( 'app-router' ).go( '/home', { replace: true} );
+			// document.querySelector( 'app-router' ).go( '/home', { replace: true} );
 		}
 	},
 
 	logOut: function() {
 		lqApp.$.user_cookie.eraseCookie();
-		lqApp.$.lqHome.cleanCollection();
-		lqApp.update();
 		fireToast( "You are now logged out" );
 	},
 

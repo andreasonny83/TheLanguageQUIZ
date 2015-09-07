@@ -68,7 +68,6 @@
 					</div>
 					<event-infinite-scroll
 						id="infinite_scroll"
-						auto-start
 						scroll-offset="300"
 						loading-delay="500"
 						on-reach-bottom="readCollections">
@@ -90,6 +89,15 @@
 		headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
 		handle-as="json"
 		on-response="getCollections">
+	</iron-ajax>
+
+	<iron-ajax
+		id="ajax_user"
+		method="POST"
+		headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
+		handle-as="json"
+		on-error="logOut"
+		on-response="getUser">
 	</iron-ajax>
 
 </template>
@@ -137,6 +145,21 @@ Polymer({
 		collectionPage: {
 			type: Number,
 			value: 0
+		}
+	},
+
+	ready: function() {
+		this.$.ajax_user.url = apiDir + "user/" + lqApp.$.user_cookie.readCookie();
+		this.$.ajax_user.generateRequest();
+	},
+
+	getUser: function( e ) {
+		console.log('getUser');
+		if ( e.detail.response.user ) {
+			console.log('getUser, user information updated');
+			this.user = e.detail.response.user;
+			fireToast( "Welcome back " + this.user.username );
+			// document.querySelector( 'app-router' ).go( '/home', { replace: true} );
 		}
 	},
 
