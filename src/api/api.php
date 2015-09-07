@@ -217,15 +217,29 @@ $app->post(
 	}
 );
 
-$app->post(
+$app->get(
 	'/user/:userid', 'authenticate', function( $userUID ) use ( $app ) {
 		sleep(2);
 		$response = array(
 			'request' => 'user'
 		);
-		$user = array();
-		$db   = new DbHandler();
 
+		$user_cookie = $app->getCookie( 'lq_user_id' );
+
+		// The userid provided by the app url must be the same as the one stored inside the user's cookie
+		$db = new DbHandler();
+
+		if ( $userUID !== $user_cookie ) {
+			$user_session = isset( $_COOKIE["LQ_session"] ) ? $_COOKIE["LQ_session"] : '';
+			// $db->logOut( $user_session );
+
+			$response['error'] = true;
+			$response['msg']   = 'Cannot verify the user identity. Please log in.';
+			echoRespnse( 400, $response );
+			$app->stop();
+		}
+
+		$user = array();
 		$user = $db->getUser( $userUID );
 
 		if ( !empty( $user ) ) {
@@ -235,6 +249,9 @@ $app->post(
 			echoRespnse( 200, $response );
 			$app->stop();
 		}
+
+		$user_session = isset( $_COOKIE["LQ_session"] ) ? $_COOKIE["LQ_session"] : '';
+		// $db->logOut( $user_session );
 
 		$response['error'] = true;
 		$response['msg']   = 'The user is not present in the database.';

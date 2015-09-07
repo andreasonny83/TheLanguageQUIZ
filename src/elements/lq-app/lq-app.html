@@ -2,7 +2,7 @@
 
 <dom-module id="lq-app">
 <template>
-	<style>
+	<style include="lq-shared-styles">
 	:host {
 		display: block;
 		height: 100%;
@@ -10,7 +10,6 @@
 	</style>
 
 	<app-router id="router" mode="hash">
-		<app-route path="/" import="components/lq-login/lq-login.html"></app-route>
 		<app-route path="/login" import="components/lq-login/lq-login.html"></app-route>
 		<app-route path="/logout" import="components/lq-login/lq-logout.html"></app-route>
 		<app-route path="/:uid/home" import="components/lq-page-home/lq-page-home.html"></app-route>
@@ -18,6 +17,8 @@
 	</app-router>
 
 	<paper-toast id="toast"></paper-toast>
+
+	<lq-page-loading id="spinner"></lq-page-loading>
 
 	<polymer-cookie
 		id="user_cookie"
@@ -28,7 +29,7 @@
 
 	<iron-ajax
 		id="ajax_user"
-		method="POST"
+		method="GET"
 		headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
 		handle-as="json"
 		on-error="logOut"
@@ -41,17 +42,17 @@
 Polymer({
 	is: 'lq-app',
 
-	properties: {
-		userCookie: {
-			type: String,
-			observer: "cookieUpdate"
-		},
-
-		user: {
-			type: Object,
-			observer: "userUpdate"
-		}
-	},
+	// properties: {
+	// 	userCookie: {
+	// 		type: String,
+	// 		observer: "cookieUpdate"
+	// 	},
+	//
+	// 	user: {
+	// 		type: Object,
+	// 		observer: "userUpdate"
+	// 	}
+	// },
 
 	attached: function() {
 		var splash = document.querySelector( '#browser-sync-binding' );
@@ -59,76 +60,80 @@ Polymer({
 
 		var elapsed = Date.now() - readyTime;
 		console.log('Loading time: ' + elapsed);
-		var t = 2500 - elapsed;
+		// var t = 2500 - elapsed;
 		// Minimum time for displaying the splashscreen
 		// is set to 2 second
-		if ( t < 2000 ) {
-			t = 2000;
-		}
+		// if ( t < 2000 ) {
+		// 	t = 2000;
+		// }
 
 		// this.async( this.update, t );
 		console.log('APP is ready');
 	},
 
-	update: function() {
-		console.log('update');
-
-		// when update is triggered
-		// we load a clean view like the app has been reloaded
-		this.user = {
-			'username': 'user',
-			'pic': appDir + 'img/avatar.jpg'
-		};
-
-		this.userCookie = this.$.user_cookie.readCookie();
-		this.async( function() {
-			this.checkUser();
-		}, 500 );
+	checkUser() {
+		var userCookie = this.$.user_cookie.readCookie();
+		this.$.ajax_user.url = apiDir + "user/" + this.userCookie;
+		this.$.ajax_user.generateRequest();
 	},
 
-	checkUser: function() {
-		console.log( 'checkUser' );
-		var uid    = document.querySelector( 'lq-page-home' ) ? document.querySelector( 'lq-page-home' ).uid : '';
-		var router = document.querySelector( 'app-router' );
-		// If a session is already started,
-		// don't ask to log in again
-		if ( this.userCookie && this.userCookie !== '' ) {
-			console.log('going home');
-			router.go( '/' + this.userCookie + '/home', { replace: true} );
-		}
-		else {
-			router.go( '/login', { replace: true} );
-		}
-	},
+	// update: function() {
+	// 	console.log('update');
+	//
+	// 	// when update is triggered
+	// 	// we load a clean view like the app has been reloaded
+	// 	this.user = {
+	// 		'username': 'user',
+	// 		'pic': appDir + 'img/avatar.jpg'
+	// 	};
+	//
+	// 	this.userCookie = this.$.user_cookie.readCookie();
+	// 	this.async( function() {
+	// 		this.checkUser();
+	// 	}, 500 );
+	// },
 
-	userUpdate: function() {
+	// checkUser: function() {
+	// 	console.log( 'checkUser' );
+	// 	var uid    = document.querySelector( 'lq-page-home' ) ? document.querySelector( 'lq-page-home' ).uid : '';
+	// 	var router = document.querySelector( 'app-router' );
+	// 	// If a session is already started,
+	// 	// don't ask to log in again
+	// 	if ( this.userCookie && this.userCookie !== '' ) {
+	// 		console.log('going home');
+	// 		router.go( '/' + this.userCookie + '/home', { replace: true} );
+	// 	}
+	// 	else {
+	// 		router.go( '/login', { replace: true} );
+	// 	}
+	// },
+
+	// userUpdate: function() {
 		// this.$.lqHome.$.lqProfile.user = this.$.lqPageFull.$.lqProfile.user = this.user;
-	},
+	// },
 
-	cookieUpdate: function() {
-		console.log('updating cookies');
-		if ( this.userCookie && this.userCookie !== '' ) {
-			this.$.ajax_user.url = apiDir + "user/" + this.userCookie;
-			this.$.ajax_user.generateRequest();
-		}
-	},
+	// cookieUpdate: function() {
+	// 	console.log('updating cookies');
+	// 	if ( this.userCookie && this.userCookie !== '' ) {
+	// 		this.$.ajax_user.url = apiDir + "user/" + this.userCookie;
+	// 		this.$.ajax_user.generateRequest();
+	// 	}
+	// },
 
-	getUser: function( e ) {
-		console.log('getUser');
-		if ( e.detail.response.user ) {
-			console.log('getUser, user information updated');
-			this.user = e.detail.response.user;
-			fireToast( "Welcome back " + this.user.username );
-			// document.querySelector( 'app-router' ).go( '/home', { replace: true} );
-		}
-	},
+	// getUser: function( e ) {
+	// 	console.log('getUser');
+	// 	if ( e.detail.response.user ) {
+	// 		console.log('getUser, user information updated');
+	// 		this.user = e.detail.response.user;
+	// 		fireToast( "Welcome back " + this.user.username );
+	// 		// document.querySelector( 'app-router' ).go( '/home', { replace: true} );
+	// 	}
+	// },
 
-	logOut: function() {
-		lqApp.$.user_cookie.eraseCookie();
-		fireToast( "You are now logged out" );
-	},
-
-
+	// logOut: function() {
+	// 	lqApp.$.user_cookie.eraseCookie();
+	// 	fireToast( "You are now logged out" );
+	// },
 });
 </script>
 </dom-module>

@@ -1,32 +1,39 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <dom-module id="lq-page-loading">
-<style>
-:host {
-	height: 100%;
-}
-.spinner-box-container {
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	margin-left: -50px;
-	margin-top: -50px;
-}
-.spinner-box {
-	padding: 50px;
-	text-align: center;
-	background-color: white;
-	border-radius: 50%;
-	@apply(--shadow-elevation-16dp);
-}
-.centered {
-	max-width: 400px;
-	margin-left: auto;
-	margin-right: auto;
-}
-</style>
-
 <template>
+	<style>
+	:host {
+		display: none;
+		position: fixed;
+		left: 0;
+		top: 0;
+		height: 100%;
+		width: 100%;
+	}
+	:host.visible {
+		display: block;
+	}
+	.spinner-box-container {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		margin-left: -50px;
+		margin-top: -50px;
+	}
+	.spinner-box {
+		padding: 50px;
+		text-align: center;
+		background-color: white;
+		border-radius: 50%;
+		@apply(--shadow-elevation-16dp);
+	}
+	.centered {
+		margin-left: auto;
+		margin-right: auto;
+	}
+	</style>
+
 	<div class="spinner-box-container">
 		<div class="spinner-box centered">
 			<paper-spinner active></paper-spinner>
@@ -39,24 +46,52 @@ Polymer({
 	is: 'lq-page-loading',
 
 	behaviors: [
-		Polymer.NeonAnimatableBehavior
+		Polymer.NeonAnimationRunnerBehavior
 	],
 
 	properties: {
+		active: {
+			type: Boolean,
+			value: false,
+			reflectToAttribute: true,
+			observer: "activate"
+		},
+
 		animationConfig: {
 			type: Object,
 			value: function() {
 				return {
-					'entry': {
+					'entry': [{
 						name: 'scale-up-animation',
 						node: this
-					},
-					'exit': {
+					}],
+					'exit': [{
 						name: 'scale-down-animation',
-						node: this
-					}
+						node: this,
+						timing: { delay: 100 }
+					}]
 				}
 			}
+		}
+	},
+
+	listeners: {
+		'neon-animation-finish': '_onAnimationFinish'
+	},
+
+	_onAnimationFinish: function() {
+		if ( ! this.active ) {
+			this.style.display = 'none';
+		}
+	},
+
+	activate: function( e ) {
+		if ( e ) {
+		this.style.display = 'inline-block';
+		this.playAnimation( 'entry' );
+		}
+		else {
+			this.playAnimation( 'exit' );
 		}
 	}
 });

@@ -4,93 +4,93 @@
 <dom-module id="lq-dropdown">
 <style>
 :host {
-    display: block;
-    position: relative;
+	display: block;
+	position: relative;
 }
 .title {
-    margin: 20px 0 10px;
-    display: flex;
-    text-align: left;
-    font-size: 16px;
+	margin: 20px 0 10px;
+	display: flex;
+	text-align: left;
+	font-size: 16px;
 }
 .dropdown-box {
-    display: block;
-    position: relative;
-    height: 40px;
-    background-color: #CCC;
+	display: block;
+	position: relative;
+	height: 40px;
+	background-color: #CCC;
 
-    @apply(--shadow-elevation-4dp);
+	@apply(--shadow-elevation-4dp);
 }
 paper-icon-item {
-    background-color: #487CCA;
-    color: #fff;
-    cursor: pointer;
+	background-color: #487CCA;
+	color: #fff;
+	cursor: pointer;
 }
 paper-icon-item .selected {
-    vertical-align: middle;
-    display: inline-block;
-    line-height: 40px;
-    margin: 0;
-    padding: 0 10px;
+	vertical-align: middle;
+	display: inline-block;
+	line-height: 40px;
+	margin: 0;
+	padding: 0 10px;
 }
 paper-icon-item .selected, paper-icon-item .flex {
-    background-color: rgba(255,255,255, .1);
+	background-color: rgba(255,255,255, .1);
 }
 paper-icon-item .icon {
-    line-height: 40px;
-    padding: 0 10px 0;
+	line-height: 40px;
+	padding: 0 10px 0;
 }
 </style>
 <template>
-    <p class="title">{{title}}</p>
-    <div class="dropdown-box">
-        <paper-icon-item class="horizontal layout" on-click="_toggleMenu">
-            <div class="selected">{{selectedValue}}</div>
-            <div class="flex"></div>
-            <div class="icon">
-                <iron-icon icon="icons:arrow-drop-down"></iron-icon>
-            </div>
-        </paper-icon-item>
-        <lq-dropdown-items id="menu" data-items="{{menuItems}}" on-change="_itemSelected"></lq-dropdown-items>
-    </div>
+	<p class="title">{{title}}</p>
+	<div class="dropdown-box">
+		<paper-icon-item class="horizontal layout" on-click="_toggleMenu">
+			<div class="selected">{{selectedValue}}</div>
+			<div class="flex"></div>
+			<div class="icon">
+				<iron-icon icon="icons:arrow-drop-down"></iron-icon>
+			</div>
+		</paper-icon-item>
+		<lq-dropdown-items id="menu" data-items="{{menuItems}}" on-change="_itemSelected"></lq-dropdown-items>
+	</div>
 </template>
 
 <script>
 Polymer({
-    is: 'lq-dropdown',
+	is: 'lq-dropdown',
 
-    options: {
-        title: {
-            type: String,
-            reflectToAttribute: true
-        },
+	options: {
+		title: {
+			type: String,
+			reflectToAttribute: true
+		},
 
-        menuItems: {
-            type: Array
-        },
+		menuItems: {
+			type: Array
+		},
 
-        selectedValue: {
-            type: String,
-            reflectToAttribute: true
-        }
-    },
+		selectedValue: {
+			type: String,
+			reflectToAttribute: true
+		}
+	},
 
-    ready: function() {
-        this.menuItems = [
-            "English", "French", "Italian", "Spanish","Swedish"
-        ];
+	ready: function() {
+		this.menuItems = [
+			"English", "French", "Italian", "Spanish","Swedish"
+		];
 
-        this.selectedValue = this.menuItems[0];
-    },
+		this.selectedValue = this.menuItems[0];
+	},
 
-    _toggleMenu: function() {
-        this.$.menu.toggle();
-    },
+	_toggleMenu: function() {
+		this.$.menu.toggle();
+	},
 
-    _itemSelected: function( pos ) {
-        pos = parseInt( pos.detail );
-        this.selectedValue = this.menuItems[pos];
-    }
+	_itemSelected: function( pos ) {
+		pos = parseInt( pos.detail );
+		this.selectedValue = this.menuItems[pos];
+	}
 });
 </script>
 </dom-module>

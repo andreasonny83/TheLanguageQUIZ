@@ -93,7 +93,7 @@
 
 	<iron-ajax
 		id="ajax_user"
-		method="POST"
+		method="GET"
 		headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
 		handle-as="json"
 		on-error="logOut"
@@ -148,9 +148,10 @@ Polymer({
 		}
 	},
 
-	ready: function() {
-		this.$.ajax_user.url = apiDir + "user/" + lqApp.$.user_cookie.readCookie();
+	attached: function() {
+		this.$.ajax_user.url = apiDir + "user/" + this.uid;
 		this.$.ajax_user.generateRequest();
+		// this.cleanCollection();
 	},
 
 	getUser: function( e ) {
@@ -163,9 +164,6 @@ Polymer({
 		}
 	},
 
-	attached: function() {
-		// this.cleanCollection();
-	},
 
 	cleanCollection: function() {
 		this.collections = [];

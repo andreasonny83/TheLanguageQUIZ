@@ -20,7 +20,15 @@
 	.horizontal-section {
 		background-color: white;
 		padding: 24px;
-		margin-right: 24px;
+		margin-bottom: 24px;
+		min-width: 200px;
+
+		@apply(--shadow-elevation-2dp);
+	}
+	.horizontal-section + .horizontal-section {
+		background-color: white;
+		padding: 24px;
+		margin-left: 24px;
 		margin-bottom: 24px;
 		min-width: 200px;
 
@@ -34,6 +42,17 @@
 	}
 	.flex-section {
 		@apply(--layout-flex);
+	}
+	@media (max-width: 639px) {
+		paper-toast {
+			left: 0;
+			right: 0;
+			bottom: 0;
+			margin: 0;
+			height: auto;
+			border-radius: 0;
+			padding: 20px;
+		}
 	}
 	</style>
 </template>
