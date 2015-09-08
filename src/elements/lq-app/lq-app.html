@@ -21,7 +21,7 @@
 	<lq-page-loading id="spinner"></lq-page-loading>
 
 	<polymer-cookie
-		id="user_cookie"
+		id="userCookie"
 		name="lq_user_id"
 		time="14"
 		format="d">
@@ -30,10 +30,17 @@
 	<iron-ajax
 		id="ajax_user"
 		method="GET"
-		headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
+		headers='{{lqApiKey}}'
 		handle-as="json"
-		on-error="logOut"
-		on-response="getUser">
+		on-error="logOut">
+	</iron-ajax>
+
+	<iron-ajax
+		id="ajax_logout"
+		method="GET"
+		handle-as="json"
+		on-error="loggedOut"
+		on-response="loggedOut">
 	</iron-ajax>
 
 </template>
@@ -54,6 +61,10 @@ Polymer({
 	// 	}
 	// },
 
+	ready: function() {
+		this.lqApiKey = lqApiKey;
+	},
+
 	attached: function() {
 		var splash = document.querySelector( '#browser-sync-binding' );
 		Polymer.Base.toggleAttribute( 'unresolved', true, splash );
@@ -71,12 +82,6 @@ Polymer({
 		console.log('APP is ready');
 	},
 
-	checkUser() {
-		var userCookie = this.$.user_cookie.readCookie();
-		this.$.ajax_user.url = apiDir + "user/" + this.userCookie;
-		this.$.ajax_user.generateRequest();
-	},
-
 	// update: function() {
 	// 	console.log('update');
 	//
@@ -87,7 +92,7 @@ Polymer({
 	// 		'pic': appDir + 'img/avatar.jpg'
 	// 	};
 	//
-	// 	this.userCookie = this.$.user_cookie.readCookie();
+	// 	this.userCookie = this.$.userCookie.readCookie();
 	// 	this.async( function() {
 	// 		this.checkUser();
 	// 	}, 500 );
@@ -120,20 +125,32 @@ Polymer({
 	// 	}
 	// },
 
-	// getUser: function( e ) {
-	// 	console.log('getUser');
-	// 	if ( e.detail.response.user ) {
-	// 		console.log('getUser, user information updated');
-	// 		this.user = e.detail.response.user;
-	// 		fireToast( "Welcome back " + this.user.username );
-	// 		// document.querySelector( 'app-router' ).go( '/home', { replace: true} );
+	// verifyUser() {
+	// 	var user_cookie = this.$.userCookie.readCookie();
+	// 	if ( user_cookie ) {
+	// 		this.$.ajax_user.url = apiDir + "user/" + user_cookie;
+	// 		this.$.ajax_user.generateRequest();
 	// 	}
 	// },
 
-	// logOut: function() {
-	// 	lqApp.$.user_cookie.eraseCookie();
-	// 	fireToast( "You are now logged out" );
+	// getUser: function( e ) {
+	// 	if ( e.detail.response.user ) {
+	// 		this.user = e.detail.response.user;
+	// 		fireToast( "Welcome back " + this.user.username );
+	// 		document.querySelector( 'app-router' ).go( '/home', { replace: true} );
+	// 	}
 	// },
+
+	logOut: function() {
+		// lqApp.$.userCookie.eraseCookie();
+
+		// this.$.ajax_logout.url = apiDir + "logout";
+		// this.$.ajax_logout.generateRequest();
+	},
+
+	loggedOut: function() {
+		fireToast( "You are now logged out" );
+	},
 });
 </script>
 </dom-module>

@@ -34,36 +34,50 @@ footer {
 
 <template>
 	<div class="horizontal-section-container hero">
-		<paper-card heading="Log In">
+		<paper-card id="card_login" heading="Log In">
 			<div class="card-content">
-				<paper-input id="login_email" required label="E-mail" autofocus type="email" error-message="enter a valid email address" value="{{email}}"></paper-input>
-				<paper-input id="login_password" label="Password" required minlength=6 type="password" error-message="password must be 6 minimum characters" value="{{password}}"></paper-input>
+				<paper-input id="login_email" name="username" required label="E-mail" autofocus type="email" error-message="enter a valid email address" value="{{email}}" tabindex="1"></paper-input>
+				<paper-input id="login_password" name="password" label="Password" required minlength=6 type="password" error-message="password must be 6 minimum characters" value="{{password}}" tabindex="2"></paper-input>
 			</div>
 			<div class="card-actions">
 				<paper-button on-tap="login">
-					<iron-icon icon="check"></iron-icon>
+					<iron-icon icon="check" tabindex="3"></iron-icon>
 					ok
 				</paper-button>
 			</div>
+
+			<iron-a11y-keys
+				id="login_keys"
+				keys="enter"
+				target="{{card_login}}"
+				on-keys-pressed="login">
+			</iron-a11y-keys>
 		</paper-card>
 
 	</div>
 	<div class="horizontal-section-container hero">
-		<paper-card heading="Register">
+		<paper-card id="card_register" heading="Register">
 			<div class="card-content">
-				<paper-input id="reg_name" type="text" label="User name*" required pattern="[a-zA-Z0-9]+" minlength=5 value="{{reg.name}}" error-message="letters and number only. Minimun of 5 charaters"></paper-input>
-				<paper-input id="reg_email" type="text" label="Email*" required value="{{reg.email}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="enter a valid email address"></paper-input>
-				<paper-input id="reg_email_confirm" type="text" label="Re-enter email*" required value="{{reg.email_confirm}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="email address doesn't match"></paper-input>
-				<paper-input id="reg_password" type="password" label="Password*" required pattern=".{6,}" value="{{reg.password}}" error-message="password must be 6 characters minimum."></paper-input>
-				<paper-input id="reg_password_confirm" type="password" required label="Re-enter password*" minlength=6 value="{{reg.password_confirm}}" error-message="password doesn't match"></paper-input>
-				<lq-dropdown id="language" title="I speak" selected-value={{reg.lang}}></lq-dropdown>
+				<paper-input id="reg_name" type="text" label="User name*" required pattern="[a-zA-Z0-9]+" minlength=5 value="{{reg.name}}" error-message="letters and number only. Minimun of 5 charaters" tabindex="4"></paper-input>
+				<paper-input id="reg_email" type="text" label="Email*" required value="{{reg.email}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="enter a valid email address" tabindex="5"></paper-input>
+				<paper-input id="reg_email_confirm" type="text" label="Re-enter email*" required value="{{reg.email_confirm}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="email address doesn't match" tabindex="6"></paper-input>
+				<paper-input id="reg_password" type="password" label="Password*" required pattern=".{6,}" value="{{reg.password}}" error-message="password must be 6 characters minimum." tabindex="7"></paper-input>
+				<paper-input id="reg_password_confirm" type="password" required label="Re-enter password*" minlength=6 value="{{reg.password_confirm}}" error-message="password doesn't match" tabindex="8"></paper-input>
+				<lq-dropdown id="language" title="I speak" selected-value={{reg.lang}} aria-disabled="false" tabindex="9"></lq-dropdown>
 			</div>
 			<div class="card-actions">
 				<paper-button on-tap="register">
-					<iron-icon icon="check"></iron-icon>
+					<iron-icon icon="check" tabindex="10"></iron-icon>
 					Register
 				</paper-button>
 			</div>
+
+			<iron-a11y-keys
+				id="register_keys"
+				keys="enter"
+				target="{{card_register}}"
+				on-keys-pressed="register">
+			</iron-a11y-keys>
 		</paper-card>
 	</div>
 
@@ -97,6 +111,15 @@ footer {
 		on-error="registerFailed">
 	</iron-ajax>
 
+	<iron-ajax
+		id="ajax_user"
+		method="GET"
+		headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
+		handle-as="json"
+		on-response="getUser"
+		on-error="logOut">
+	</iron-ajax>
+
 </template>
 
 <script>
@@ -128,15 +151,31 @@ Polymer({
 	},
 
 	observers: [
-	  '_verifyName( reg.name )',
-	  '_verifyEmail( reg.email, reg.email_confirm )',
-	  '_verifyPassword( reg.password, reg.password_confirm )'
+		'_verifyName( reg.name )',
+		'_verifyEmail( reg.email, reg.email_confirm )',
+		'_verifyPassword( reg.password, reg.password_confirm )'
 	],
 
 	ready: function() {
 		this.resetFields();
-		// lqApp.update();
-		// lqUser = lqApp.checkUser();
+	},
+
+	attached: function() {
+		this.user_cookie = lqApp.$.userCookie.readCookie();
+		if ( this.user_cookie ) {
+			this.$.ajax_user.url = apiDir + "user/" + this.user_cookie;
+			this.$.ajax_user.generateRequest();
+		}
+	},
+
+	getUser: function( e ) {
+		if ( e.detail.response.user ) {
+			document.querySelector( 'app-router' ).go( '/' + this.user_cookie + '/home', { replace: true} );
+		}
+	},
+
+	logOut: function() {
+		lqApp.logOut();
 	},
 
 	/**
@@ -246,7 +285,6 @@ Polymer({
 			this.$.ajax_login.body = "email=" + encodeURIComponent( this.email ) +
 									 "&password=" + encodeURIComponent( this.password );
 
-
 			this.$.ajax_login.generateRequest();
 		}
 		else {
@@ -257,7 +295,7 @@ Polymer({
 	registerSucceed: function() {
 		lqApp.$.spinner.active = false; //loading
 		this.resetFields();
-		fireToast( "You are now register" );
+		fireToast( "You are now registered." );
 	},
 
 	registerFailed: function() {
@@ -278,18 +316,17 @@ Polymer({
 		if ( n_try >= 3 ) {
 			lqApp.$.spinner.active = false; //loading
 			fireToast( "It has been impossible to perform a log in. Please try again." );
+
 			return;
 		}
 
-		var userCookie = lqApp.$.user_cookie.readCookie() ? lqApp.$.user_cookie.readCookie() : null;
+		var user_cookie = lqApp.$.userCookie.readCookie() ? lqApp.$.userCookie.readCookie() : null;
 
-		if ( userCookie ) {
-			lqApp.$.router.go( '/' + userCookie + '/home', { replace: true} );
-			lqApp.$.spinner.active = false; //loading
+		if ( user_cookie ) {
+			lqApp.$.router.go( '/' + user_cookie + '/home', { replace: true} );
+
 			return;
 		}
-
-		// n_try++;
 
 		this.async( function() {
 			this.tryLogIn( n_try + 1 );
@@ -297,9 +334,17 @@ Polymer({
 
 	},
 
-	loginFailed: function() {
+	loginFailed: function( e, response ) {
+		var status = response.request.xhr.response ? response.request.xhr.response : null;
 		lqApp.$.spinner.active = false; //loading
-		fireToast( "Email address or password invalid" );
+
+		if ( status && status.msg ) {
+			fireToast( status.msg );
+
+			return;
+		}
+
+		fireToast( "It has been impossible to receive any response from the server. Please, try again." );
 	}
 });
 </script>

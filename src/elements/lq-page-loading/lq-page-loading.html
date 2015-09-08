@@ -1,18 +1,27 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="lq-spinner.html">
 
 <dom-module id="lq-page-loading">
 <template>
 	<style>
 	:host {
-		display: none;
+		visibility: hidden;
 		position: fixed;
 		left: 0;
 		top: 0;
 		height: 100%;
 		width: 100%;
+		opacity: 0;
+		background-color: rgba(0,0,0,0.3);
+
+		-webkit-transition: all 1s;
+		-webkit-transition-delay: .1s;
+		transition: all 1s;
+		transition-delay: .1s;
 	}
-	:host.visible {
-		display: block;
+	:host[active] {
+		visibility: visible;
+		opacity: 1;
 	}
 	.spinner-box-container {
 		position: absolute;
@@ -21,23 +30,10 @@
 		margin-left: -50px;
 		margin-top: -50px;
 	}
-	.spinner-box {
-		padding: 50px;
-		text-align: center;
-		background-color: white;
-		border-radius: 50%;
-		@apply(--shadow-elevation-16dp);
-	}
-	.centered {
-		margin-left: auto;
-		margin-right: auto;
-	}
 	</style>
 
 	<div class="spinner-box-container">
-		<div class="spinner-box centered">
-			<paper-spinner active></paper-spinner>
-		</div>
+		<lq-spinner id="spinner"></lq-spinner>
 	</div>
 </template>
 
@@ -45,53 +41,21 @@
 Polymer({
 	is: 'lq-page-loading',
 
-	behaviors: [
-		Polymer.NeonAnimationRunnerBehavior
-	],
-
 	properties: {
 		active: {
 			type: Boolean,
 			value: false,
 			reflectToAttribute: true,
-			observer: "activate"
-		},
-
-		animationConfig: {
-			type: Object,
-			value: function() {
-				return {
-					'entry': [{
-						name: 'scale-up-animation',
-						node: this
-					}],
-					'exit': [{
-						name: 'scale-down-animation',
-						node: this,
-						timing: { delay: 100 }
-					}]
-				}
-			}
+			observer: "_activateChanged"
 		}
 	},
 
-	listeners: {
-		'neon-animation-finish': '_onAnimationFinish'
-	},
-
-	_onAnimationFinish: function() {
-		if ( ! this.active ) {
-			this.style.display = 'none';
-		}
-	},
-
-	activate: function( e ) {
+	_activateChanged: function( e ) {
 		if ( e ) {
-		this.style.display = 'inline-block';
-		this.playAnimation( 'entry' );
+			this.$.spinner.setAttribute( 'active', true );
 		}
 		else {
-			this.playAnimation( 'exit' );
+			this.$.spinner.removeAttribute( 'active' );
 		}
 	}
 });

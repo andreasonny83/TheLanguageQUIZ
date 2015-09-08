@@ -235,7 +235,7 @@ $app->get(
 
 			$response['error'] = true;
 			$response['msg']   = 'Cannot verify the user identity. Please log in.';
-			echoRespnse( 400, $response );
+			echoRespnse( 401, $response );
 			$app->stop();
 		}
 
@@ -255,7 +255,7 @@ $app->get(
 
 		$response['error'] = true;
 		$response['msg']   = 'The user is not present in the database.';
-		echoRespnse( 400, $response );
+		echoRespnse( 401, $response );
 		$app->stop();
 });
 
@@ -282,7 +282,7 @@ $app->get(
 
 		$response['error'] = true;
 		$response['msg']   = 'Impossible to retrieve the user information.';
-		echoRespnse( 400, $response );
+		echoRespnse( 401, $response );
 		$app->stop();
 });
 
@@ -388,7 +388,7 @@ $app->get(
 
 		$response['error'] = true;
 		$response['msg']   = 'Impossible to retrieve the user avatar.';
-		echoRespnse( 400, $response );
+		echoRespnse( 401, $response );
 		$app->stop();
 });
 
@@ -402,14 +402,14 @@ $app->post(
 		if ( empty( $_FILES['file'] ) ) {
 			$response['error'] = true;
 			$response['msg']   = 'File information missing or wrong.';
-			echoRespnse( 400, $response );
+			echoRespnse( 401, $response );
 			$app->stop();
 		}
 
 		if ( 0 < $_FILES['file']['error'] ) {
 			$response['error'] = true;
 			$response['msg']   = 'Impossible to read the image file.';
-			echoRespnse( 400, $response );
+			echoRespnse( 401, $response );
 			$app->stop();
 		}
 
@@ -429,7 +429,7 @@ $app->post(
 		if ( ! array_key_exists( $file_type, $mime_types ) ) {
 			$response['error'] = true;
 			$response['msg']   = 'File format not valid.';
-			echoRespnse( 400, $response );
+			echoRespnse( 401, $response );
 			$app->stop();
 		}
 
@@ -453,7 +453,7 @@ $app->post(
 
 		$response['error'] = true;
 		$response['msg']   = 'Impossible to save the new avatar.';
-		echoRespnse( 400, $response );
+		echoRespnse( 401, $response );
 		$app->stop();
 });
 
