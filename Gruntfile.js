@@ -31,7 +31,7 @@ module.exports = function(grunt) {
 				src: ['<%= project.dist %>/components/']
 			},
 			api: {
-				src: ['<%= project.dist %>/api/*.*', '<%= project.dist %>/api/config/*.*']
+				src: ['<%= project.dist %>/api/v1/']
 			},
 			composer: {
 				src: ['<%= project.dist %>/api/vendor/']
@@ -87,8 +87,20 @@ module.exports = function(grunt) {
 					{
 						expand: true,
 						cwd: '<%= project.dev %>/img/',
-						src: '**',
+						src: '*.*',
 						dest: '<%= project.dist %>/img/'
+					},
+					{
+						expand: true,
+						cwd: '<%= project.dev %>/img/touch',
+						src: '*.*',
+						dest: '<%= project.dist %>/img/touch'
+					},
+					{
+						expand: true,
+						cwd: '<%= project.dev %>/img/avatars',
+						src: ['*', '!*.htaccess'],
+						dest: '<%= project.dist %>/img/avatars'
 					}
 				]
 			},
@@ -146,14 +158,10 @@ module.exports = function(grunt) {
 			api: {
 				files: [
 					{
-						src: '<%= project.dev %>/api/api.php',
-						dest: '<%= project.dist %>/api/api.php',
-					},
-					{
 						expand: true,
-						cwd: '<%= project.dev %>/api/config/',
-						src: ['connect.php', 'db_handler.php', 'secure_session.php'],
-						dest: '<%= project.dist %>/api/config/',
+						cwd: '<%= project.dev %>/api/v1/',
+						src: ['**/*'],
+						dest: '<%= project.dist %>/api/v1/',
 					}
 				]
 			},
@@ -172,8 +180,12 @@ module.exports = function(grunt) {
 						dest: '<%= project.dist %>/api/.htaccess',
 					},
 					{
-						src: '<%= project.dev %>/api/config/db.config.dev.php',
-						dest: '<%= project.dist %>/api/config/db.config.php',
+						src: '<%= project.dev %>/api/v1/config/db.config.dev.php',
+						dest: '<%= project.dist %>/api/v1/config/db.config.php',
+					},
+					{
+						src: '<%= project.dev %>/img/avatars/dev.htaccess',
+						dest: '<%= project.dist %>/img/avatars/.htaccess',
 					},
 				]
 			},
@@ -192,8 +204,12 @@ module.exports = function(grunt) {
 						dest: '<%= project.dist %>/api/.htaccess',
 					},
 					{
-						src: '<%= project.dev %>/api/config/db.config.prod.php',
-						dest: '<%= project.dist %>/api/config/db.config.php',
+						src: '<%= project.dev %>/api/v1/config/db.config.prod.php',
+						dest: '<%= project.dist %>/api/v1/config/db.config.php',
+					},
+					{
+						src: '<%= project.dev %>/img/avatars/prod.htaccess',
+						dest: '<%= project.dist %>/img/avatars/.htaccess',
 					},
 				]
 			},
@@ -211,7 +227,7 @@ module.exports = function(grunt) {
 			},
 			img: {
 				files: ['<%= project.dev %>/img/**/*'],
-				tasks: ['clean:img', 'copy:img']
+				tasks: ['clean:img', 'copy:img', 'copy:dev']
 			},
 			sass: {
 				files: ['<%= project.dev %>/sass/**/*', '<%= project.dev %>/css/**/*'],
@@ -235,7 +251,7 @@ module.exports = function(grunt) {
 				tasks: ['clean:elements', 'copy:elements']
 			},
 			api: {
-				files: ['<%= project.dev %>/api/*', '<%= project.dev %>/api/config/*'],
+				files: ['<%= project.dev %>/api/v1/**/*', '<%= project.dev %>/api/*.htaccess'],
 				tasks: ['clean:api', 'copy:api', 'copy:dev']
 			},
 			composer: {

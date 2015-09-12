@@ -114,7 +114,7 @@ footer {
 	<iron-ajax
 		id="ajax_user"
 		method="GET"
-		headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
+		headers={{apiKey}}
 		handle-as="json"
 		on-response="getUser"
 		on-error="logOut">
@@ -156,16 +156,19 @@ Polymer({
 		'_verifyPassword( reg.password, reg.password_confirm )'
 	],
 
-	ready: function() {
-		this.resetFields();
-	},
-
 	attached: function() {
-		this.user_cookie = lqApp.$.userCookie.readCookie();
+		this.resetFields();
+
+		lqApp.$.spinner.active = true; //loading
+		this.apiKey            = lqApiKey;
+		this.user_cookie       = lqApp.$.userCookie.readCookie();
+
 		if ( this.user_cookie ) {
 			this.$.ajax_user.url = apiDir + "user/" + this.user_cookie;
-			this.$.ajax_user.generateRequest();
+			return this.$.ajax_user.generateRequest();
 		}
+
+		lqApp.$.spinner.active = false; //loading
 	},
 
 	getUser: function( e ) {

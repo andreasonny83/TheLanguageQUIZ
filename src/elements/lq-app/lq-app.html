@@ -7,11 +7,15 @@
 		display: block;
 		height: 100%;
 	}
+	app-router {
+		display: block;
+		height: 100%;
+	}
 	</style>
 
 	<app-router id="router" mode="hash">
 		<app-route path="/login" import="components/lq-login/lq-login.html"></app-route>
-		<app-route path="/logout" import="components/lq-login/lq-logout.html"></app-route>
+		<app-route path="/logout" import="components/lq-logout/lq-logout.html"></app-route>
 		<app-route path="/:uid/home" import="components/lq-page-home/lq-page-home.html"></app-route>
 		<app-route path="*" redirect="/login"></app-route>
 	</app-router>
@@ -142,14 +146,18 @@ Polymer({
 	// },
 
 	logOut: function() {
-		// lqApp.$.userCookie.eraseCookie();
+		lqApp.$.userCookie.eraseCookie();
 
-		// this.$.ajax_logout.url = apiDir + "logout";
-		// this.$.ajax_logout.generateRequest();
+		this.$.ajax_logout.url = apiDir + "logout";
+		this.$.ajax_logout.generateRequest();
+
+		lqApp.$.router.go( '/login', { replace: true} );
+
+		if ( lqApp.$.spinner.active ) lqApp.$.spinner.active = false; //loading
 	},
 
-	loggedOut: function() {
-		fireToast( "You are now logged out" );
+	loggedOut: function( e ) {
+		fireToast( e.detail.response.msg );
 	},
 });
 </script>

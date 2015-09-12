@@ -4,11 +4,15 @@
   "authors": [
     "Andrea Sonny <andreasonny83@gmail.com>"
   ],
-  "main": "index.html",
-  "moduleType": [
-    "amd"
+  "main": [
+    "index.html"
   ],
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andreasonny83/TheLanguageQUIZ.git"
+  },
+  "license": "https://github.com/andreasonny83/TheLanguageQUIZ/blob/master/LICENSE",
+  "homepage": "https://github.com/andreasonny83/TheLanguageQUIZ",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -24,5 +28,8 @@
     "paper-elements": "PolymerElements/paper-elements#~1.0.5",
     "polymer": "Polymer/polymer#~1.1.1",
     "polymer-cookie": "~0.1.2"
+  },
+  "devDependencies": {
+    "web-component-tester": "~3.3.21"
   }
 }
