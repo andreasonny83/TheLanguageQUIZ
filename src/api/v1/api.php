@@ -1,5 +1,5 @@
 <?php
-require_once dirname( __FILE__ ) . '/vendor/autoload.php';
+require_once dirname( dirname( __FILE__ ) ) . '/vendor/autoload.php';
 use \Slim\Slim;
 use \Slim\LogWriter;
 use \Config\Database\DbHandler;
@@ -217,15 +217,29 @@ $app->post(
 	}
 );
 
-$app->post(
+$app->get(
 	'/user/:userid', 'authenticate', function( $userUID ) use ( $app ) {
 		sleep(2);
 		$response = array(
 			'request' => 'user'
 		);
-		$user = array();
-		$db   = new DbHandler();
 
+		$user_cookie = $app->getCookie( 'lq_user_id' );
+
+		// The userid provided by the app url must be the same as the one stored inside the user's cookie
+		$db = new DbHandler();
+
+		if ( $userUID !== $user_cookie ) {
+			$user_session = isset( $_COOKIE["LQ_session"] ) ? $_COOKIE["LQ_session"] : '';
+			$db->logOut( $user_session );
+
+			$response['error'] = true;
+			$response['msg']   = 'Cannot verify the user identity. Please log in.';
+			echoRespnse( 401, $response );
+			$app->stop();
+		}
+
+		$user = array();
 		$user = $db->getUser( $userUID );
 
 		if ( !empty( $user ) ) {
@@ -236,9 +250,12 @@ $app->post(
 			$app->stop();
 		}
 
+		$user_session = isset( $_COOKIE["LQ_session"] ) ? $_COOKIE["LQ_session"] : '';
+		$db->logOut( $user_session );
+
 		$response['error'] = true;
 		$response['msg']   = 'The user is not present in the database.';
-		echoRespnse( 400, $response );
+		echoRespnse( 401, $response );
 		$app->stop();
 });
 
@@ -265,7 +282,7 @@ $app->get(
 
 		$response['error'] = true;
 		$response['msg']   = 'Impossible to retrieve the user information.';
-		echoRespnse( 400, $response );
+		echoRespnse( 401, $response );
 		$app->stop();
 });
 
@@ -371,7 +388,7 @@ $app->get(
 
 		$response['error'] = true;
 		$response['msg']   = 'Impossible to retrieve the user avatar.';
-		echoRespnse( 400, $response );
+		echoRespnse( 401, $response );
 		$app->stop();
 });
 
@@ -385,14 +402,14 @@ $app->post(
 		if ( empty( $_FILES['file'] ) ) {
 			$response['error'] = true;
 			$response['msg']   = 'File information missing or wrong.';
-			echoRespnse( 400, $response );
+			echoRespnse( 401, $response );
 			$app->stop();
 		}
 
 		if ( 0 < $_FILES['file']['error'] ) {
 			$response['error'] = true;
 			$response['msg']   = 'Impossible to read the image file.';
-			echoRespnse( 400, $response );
+			echoRespnse( 401, $response );
 			$app->stop();
 		}
 
@@ -409,10 +426,15 @@ $app->post(
 		$file      = $_FILES['file'];
 		$file_type = $_FILES['file']['type'];
 
-		if ( ! array_key_exists( $file_type, $mime_types ) ) {
+		print_r($_FILES);
+		$image_info = getimagesize ( $_FILES['file']['tmp_name'] );
+		$mime_type = $image_info['mime'] ? $image_info['mime'] : null;
+		var_dump($mime_type);
+
+		if ( ! array_key_exists( $file_type, $mime_types ) || ! $mime_type ) {
 			$response['error'] = true;
 			$response['msg']   = 'File format not valid.';
-			echoRespnse( 400, $response );
+			echoRespnse( 401, $response );
 			$app->stop();
 		}
 
@@ -436,33 +458,34 @@ $app->post(
 
 		$response['error'] = true;
 		$response['msg']   = 'Impossible to save the new avatar.';
-		echoRespnse( 400, $response );
+		echoRespnse( 401, $response );
 		$app->stop();
 });
 
 $app->get(
 	'/user/:userid/collections/', 'authenticate', function( $userid ) use ( $app ) {
 		sleep(2);
-		$page     = $app->request()->get( 'page' );
-		$page     = isset( $page ) ? $page : 0;
+		// $page     = $app->request()->get( 'page' );
+		// $page     = isset( $page ) ? $page : 0;
 		$db       = new DbHandler();
 		$response = array(
 			'request' => 'collections'
 		);
 
-		$collections = $db->getCollections( 0, $userid, $page );
+		// $collections = $db->getCollections( 0, $userid, $page );
+		$collections = $db->getCollections( 0, $userid );
 
 		if ( ! empty( $collections['collections'] ) ) {
 			$response['error']       = false;
 			$response['collections'] = $collections['collections'];
-			$response['loadMore']    = $collections['loadMore'];
+			// $response['loadMore']    = $collections['loadMore'];
 			$response['msg']         = 'Collections correctly fetched.';
 			echoRespnse( 200, $response );
 			$app->stop();
 		}
 
 		$response['error']    = true;
-		$response['loadMore'] = $collections['loadMore'];
+		// $response['loadMore'] = $collections['loadMore'];
 		$response['msg']      = 'Cannot retrieve new collections.';
 		echoRespnse( 200, $response );
 		$app->stop();
@@ -498,7 +521,7 @@ $app->get(
 		$db->logOut( $user_session );
 		$response['error']      = false;
 		$response['logged_out'] = true;
-		$response['msg']        = 'User logged out.';
+		$response['msg']        = 'You are now logged out.';
 		echoRespnse( 200, $response );
 		$app->stop();
 

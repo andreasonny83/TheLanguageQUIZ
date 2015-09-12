@@ -77,7 +77,7 @@ Polymer({
     _logOut: function(e) {
         this.$.profileDropdown.close();
         lqApp.$.pages.selected = 1; //loading
-        lqApp.$.user_cookie.eraseCookie();
+        lqApp.$.userCookie.eraseCookie();
         lqApp.$.lqHome.cleanCollection();
         lqApp.user = lqApp.userDefault;
         this.$.ajax_logout.url = apiDir + "logout";

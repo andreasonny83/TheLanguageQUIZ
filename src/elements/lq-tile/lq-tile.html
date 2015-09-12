@@ -3,38 +3,36 @@
 <dom-module id="lq-tile">
 <style>
 :host {
-    display: block;
-    margin: 12px;
-}
-:host([small]) {
-    width: calc(33.33% - 24px);
-}
-:host([large]) {
-    width: 100%;
+	display: block;
+	margin: 12px;
+	transition: all linear .4s;
 }
 :host([small]) iron-image {
-    width: 100%;
-    height: var(--lq-tile-height);
+	width: 100%;
+	height: var(--lq-tile-height);
 }
 :host([large]) iron-image {
-    width: 50%;
-    height: 100%;
+	width: 50%;
+	height: 100%;
 }
 :host([loading]) {
-    height: var(--lq-tile-height);
+	height: var(--lq-tile-height);
 
-    @apply(--layout-horizontal);
-    @apply(--layout-center);
-    @apply(--layout-center-justified);
-    @apply(--layout-flex-auto);
+	@apply(--layout-horizontal);
+	@apply(--layout-center);
+	@apply(--layout-center-justified);
+	@apply(--layout-flex-auto);
 }
 ::content .description {
-    height: 97px;
-    overflow: hidden;
+	height: 97px;
+	overflow: hidden;
 }
 paper-card {
-    width: 100%;
-    --paper-card-header-color: var(--paper-pink-500);
+	width: 100%;
+	--paper-card-header-color: var(--paper-pink-500);
+}
+.card-actions {
+	display: flex;
 }
 paper-icon-button.red {
   color: var(--paper-red-500);
@@ -46,72 +44,69 @@ paper-icon-button.red:hover {
   border-radius: 50%;
 }
 iron-image {
-    @apply(--layout-flex);
-}
-paper-spinner {
+	@apply(--layout-flex);
 }
 </style>
 
 <template>
-    <template is="dom-if" if="[[loading]]">
-        <paper-spinner active$="{{active}}"></paper-spinner>
-    </template>
+	<template is="dom-if" if="[[loading]]">
+		<paper-spinner active$="{{active}}"></paper-spinner>
+	</template>
 
-    <template is="dom-if" if="[[!loading]]">
-        <paper-card heading="[[title]]" class="pink"
-            image="[[image]]"
-            id="card">
-            <div class="card-content">
-                <content select=".description"></content>
-            </div>
-            <div class="card-actions">
-              <paper-button>Nay</paper-button>
-              <paper-button>Yay!</paper-button>
-              <paper-icon-button icon="favorite" title="favorite" class="red"></paper-icon-button>
-              <paper-icon-button icon="bookmark" title="bookmark"></paper-icon-button>
-              <paper-icon-button icon="cloud-upload" title="cloud-upload"></paper-icon-button>
-            </div>
-        </paper-card>
-    </template>
+	<template is="dom-if" if="[[!loading]]">
+		<paper-card heading="[[title]]" class="pink"
+			image="[[image]]"
+			id="card">
+			<div class="card-content">
+				<content select=".description"></content>
+			</div>
+			<div class="card-actions">
+				<paper-button>Nay</paper-button>
+				<paper-button>Yay!</paper-button>
+				<div class="flex"></div>
+				<paper-icon-button icon="favorite" title="favorite" class="red"></paper-icon-button>
+			</div>
+		</paper-card>
+	</template>
 </template>
 
 <script>
 Polymer({
-    is: 'lq-tile',
+	is: 'lq-tile',
 
-    properties: {
-        image: {
-            type: String,
-            value: "http://lorempixel.com/600/400",
-            reflectToAttribute: true
-        },
+	properties: {
+		image: {
+			type: String,
+			value: "http://lorempixel.com/600/400",
+			reflectToAttribute: true
+		},
 
-        name: {
-            type: String,
-            reflectToAttribute: true
-        },
+		name: {
+			type: String,
+			reflectToAttribute: true
+		},
 
-        loading: {
-            type: Boolean,
-            value: false,
-            reflectToAttribute: true
-        },
+		loading: {
+			type: Boolean,
+			value: false,
+			reflectToAttribute: true
+		},
 
-        small: {
-            type: Boolean,
-            value: false,
-            reflectToAttribute: true
-        },
+		small: {
+			type: Boolean,
+			value: false,
+			reflectToAttribute: true
+		},
 
-        large: {
-            type: Boolean,
-            value: false,
-            reflectToAttribute: true
-        }
-    },
+		large: {
+			type: Boolean,
+			value: false,
+			reflectToAttribute: true
+		}
+	},
 
-    ready: function() {
-    }
+	ready: function() {
+	}
 
 });
 </script>

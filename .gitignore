@@ -11,5 +11,6 @@ src/index.html
 src/index.prod.html
 src/api/.htaccess
 src/api/prod.htaccess
-src/api/config/db.config.php
-src/api/config/db.config.prod.php
+src/api/v1/config/db.config.php
+src/api/v1/config/db.config.prod.php
+src/api/vendor

@@ -1,0 +1,59 @@
+<dom-module id="lq-shared-styles">
+<template>
+	<style>
+	:host {
+		background-color: var(--lq-primary-2);
+	}
+	neon-animated-pages {
+		height: 100%;
+	}
+	.horizontal-section-container {
+		@apply(--layout-horizontal);
+		@apply(--layout-center-justified);
+		@apply(--layout-wrap);
+	}
+	.vertical-section-container {
+		@apply(--layout-vertical);
+		@apply(--layout-center-justified);
+		@apply(--layout-wrap);
+	}
+	.horizontal-section {
+		background-color: white;
+		padding: 24px;
+		margin-bottom: 24px;
+		min-width: 200px;
+
+		@apply(--shadow-elevation-2dp);
+	}
+	.horizontal-section + .horizontal-section {
+		background-color: white;
+		padding: 24px;
+		margin-left: 24px;
+		margin-bottom: 24px;
+		min-width: 200px;
+
+		@apply(--shadow-elevation-2dp);
+	}
+	.vertical-section {
+		background-color: white;
+		padding: 24px;
+
+		@apply(--shadow-elevation-2dp);
+	}
+	.flex-section {
+		@apply(--layout-flex);
+	}
+	@media (max-width: 639px) {
+		paper-toast {
+			left: 0;
+			right: 0;
+			bottom: 0;
+			margin: 0;
+			height: auto;
+			border-radius: 0;
+			padding: 20px;
+		}
+	}
+	</style>
+</template>
+</dom-module>

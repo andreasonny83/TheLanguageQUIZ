@@ -1,159 +1,417 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../event-infinite-scroll/event-infinite-scroll.html">
+<link rel="import" href="../lq-tile/lq-tile.html">
+<link rel="import" href="../lq-dropdown/lq-dropdown.html">
+<link rel="import" href="../lq-profile-logo/lq-profile-logo.html">
 
 <dom-module id="lq-page-home">
-<style>
-:host {
-    display: block;
-}
-paper-header-panel {
-    background-color: var(--paper-grey-200, #eee);
-}
-paper-toolbar {
-    background-color: var(--lq-primary-0);
-}
-.content {
-    padding: 10px;
-    max-width: 1100px;
-    margin: 0 auto;
-}
-.horizontal-section-container {
-    @apply(--layout-horizontal);
-    @apply(--layout-wrap);
-}
-</style>
-
 <template>
-    <paper-header-panel mode="waterfall">
-        <paper-toolbar class="medium-tall">
-            <div class="title">The LanguageQUIZ</div>
-            <div class="flex"></div>
-            <lq-profile-logo id="lqProfile"></lq-profile-logo>
+	<style include="lq-shared-styles">
+	:host {
+		display: block;
+		height: 100%;
+	}
+	paper-scroll-header-panel {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background-color: var(--paper-grey-200, #eee);
+	}
+	paper-toolbar {
+		background-color: var(--lq-primary-0);
+		height: 160px;
+	}
+	paper-toolbar.tall .title {
+		font-size: 32px;
+		line-height: 40px;
+		text-align: center;
+		margin-left: 0;
+	}
+	#searchBox {
+		width: 90%;
+		max-width: 1100px;
+		height: 54px;
+		margin: 0 auto;
+		padding: 0 15px;
+		line-height: 54px;
+		font-size: 26px;
+		text-transform: lowercase;
+		outline: none;
+		border: none;
+		border-radius: 3px;
+		background-color: rgba(255, 255, 255, 0.95);
+		box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.52);
+		-webkit-user-select: none;
+		/*visibility: hidden;*/
+		opacity: 0;
+		-webkit-transition: all .5s;
+		transition: all .5s;
+		transform: translateY(-10px);
+	}
+	paper-icon-button.bottom {
+		-webkit-transition: transform .5s;
+		transition: transform .5s;
+	}
+	paper-toolbar[search] #searchBox {
+		visibility: visible;
+		opacity: 1;
+		transform: translateY(25px);
+	}
+	paper-toolbar[search] paper-icon-button.right {
+		transform: translateX(80px);
+	}
+	paper-toolbar[search] paper-icon-button.left {
+		transform: translateX(-80px);
+	}
+	.content {
+		max-width: 1400px;
+		margin: 0 auto;
+	}
+	lq-tile[small] {
+		width: calc(33.33% - 24px);
+	}
+	lq-tile[large] {
+		width: 100%;
+	}
 
-            <paper-icon-button class="bottom social" icon="assessment"></paper-icon-button>
-            <div class="bottom flex"></div>
-            <paper-icon-button class="bottom" icon="favorite"></paper-icon-button>
-        </paper-toolbar>
+	@media all and (max-width: 600px) {
+		lq-tile[small] {
+			width: 100%;
+		}
+	}
+	@media all and (min-width: 601px) and (max-width: 900px) {
+		lq-tile[small] {
+			width: calc(50% - 24px);
+		}
+	}
+	</style>
 
-        <!-- Main Content -->
-        <div class="content">
-            <div class="horizontal-section-container">
-                <lq-tile large image="http://placehold.it/900x300"></lq-tile>
-            </div>
+	<!-- Main Area -->
+	<paper-scroll-header-panel condenses header-height="160" condensed-header-height="128">
 
-            <div class="horizontal-section-container">
-                <template is="dom-repeat" items="[[collections]]" as="collection">
-                    <lq-tile small
-                        title=[[collection.name]]
-                        image="http://placehold.it/350x250">
-                        <p class="description">[[collection.description]]</p>
-                    </lq-tile>
-                </template>
-                <lq-tile id="titleLoading" loading></lq-tile>
-            </div>
-        </div>
+		<!-- Main Toolbar -->
+		<paper-toolbar class="tall" search$={{search}}>
 
-        <event-infinite-scroll
-            auto-start
-            scroll-offset="300"
-            loading-delay="500"
-            on-reach-bottom="readCollections">
-        </event-infinite-scroll>
+			<div class="title">The LanguageQUIZ</div>
+			<paper-icon-button on-tap="searchToggle" icon="search"></paper-icon-button>
 
-    </paper-header-panel>
+			<input type="text" class="middle" id="searchBox" maxlength="30" value="{{searchString::input}}" aria-disabled="{{search}}" placeholder="Search a collection">
 
-    <iron-localstorage name="lq-global-collections"
-    id="lqCollections"
-    value="{{collections}}">
-    </iron-localstorage>
+			<paper-icon-button class="bottom left social" icon="assessment"></paper-icon-button>
+			<div class="bottom flex"></div>
+			<paper-icon-button class="bottom right favorite" icon="favorite"></paper-icon-button>
 
-    <iron-ajax
+		</paper-toolbar>
+
+		<!-- Main Content -->
+		<div class="content">
+
+			<div class="horizontal-section-container">
+				<lq-tile large image="http://placehold.it/900x300"></lq-tile>
+			</div>
+
+			<div class="horizontal-section-container">
+				<array-selector id="selector" items="[[collections]]" selected="{{collectionsSelected}}" multi toggle></array-selector>
+
+				<template id="collectionsList" is="dom-repeat" items="[[collectionsSelected]]" as="collection" filter="filterCollections">
+					<lq-tile small
+						title=[[collection.name]]
+						image="http://placehold.it/350x250">
+						<p class="description">[[collection.description]]</p>
+					</lq-tile>
+				</template>
+
+				<lq-tile id="tileLoading" loading></lq-tile>
+
+			</div>
+
+		</div>
+			<event-infinite-scroll
+				id="infinite_scroll"
+				scroll-offset="50"
+				loading-delay="500"
+				on-reach-bottom="loadMoreCollections">
+			</event-infinite-scroll>
+
+	</paper-scroll-header-panel>
+
+	<iron-localstorage name="lq-global-collections"
+		id="lqCollections"
+		value="{{collections}}">
+	</iron-localstorage>
+
+	<iron-ajax
 		id="ajax_collections"
 		method="GET"
-        headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
+		headers={{apiKey}}
 		handle-as="json"
-		on-response="getCollections">
+		on-response="fetchCollections">
 	</iron-ajax>
 
+	<iron-ajax
+		id="ajax_user"
+		method="GET"
+		headers={{apiKey}}
+		handle-as="json"
+		on-error="logOut"
+		on-response="getUser">
+	</iron-ajax>
 
 </template>
 
 <script>
+// custom transformation: scale header's title
+addEventListener( 'paper-header-transform', function( e ) {
+	var title = document.querySelector( '.title' );
+	var d     = e.detail;
+	var m     = d.height - d.condensedHeight;
+	var scale = Math.max(0.75, ( m - d.y ) / ( m / 0.25 )  + 0.75 );
+
+	Polymer.Base.transform( 'scale(' + scale + ') translateZ(0)', title );
+});
+
 Polymer({
-    is: 'lq-page-home',
+	is: 'lq-page-home',
 
-    behaviors: [
-        Polymer.NeonAnimatableBehavior
-    ],
+	properties: {
+		collections: {
+			type: Object,
+			value: []
+		},
 
-    properties: {
-        animationConfig: {
-            type: Object,
-            value: function() {
-                return {
-                    'entry': {
-                        name: 'fade-in-animation',
-                        node: this
-                    },
-                    'exit': {
-                        name: 'fade-out-animation',
-                        node: this
-                    }
-                }
-            }
-        },
+		collectionsSelected: {
+			type: Object,
+			value: []
+		},
 
-        collections: {
-            type: Object,
-            value: []
-        },
+		collectionsBuffer: {
+			type: Object,
+			value: []
+		},
 
-        busy: {
-            type: Boolean,
-            value: false
-        }
+		items_per_page: {
+			type: Number,
+			value: 10
+		},
 
-    },
+		search: {
+			type: Boolean,
+			value: false
+		},
 
-    attached: function() {
-        this.cleanCollection();
-    },
+		searchString: {
+			type: String,
+			value: '',
+			observer: 'refreshFilter'
+		},
 
-    cleanCollection: function() {
-        this.collections = [];
-        this.$.lqCollections.save();
-    },
+		animationConfig: {
+			type: Object,
+			value: function() {
+				return {
+					'entry': {
+						name: 'fade-in-animation',
+						node: this
+					},
+					'exit': {
+						name: 'fade-out-animation',
+						node: this
+					}
+				}
+			}
+		},
+	},
 
-    readCollections: function() {
-        if ( ! this.busy && lqApp.userCookie ) {
-            this.busy = true;
-            this.$.titleLoading.toggleAttribute( 'active', true );
-            this.$.ajax_collections.url = apiDir + "user/" + lqApp.userCookie + "/collections?page=" + collectionPage;
+	attached: function() {
+		lqApp.$.spinner.active = true; //loading
 
-            this.async( function() {
-                this.$.ajax_collections.generateRequest();
-            }, 500);
-        }
-    },
+		if ( ! this.checkUserCookie() ) {
+			return lqApp.$.router.go( '/login', { replace: true} );
+		}
 
-    getCollections: function( e ) {
-        var that = this;
+		this.apiKey = lqApiKey;
+		this.cleanCollection();
+		this.update();
+	},
 
-        if ( e.detail.response && e.detail.response.collections ) {
-            e.detail.response.collections.forEach(function( collection ) {
-                that.push( 'collections', collection );
-            });
+	update: function( n_try ) {
+		// Try fetch the user for 3 times,
+		// If fails, quit
+		var n_try, user_cookie, user_uid;
 
-            if ( e.detail.response.loadMore ) {
-                collectionPage++;
-                this.busy = false;
-            }
+		// If it fails either to read the user uid from the URL
+		// or the cookie information, try reading again
+		n_try = n_try ? n_try : 0;
 
-        }
+		if ( n_try >= 3 ) {
+			// If it has been not possible to verify the user, log out.
+			fireToast( "It has been impossible to verify the user information. Logging out." );
 
-        this.$.titleLoading.toggleAttribute( 'active', false );
-    }
+			return lqApp.logOut();
+		}
 
+		this.cleanCollection();
+
+		user_cookie = this.checkUserCookie();
+		user_id     = this.uid ? this.uid : null;
+
+		if ( user_cookie && user_id && user_cookie === user_id ) {
+			// If the user has been found from both the url and the cookie,
+			// verify the user identity using the service API
+			this.$.ajax_user.url = apiDir + "user/" + this.uid;
+			this.$.ajax_user.generateRequest();
+
+			return;
+		}
+
+		this.async( function() {
+			this.update( n_try + 1 );
+		}, 1000 );
+	},
+
+	getUser: function( e ) {
+		lqApp.$.spinner.active = false; //loading
+
+		// If the user has been verified,
+		// complete rendering the home page
+		if ( e.detail.response.user ) {
+			this.user = e.detail.response.user;
+			fireToast( "Welcome back " + this.user.username );
+			// Read the first set of collection once the user is logged id and verified
+			this.readCollections();
+		}
+	},
+
+	/**
+	 * cleanCollection
+	 *
+	 * Clean all the collection objects and empty the local storage
+	 */
+	cleanCollection: function() {
+		this.collections         = [];
+		this.collectionsSelected = [];
+		this.$.lqCollections.save();
+	},
+
+	/**
+	 * readCollections
+	 *
+	 * Request all the collections using an Ajax request to the API
+	 */
+	readCollections: function() {
+		if ( this.checkUserCookie() ) {
+			this.$.tileLoading.setAttribute( 'active', true );
+			console.log('spin activated');
+			this.$.ajax_collections.url = apiDir + "user/" + this.checkUserCookie() + "/collections";
+			this.$.ajax_collections.generateRequest();
+		}
+	},
+
+	/**
+	 * fetchCollections
+	 *
+	 * store all the collections, returned from the Ajax request,
+	 * to the browser's local storage
+	 */
+	fetchCollections: function( e ) {
+		var that = this;
+
+		if ( e.detail.response && e.detail.response.collections ) {
+			e.detail.response.collections.forEach( function( collection ) {
+				that.push( 'collections', collection );
+			});
+
+			// Activate the Infinite Scroll
+			this.$.infinite_scroll.startObserve();
+			// Render the first set of collections
+			this.loadMoreCollections();
+		}
+
+		this.$.tileLoading.removeAttribute( 'active' );
+	},
+
+	/**
+	 * loadMoreCollections
+	 *
+	 * Render more collections when the bottom is reached
+	 */
+	loadMoreCollections: function() {
+		if ( this.$.infinite_scroll.getAttribute( 'busy') ) {
+			// console.log('busy');
+			return;
+		}
+
+		// When all the collection have been rendered, stop searching more
+		if ( this.collectionsSelected.length >= this.collections.length ) {
+			this.$.infinite_scroll.setAttribute( 'busy', true );
+			this.$.tileLoading.removeAttribute( 'active' );
+			return;
+		}
+
+		// empty buffer
+		this.collectionsBuffer = [];
+
+		this.$.infinite_scroll.setAttribute( 'busy', true );
+		this.$.tileLoading.setAttribute( 'active', true );
+
+		var that  = this;
+		var start = this.collectionsSelected.length;
+		var stop  = this.collectionsSelected.length + this.items_per_page;
+		stop      = stop < this.collections.length ? stop : this.collections.length;
+
+		for ( var pos = start; pos < stop; pos++ ) {
+			var item = this.collections[pos];
+			that.push( 'collectionsBuffer', item );
+		}
+
+		this.async( function() {
+			this.collectionsBuffer.forEach( function( item ) {
+				that.push( 'collectionsSelected', item );
+			});
+
+			this.$.infinite_scroll.removeAttribute( 'busy' );
+			this.$.tileLoading.removeAttribute( 'active' );
+		}, 500);
+	},
+
+	/**
+	 * filterCollections
+	 * Filter collections based on the input search, if any
+	 * @param  [Object] item
+	 * @return [Object]
+	 */
+	filterCollections: function( item ) {
+		return item.name.match( new RegExp( this.searchString, 'i' ) );
+	},
+
+	/**
+	 * searchToggle
+	 * toggle the search box when the search button is clicked
+	 */
+	searchToggle: function() {
+		if ( ! this.search ) {
+			this.$.searchBox.focus();
+		}
+		else {
+			this.set( 'searchString', '' );
+		}
+
+		this.search = ! this.search;
+	},
+
+	refreshFilter: function() {
+		this.$.collectionsList.render();
+	},
+
+	/**
+	 * Read the user cookie
+	 * @return [String] The user uid
+	 */
+	checkUserCookie: function() {
+		return lqApp.$.userCookie.readCookie() ? lqApp.$.userCookie.readCookie() : null;
+	}
 });
 </script>
-
 </dom-module>

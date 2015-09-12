@@ -1,36 +1,39 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="lq-spinner.html">
 
 <dom-module id="lq-page-loading">
-<style>
-:host {
-	height: 100%;
-}
-.spinner-box-container {
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	margin-left: -50px;
-	margin-top: -50px;
-}
-.spinner-box {
-	padding: 50px;
-	text-align: center;
-	background-color: white;
-	border-radius: 50%;
-	@apply(--shadow-elevation-16dp);
-}
-.centered {
-	max-width: 400px;
-	margin-left: auto;
-	margin-right: auto;
-}
-</style>
-
 <template>
+	<style>
+	:host {
+		visibility: hidden;
+		position: fixed;
+		left: 0;
+		top: 0;
+		height: 100%;
+		width: 100%;
+		opacity: 0;
+		background-color: rgba(0,0,0,0.3);
+
+		-webkit-transition: all 1s;
+		-webkit-transition-delay: .1s;
+		transition: all 1s;
+		transition-delay: .1s;
+	}
+	:host[active] {
+		visibility: visible;
+		opacity: 1;
+	}
+	.spinner-box-container {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		margin-left: -50px;
+		margin-top: -50px;
+	}
+	</style>
+
 	<div class="spinner-box-container">
-		<div class="spinner-box centered">
-			<paper-spinner active></paper-spinner>
-		</div>
+		<lq-spinner id="spinner"></lq-spinner>
 	</div>
 </template>
 
@@ -38,25 +41,21 @@
 Polymer({
 	is: 'lq-page-loading',
 
-	behaviors: [
-		Polymer.NeonAnimatableBehavior
-	],
-
 	properties: {
-		animationConfig: {
-			type: Object,
-			value: function() {
-				return {
-					'entry': {
-						name: 'scale-up-animation',
-						node: this
-					},
-					'exit': {
-						name: 'scale-down-animation',
-						node: this
-					}
-				}
-			}
+		active: {
+			type: Boolean,
+			value: false,
+			reflectToAttribute: true,
+			observer: "_activateChanged"
+		}
+	},
+
+	_activateChanged: function( e ) {
+		if ( e ) {
+			this.$.spinner.setAttribute( 'active', true );
+		}
+		else {
+			this.$.spinner.removeAttribute( 'active' );
 		}
 	}
 });

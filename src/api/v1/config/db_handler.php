@@ -364,18 +364,20 @@ class DbHandler {
 	 * @page			integer		the page to load. Each page contains 10 collections
 	 * @return			array		return the collections, if any, and other informations
 	 */
-	public function getCollections( $collectionType, $userId, $page = 0 ) {
+	// public function getCollections( $collectionType, $userId, $page = 0 ) {
+	public function getCollections( $collectionType, $userId ) {
 		$collections    = array();
-		$loadMore       = true;
-		$items_per_page = 10;
-		$page           = $page * $items_per_page;
+		// $loadMore       = true;
+		// $items_per_page = 5;
+		// $page           = $page * $items_per_page;
 
 		// Prepare to read the global collections
 		if ( ! $collectionType ) {
 			$stmt = $this->conn->prepare( 'SELECT
 				uid, name, description, lang, rank, score, flash, taboo
 				FROM LQ_collections
-				WHERE status = 2 LIMIT ?, 10' );
+				WHERE status = 2' );
+				// WHERE status = 2 LIMIT ?, ?' );
 		}
 		// Otherwise read the user private collections
 		else {
@@ -383,14 +385,14 @@ class DbHandler {
 			$stmt = $this->conn->prepare( 'SELECT
 				uid, name, description, lang, rank, score, flash, taboo
 				FROM LQ_collections
-				WHERE status = 2 LIMIT ?, 10' );
+				WHERE status = 2' );
+				// WHERE status = 2 LIMIT ?, ?' );
 		}
 
-		$stmt->bind_param( 'i', $page );
+		// $stmt->bind_param( 'ii', $page, $items_per_page );
 		$stmt->execute();
 		$stmt->bind_result( $uid, $name, $description, $lang, $rank, $score, $flash, $taboo );
 		$stmt->store_result();
-
 		while( $stmt->fetch() ) {
 
 			$collections[] = array(
@@ -409,13 +411,13 @@ class DbHandler {
 
 		// disable loading further collections
 		// if we already reached the end of the table
-		if ( sizeof ( $collections ) < 10 ) {
-			$loadMore = false;
-		}
+		// if ( sizeof ( $collections ) < $items_per_page ) {
+		// 	$loadMore = false;
+		// }
 
 		return array(
 			'collections' => $collections,
-			'loadMore' => $loadMore
+			// 'loadMore' => $loadMore
 		);
 	}
 
@@ -431,11 +433,22 @@ class DbHandler {
 		}
 
 		$this->session->forget();
+
+		// unset cookies
+		if ( isset( $_SERVER['HTTP_COOKIE'] ) ) {
+			$cookies = explode( ';', $_SERVER['HTTP_COOKIE'] );
+			foreach( $cookies as $cookie ) {
+				$parts = explode( '=', $cookie );
+				$name = trim( $parts[0] );
+				setcookie( $name, '', time() - 1000 );
+				setcookie( $name, '', time() - 1000, '/' );
+			}
+		}
 	}
 
 	public function fetchGlobalCollections( $useruid, $page ) {
 		$collections    = array();
-		$items_per_page = 10;
+		$items_per_page = 3;
 		$page           = $page * $items_per_page;
 
 		if ( $stmt = $this->conn->prepare( 'SELECT uid, name, description, lang, rank, score, flash, taboo FROM LQ_collections WHERE status = 2 LIMIT ?, 10' ) ) {
