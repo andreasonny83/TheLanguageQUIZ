@@ -1,8 +1,8 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../event-infinite-scroll/event-infinite-scroll.html">
 <link rel="import" href="../lq-tile/lq-tile.html">
-<link rel="import" href="../lq-dropdown/lq-dropdown.html">
 <link rel="import" href="../lq-profile-logo/lq-profile-logo.html">
+<link rel="import" href="../paper-menu-button/paper-menu-button.html">
 
 <dom-module id="lq-page-home">
 <template>
@@ -30,12 +30,13 @@
 		margin-left: 0;
 	}
 	#searchBox {
+		visibility: hidden;
 		width: 90%;
 		max-width: 1100px;
-		height: 54px;
+		height: 50px;
 		margin: 0 auto;
 		padding: 0 15px;
-		line-height: 54px;
+		line-height: 50px;
 		font-size: 26px;
 		text-transform: lowercase;
 		outline: none;
@@ -44,7 +45,6 @@
 		background-color: rgba(255, 255, 255, 0.95);
 		box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.52);
 		-webkit-user-select: none;
-		/*visibility: hidden;*/
 		opacity: 0;
 		-webkit-transition: all .5s;
 		transition: all .5s;
@@ -57,13 +57,30 @@
 	paper-toolbar[search] #searchBox {
 		visibility: visible;
 		opacity: 1;
-		transform: translateY(25px);
+		transform: translateY(28px);
 	}
 	paper-toolbar[search] paper-icon-button.right {
 		transform: translateX(80px);
 	}
 	paper-toolbar[search] paper-icon-button.left {
 		transform: translateX(-80px);
+	}
+	paper-menu-button {
+		padding: 0;
+	}
+	.avatar {
+		--iron-icon-height: 40px;
+		--iron-icon-width: 40px;
+		--paper-icon-button: {
+			padding: 5px;
+		}
+	}
+	.avatar ::content iron-icon {
+		border: 2px solid #fff;
+		border-radius: 50%;
+	}
+	.avatar ::content iron-icon img {
+		border-radius: 50%;
 	}
 	.content {
 		max-width: 1400px;
@@ -76,7 +93,19 @@
 		width: 100%;
 	}
 
-	@media all and (max-width: 600px) {
+	@media all and (max-width: 639px) {
+		paper-toolbar.tall .title {
+			font-size: 21px;
+			line-height: 40px;
+		}
+		#searchBox {
+			height: 48px;
+			line-height: 48px;
+			font-size: 24px;
+		}
+		paper-toolbar[search] #searchBox {
+			transform: translateY(40px);
+		}
 		lq-tile[small] {
 			width: 100%;
 		}
@@ -94,6 +123,14 @@
 		<!-- Main Toolbar -->
 		<paper-toolbar class="tall" search$={{search}}>
 
+			<paper-menu-button>
+				<paper-icon-button src="{{avatar}}" class="dropdown-trigger avatar"></paper-icon-button>
+					<paper-menu class="dropdown-content">
+					<paper-item>Share</paper-item>
+					<paper-item>Settings</paper-item>
+					<paper-item>Help</paper-item>
+				</paper-menu>
+			</paper-menu-button>
 			<div class="title">The LanguageQUIZ</div>
 			<paper-icon-button on-tap="searchToggle" icon="search"></paper-icon-button>
 
@@ -109,16 +146,22 @@
 		<div class="content">
 
 			<div class="horizontal-section-container">
+				<h2>Collection of the month</h2>
+			</div>
+			<div class="horizontal-section-container">
 				<lq-tile large image="http://placehold.it/900x300"></lq-tile>
 			</div>
 
+			<div class="horizontal-section-container">
+				<h2>Collections from the world</h2>
+			</div>
 			<div class="horizontal-section-container">
 				<array-selector id="selector" items="[[collections]]" selected="{{collectionsSelected}}" multi toggle></array-selector>
 
 				<template id="collectionsList" is="dom-repeat" items="[[collectionsSelected]]" as="collection" filter="filterCollections">
 					<lq-tile small
-						title=[[collection.name]]
-						image="http://placehold.it/350x250">
+						id="[[collection.uid]]"
+						title="[[collection.name]]">
 						<p class="description">[[collection.description]]</p>
 					</lq-tile>
 				</template>
@@ -193,7 +236,7 @@ Polymer({
 
 		items_per_page: {
 			type: Number,
-			value: 10
+			value: 6
 		},
 
 		search: {
@@ -225,6 +268,8 @@ Polymer({
 	},
 
 	attached: function() {
+		this.avatar = appDir + "img/avatar.jpg";
+
 		lqApp.$.spinner.active = true; //loading
 
 		if ( ! this.checkUserCookie() ) {
@@ -268,7 +313,7 @@ Polymer({
 
 		this.async( function() {
 			this.update( n_try + 1 );
-		}, 1000 );
+		}, 100 );
 	},
 
 	getUser: function( e ) {
@@ -373,7 +418,7 @@ Polymer({
 
 			this.$.infinite_scroll.removeAttribute( 'busy' );
 			this.$.tileLoading.removeAttribute( 'active' );
-		}, 500);
+		}, 1000);
 	},
 
 	/**
@@ -391,14 +436,14 @@ Polymer({
 	 * toggle the search box when the search button is clicked
 	 */
 	searchToggle: function() {
-		if ( ! this.search ) {
-			this.$.searchBox.focus();
-		}
-		else {
-			this.set( 'searchString', '' );
-		}
-
 		this.search = ! this.search;
+
+		if ( ! this.search ) return;
+
+		this.async( function() {
+			this.$.searchBox.select();
+			this.$.searchBox.focus();
+		}, 500 );
 	},
 
 	refreshFilter: function() {
@@ -411,6 +456,21 @@ Polymer({
 	 */
 	checkUserCookie: function() {
 		return lqApp.$.userCookie.readCookie() ? lqApp.$.userCookie.readCookie() : null;
+	},
+
+	/**
+	 * logOut
+	 *
+	 * Perform a secure log out
+	 */
+	logOut: function( e ) {
+		var status = e.detail.request.xhr.response ? e.detail.request.xhr.response : null;
+
+		if ( status && status.msg ) {
+			fireToast( status.msg );
+		}
+
+		return lqApp.logOut();
 	}
 });
 </script>
