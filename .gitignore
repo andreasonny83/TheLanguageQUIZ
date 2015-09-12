@@ -14,5 +14,3 @@ src/api/prod.htaccess
 src/api/v1/config/db.config.php
 src/api/v1/config/db.config.prod.php
 src/api/vendor
-src/api/vendor/
-src/api/vendor/*.*
