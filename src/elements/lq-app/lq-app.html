@@ -14,9 +14,9 @@
 	</style>
 
 	<app-router id="router" mode="hash">
-		<app-route path="/login" import="components/lq-login/lq-login.html"></app-route>
-		<app-route path="/logout" import="components/lq-logout/lq-logout.html"></app-route>
-		<app-route path="/:uid/home" import="components/lq-page-home/lq-page-home.html"></app-route>
+		<app-route path="/login" import="components/lq-pages/lq-login.html"></app-route>
+		<app-route path="/:uid/:page" import="components/lq-pages/lq-main.html"></app-route>
+		<app-route path="/:uid/:page/:collid" import="components/lq-pages/lq-main.html"></app-route>
 		<app-route path="*" redirect="/login"></app-route>
 	</app-router>
 

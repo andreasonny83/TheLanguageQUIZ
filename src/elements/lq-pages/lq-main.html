@@ -1,0 +1,242 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="lq-home-page.html">
+<link rel="import" href="lq-tile-full.html">
+<link rel="import" href="lq-user-profile.html">
+
+<dom-module id="lq-main">
+<template>
+	<style>
+	neon-animated-pages {
+		height: 100%;
+	}
+	</style>
+
+	<neon-animated-pages id="pages" class="flex" selected="[[selected]]" entry-animation="[[entryAnimation]]" exit-animation="[[exitAnimation]]">
+
+		<lq-home-page id="lqHome" avatar="[[avatar]]" collections="[[collections]]" on-tile-click="_onCollection" on-log-out="_logOut" on-user-profile="_userProfile"></lq-home-page>
+		<lq-tile-full id="lqTile" on-go-back="_goBack"></lq-tile-full>
+		<lq-user-profile id="lqUserProfile" on-go-back="_goBack"></lq-user-profile>
+
+	</neon-animated-pages>
+
+	<iron-localstorage name="lq-global-collections"
+		id="lqCollections"
+		value="{{collections}}">
+	</iron-localstorage>
+
+	<iron-ajax
+		id="ajax_collections"
+		method="GET"
+		headers={{apiKey}}
+		handle-as="json"
+		on-response="fetchCollections">
+	</iron-ajax>
+
+	<iron-ajax
+		id="ajax_user"
+		method="GET"
+		headers={{apiKey}}
+		handle-as="json"
+		on-error="logOut"
+		on-response="getUser">
+	</iron-ajax>
+
+</template>
+
+<script>
+
+Polymer({
+	is: 'lq-main',
+
+	properties: {
+		page: '',
+
+		selected: 0,
+
+		collections: {
+			type: Object,
+			value: []
+		},
+
+		items_per_page: {
+			type: Number,
+			value: 6
+		}
+	},
+
+	attached: function() {
+		this.page ? this.page : null;
+		window.lqMain          = this;
+		this.avatar            = appDir + "img/avatar.jpg";
+		lqApp.$.spinner.active = true; //loading
+
+		switch( this.page ) {
+			case 'home':
+				this.selected = 0;
+				break;
+			case 'profile':
+				this.selected = 2;
+				break;
+			case 'collection':
+				if ( this.collid ) {
+					this.selected = 3;
+				} else {
+					lqApp.$.router.go( '/' + this.checkUserCookie() + '/home' );
+				}
+				break;
+			default:
+				lqApp.$.router.go( '/' + this.checkUserCookie() + '/home' );
+		}
+
+		if ( ! this.checkUserCookie() ) {
+			return lqApp.$.router.go( '/login', { replace: true} );
+		}
+
+		this.apiKey = lqApiKey;
+		this.cleanCollection();
+		this.update();
+	},
+
+	update: function( n_try ) {
+		// Try fetch the user for 3 times,
+		// If fails, quit
+		var n_try, user_cookie, user_uid;
+
+		// If it fails either to read the user uid from the URL
+		// or the cookie information, try reading again
+		n_try = n_try ? n_try : 0;
+
+		if ( n_try >= 3 ) {
+			// If it has been not possible to verify the user, log out.
+			fireToast( "It has been impossible to verify the user information. Logging out." );
+
+			return lqApp.logOut();
+		}
+
+		this.cleanCollection();
+
+		user_cookie = this.checkUserCookie();
+		user_id     = this.uid ? this.uid : null;
+
+		if ( user_cookie && user_id && user_cookie === user_id ) {
+			// If the user has been found from both the url and the cookie,
+			// verify the user identity using the service API
+			this.$.ajax_user.url = apiDir + "user/" + this.uid;
+			this.$.ajax_user.generateRequest();
+
+			return;
+		}
+
+		this.async( function() {
+			this.update( n_try + 1 );
+		}, 100 );
+	},
+
+	getUser: function( e ) {
+		lqApp.$.spinner.active = false; //loading
+
+		// If the user has been verified,
+		// complete rendering the home page
+		if ( e.detail.response.user ) {
+			this.user = e.detail.response.user;
+			fireToast( "Welcome back " + this.user.username );
+			// Read the global collections once the user is logged id and verified
+			this.readCollections();
+		}
+	},
+
+	/**
+	 * cleanCollection
+	 *
+	 * Clean all the collection objects and empty the local storage
+	 */
+	cleanCollection: function() {
+		this.collections = [];
+		this.$.lqCollections.save();
+	},
+
+	/**
+	 * readCollections
+	 *
+	 * Request all the collections using an Ajax request to the API
+	 */
+	readCollections: function() {
+		if ( this.checkUserCookie() ) {
+			// this.$.lqHome.tileLoading.setAttribute( 'active', true );
+
+			this.$.ajax_collections.url = apiDir + "user/" + this.checkUserCookie() + "/collections";
+			this.$.ajax_collections.generateRequest();
+		}
+	},
+
+	/**
+	 * fetchCollections
+	 *
+	 * store all the collections, returned from the Ajax request,
+	 * to the browser's local storage
+	 */
+	fetchCollections: function( e ) {
+		var that = this;
+
+		if ( e.detail.response && e.detail.response.collections ) {
+			e.detail.response.collections.forEach( function( collection ) {
+				that.push( 'collections', collection );
+			});
+		}
+
+		// this.$.lqHome.tileLoading.removeAttribute( 'active' );
+		console.log('Main ready, moving on');
+		this.$.lqHome.update();
+	},
+
+	/**
+	 * Read the user cookie
+	 * @return [String] The user uid
+	 */
+	checkUserCookie: function() {
+		return lqApp.$.userCookie.readCookie() ? lqApp.$.userCookie.readCookie() : null;
+	},
+
+	/**
+	 * logOut
+	 *
+	 * Perform a secure log out
+	 */
+	logOut: function( e ) {
+		var status = e.detail.request.xhr.response ? e.detail.request.xhr.response : null;
+
+		if ( status && status.msg ) {
+			fireToast( status.msg );
+		}
+
+		return lqApp.logOut();
+	},
+
+	_goBack: function() {
+		this.entryAnimation = 'slide-from-left-animation';
+		this.exitAnimation = 'slide-right-animation';
+
+		this.selected = 0;
+	},
+
+	_onCollection: function() {
+		this.entryAnimation = 'slide-from-right-animation';
+		this.exitAnimation = 'slide-left-animation';
+
+		this.selected = 1;
+	},
+
+	_userProfile: function() {
+		this.entryAnimation = 'slide-from-right-animation';
+		this.exitAnimation = 'slide-left-animation';
+
+		this.selected = 2;
+	},
+
+	_logOut: function() {
+		lqApp.logOut();
+	},
+
+});
+</script>
+</dom-module>

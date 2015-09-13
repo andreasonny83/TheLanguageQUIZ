@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../lq-card/lq-card.html">
 
 <dom-module id="lq-tile">
 <style>
@@ -7,43 +8,42 @@
 	opacity: 0;
 	margin: 12px;
 	transition: all linear .4s;
-}
-:host([small]) iron-image {
-	width: 100%;
-	height: var(--lq-tile-height);
-}
-:host([large]) iron-image {
-	width: 50%;
-	height: 100%;
-}
-:host([loading]) {
-	height: var(--lq-tile-height);
 
+	@apply(--lq-tile);
+}
+
+:host([loading]) {
 	@apply(--layout-horizontal);
 	@apply(--layout-center);
 	@apply(--layout-center-justified);
 	@apply(--layout-flex-auto);
 }
+
+lq-card {
+	width: 100%;
+	--paper-card-header-color: var(--paper-pink-500);
+}
+
 ::content .description {
 	height: 97px;
 	overflow: hidden;
 }
-paper-card {
-	width: 100%;
-	--paper-card-header-color: var(--paper-pink-500);
-}
+
 .card-actions {
 	display: flex;
 }
-paper-icon-button.red {
-  color: var(--paper-red-500);
 
-  --paper-icon-button-ink-color: var(--paper-red-500);
+paper-icon-button.red {
+	color: var(--paper-red-500);
+
+	--paper-icon-button-ink-color: var(--paper-red-500);
 }
+
 paper-icon-button.red:hover {
-  background: var(--paper-red-50);
-  border-radius: 50%;
+	background: var(--paper-red-50);
+	border-radius: 50%;
 }
+
 iron-image {
 	@apply(--layout-flex);
 }
@@ -51,15 +51,12 @@ iron-image {
 
 <template>
 	<template is="dom-if" if="[[loading]]">
-		<paper-spinner active$="{{active}}"></paper-spinner>
+		<paper-spinner active$="[[active]]"></paper-spinner>
 	</template>
 
 	<template is="dom-if" if="[[!loading]]">
-		<paper-card heading="[[title]]" class="pink"
-
-			id="card">
+		<lq-card heading="[[title]]" image="[[image]]" placeholder="[[placeholder]]" sizing="[[sizing]]" fade$="[[fade]]">
 			<div class="card-content">
-				<iron-image id="preload3a" class="sized gray" preload placeholder="{{placeholder}}" src=[[image]]></iron-image>
 				<content select=".description"></content>
 			</div>
 			<div class="card-actions">
@@ -68,7 +65,7 @@ iron-image {
 				<div class="flex"></div>
 				<paper-icon-button icon="favorite" title="favorite" class="red"></paper-icon-button>
 			</div>
-		</paper-card>
+		</lq-card>
 	</template>
 </template>
 
@@ -94,11 +91,6 @@ Polymer({
 			reflectToAttribute: true
 		},
 
-		placeholder: {
-			type: String,
-			value: appDir + "img/avatar.jpg",
-		},
-
 		small: {
 			type: Boolean,
 			value: false,
@@ -117,14 +109,14 @@ Polymer({
 					'entry': [{
 						name: 'fade-in-animation',
 						timing: {
-							duration: 1000,
+							duration: 800
 						},
 						node: this
 					},
 					{
 						name: 'slide-down-animation',
 						timing: {
-							duration: 300,
+							duration: 250
 						},
 						node: this
 					}]
@@ -143,9 +135,10 @@ Polymer({
 	ready: function() {
 		if ( ! this.image ) {
 			var path = "http://lorempixel.com/";
-			path = path + this.getRandomArbitrary(345, 355) + '/' + this.getRandomArbitrary(355, 355);
+			path = path + this.getRandomArbitrary( 400, 500 ) + '/' + this.getRandomArbitrary( 200, 300 );
 			this.image = path;
 		}
+
 		this.show();
 	},
 
@@ -156,10 +149,11 @@ Polymer({
 
 	show: function() {
 		this.async( function() {
-			this.playAnimation('entry');
-		}, 1000 );
+			this.playAnimation( 'entry' );
+		}, 750 );
 
 	},
+
 	_onNeonAnimationFinish: function() {
 		this.style.opacity = 1;
 	}

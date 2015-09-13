@@ -1,16 +1,16 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../event-infinite-scroll/event-infinite-scroll.html">
 <link rel="import" href="../lq-tile/lq-tile.html">
-<link rel="import" href="../lq-profile-logo/lq-profile-logo.html">
-<link rel="import" href="../paper-menu-button/paper-menu-button.html">
 
-<dom-module id="lq-page-home">
+<dom-module id="lq-home-page">
 <template>
+
 	<style include="lq-shared-styles">
 	:host {
 		display: block;
 		height: 100%;
 	}
+
 	paper-scroll-header-panel {
 		position: absolute;
 		top: 0;
@@ -19,16 +19,19 @@
 		left: 0;
 		background-color: var(--paper-grey-200, #eee);
 	}
+
 	paper-toolbar {
 		background-color: var(--lq-primary-0);
 		height: 160px;
 	}
+
 	paper-toolbar.tall .title {
 		font-size: 32px;
 		line-height: 40px;
 		text-align: center;
 		margin-left: 0;
 	}
+
 	#searchBox {
 		visibility: hidden;
 		width: 90%;
@@ -50,47 +53,82 @@
 		transition: all .5s;
 		transform: translateY(-10px);
 	}
+
 	paper-icon-button.bottom {
 		-webkit-transition: transform .5s;
 		transition: transform .5s;
 	}
+
 	paper-toolbar[search] #searchBox {
 		visibility: visible;
 		opacity: 1;
 		transform: translateY(28px);
 	}
+
 	paper-toolbar[search] paper-icon-button.right {
 		transform: translateX(80px);
 	}
+
 	paper-toolbar[search] paper-icon-button.left {
 		transform: translateX(-80px);
 	}
+
 	paper-menu-button {
 		padding: 0;
 	}
+
 	.avatar {
 		--iron-icon-height: 40px;
 		--iron-icon-width: 40px;
 		--paper-icon-button: {
 			padding: 5px;
-		}
+		};
 	}
+
 	.avatar ::content iron-icon {
 		border: 2px solid #fff;
 		border-radius: 50%;
 	}
+
 	.avatar ::content iron-icon img {
 		border-radius: 50%;
 	}
+
 	.content {
 		max-width: 1400px;
 		margin: 0 auto;
 	}
-	lq-tile[small] {
-		width: calc(33.33% - 24px);
+
+	lq-tile {
+		cursor: pointer;
 	}
+
+	lq-tile[small] {
+		--lq-tile: {
+			width: calc(33.33% - 24px);
+		};
+
+		--lq-card-header-image: {
+			width: 100%;
+			max-width: 440px;
+			height: 250px;
+		};
+
+		--lq-card-header-text: {
+			padding: 8px 12px;
+			background-color: rgba(255,255,255,0.5);
+		};
+	}
+
 	lq-tile[large] {
-		width: 100%;
+		--lq-tile: {
+			width: 100%;
+		};
+
+		--lq-card-header-image: {
+			width: 50%;
+			height: 250px;
+		};
 	}
 
 	@media all and (max-width: 639px) {
@@ -98,37 +136,51 @@
 			font-size: 21px;
 			line-height: 40px;
 		}
+
 		#searchBox {
 			height: 48px;
 			line-height: 48px;
 			font-size: 24px;
 		}
+
 		paper-toolbar[search] #searchBox {
 			transform: translateY(40px);
 		}
+
 		lq-tile[small] {
 			width: 100%;
+
+			--lq-card-header-image: {
+				width: 100%;
+				height: 250px;
+			};
 		}
 	}
+
 	@media all and (min-width: 601px) and (max-width: 900px) {
 		lq-tile[small] {
 			width: calc(50% - 24px);
+
+			--lq-card-header-image: {
+				width: 100%;
+				height: 250px;
+			};
 		}
 	}
 	</style>
 
-	<!-- Main Area -->
+	<!-- Home -->
 	<paper-scroll-header-panel condenses header-height="160" condensed-header-height="128">
 
 		<!-- Main Toolbar -->
 		<paper-toolbar class="tall" search$={{search}}>
-
 			<paper-menu-button>
-				<paper-icon-button src="{{avatar}}" class="dropdown-trigger avatar"></paper-icon-button>
+				<paper-icon-button src="[[avatar]]" class="dropdown-trigger avatar"></paper-icon-button>
 					<paper-menu class="dropdown-content">
-					<paper-item>Share</paper-item>
-					<paper-item>Settings</paper-item>
-					<paper-item>Help</paper-item>
+					<paper-item on-tap="_userProfile">Profile settings</paper-item>
+					<paper-item>Private collections</paper-item>
+					<paper-item on-tap="_userOptions">Options</paper-item>
+					<paper-item on-tap="_logOut">Log Out</paper-item>
 				</paper-menu>
 			</paper-menu-button>
 			<div class="title">The LanguageQUIZ</div>
@@ -149,7 +201,7 @@
 				<h2>Collection of the month</h2>
 			</div>
 			<div class="horizontal-section-container">
-				<lq-tile large image="http://placehold.it/900x300"></lq-tile>
+				<lq-tile large image="http://lotus.se-mc.com/image/www-static.se-mc.com/blogs.dir/0/files/2015/07/xperia-z5-camera-hybrid-af-desktop-f6cc693928982eb8a41dc345b2e9285b.jpg?wid=5000" placeholder="[[highlight_placeholder]]" sizing="cover" fade on-tap="_onClick"></lq-tile>
 			</div>
 
 			<div class="horizontal-section-container">
@@ -159,9 +211,9 @@
 				<array-selector id="selector" items="[[collections]]" selected="{{collectionsSelected}}" multi toggle></array-selector>
 
 				<template id="collectionsList" is="dom-repeat" items="[[collectionsSelected]]" as="collection" filter="filterCollections">
-					<lq-tile small
-						id="[[collection.uid]]"
-						title="[[collection.name]]">
+					<lq-tile small id="[[collection.uid]]"
+						title="[[collection.name]]"
+						placeholder="[[tile_placeholder]]" sizing="cover" fade>
 						<p class="description">[[collection.description]]</p>
 					</lq-tile>
 				</template>
@@ -171,37 +223,15 @@
 			</div>
 
 		</div>
-			<event-infinite-scroll
-				id="infinite_scroll"
-				scroll-offset="50"
-				loading-delay="500"
-				on-reach-bottom="loadMoreCollections">
-			</event-infinite-scroll>
+
+		<event-infinite-scroll
+			id="infinite_scroll"
+			scroll-offset="50"
+			loading-delay="500"
+			on-reach-bottom="loadMoreCollections">
+		</event-infinite-scroll>
 
 	</paper-scroll-header-panel>
-
-	<iron-localstorage name="lq-global-collections"
-		id="lqCollections"
-		value="{{collections}}">
-	</iron-localstorage>
-
-	<iron-ajax
-		id="ajax_collections"
-		method="GET"
-		headers={{apiKey}}
-		handle-as="json"
-		on-response="fetchCollections">
-	</iron-ajax>
-
-	<iron-ajax
-		id="ajax_user"
-		method="GET"
-		headers={{apiKey}}
-		handle-as="json"
-		on-error="logOut"
-		on-response="getUser">
-	</iron-ajax>
-
 </template>
 
 <script>
@@ -216,9 +246,23 @@ addEventListener( 'paper-header-transform', function( e ) {
 });
 
 Polymer({
-	is: 'lq-page-home',
+	is: 'lq-home-page',
 
 	properties: {
+
+		is_ready: false,
+
+		search: {
+			type: Boolean,
+			value: false
+		},
+
+		searchString: {
+			type: String,
+			value: '',
+			observer: '_refreshFilter'
+		},
+
 		collections: {
 			type: Object,
 			value: []
@@ -234,147 +278,26 @@ Polymer({
 			value: []
 		},
 
-		items_per_page: {
-			type: Number,
-			value: 6
-		},
-
-		search: {
-			type: Boolean,
-			value: false
-		},
-
-		searchString: {
+		highlight_placeholder: {
 			type: String,
-			value: '',
-			observer: 'refreshFilter'
+			value: appDir + "img/tile_large.png"
 		},
 
-		animationConfig: {
-			type: Object,
-			value: function() {
-				return {
-					'entry': {
-						name: 'fade-in-animation',
-						node: this
-					},
-					'exit': {
-						name: 'fade-out-animation',
-						node: this
-					}
-				}
-			}
-		},
-	},
-
-	attached: function() {
-		this.avatar = appDir + "img/avatar.jpg";
-
-		lqApp.$.spinner.active = true; //loading
-
-		if ( ! this.checkUserCookie() ) {
-			return lqApp.$.router.go( '/login', { replace: true} );
+		tile_placeholder: {
+			type: String,
+			value: appDir + "img/tile_small.png"
 		}
 
-		this.apiKey = lqApiKey;
-		this.cleanCollection();
-		this.update();
 	},
 
-	update: function( n_try ) {
-		// Try fetch the user for 3 times,
-		// If fails, quit
-		var n_try, user_cookie, user_uid;
+	update: function() {
+		this.is_ready = true;
 
-		// If it fails either to read the user uid from the URL
-		// or the cookie information, try reading again
-		n_try = n_try ? n_try : 0;
-
-		if ( n_try >= 3 ) {
-			// If it has been not possible to verify the user, log out.
-			fireToast( "It has been impossible to verify the user information. Logging out." );
-
-			return lqApp.logOut();
-		}
-
-		this.cleanCollection();
-
-		user_cookie = this.checkUserCookie();
-		user_id     = this.uid ? this.uid : null;
-
-		if ( user_cookie && user_id && user_cookie === user_id ) {
-			// If the user has been found from both the url and the cookie,
-			// verify the user identity using the service API
-			this.$.ajax_user.url = apiDir + "user/" + this.uid;
-			this.$.ajax_user.generateRequest();
-
-			return;
-		}
-
-		this.async( function() {
-			this.update( n_try + 1 );
-		}, 100 );
-	},
-
-	getUser: function( e ) {
-		lqApp.$.spinner.active = false; //loading
-
-		// If the user has been verified,
-		// complete rendering the home page
-		if ( e.detail.response.user ) {
-			this.user = e.detail.response.user;
-			fireToast( "Welcome back " + this.user.username );
-			// Read the first set of collection once the user is logged id and verified
-			this.readCollections();
-		}
-	},
-
-	/**
-	 * cleanCollection
-	 *
-	 * Clean all the collection objects and empty the local storage
-	 */
-	cleanCollection: function() {
-		this.collections         = [];
 		this.collectionsSelected = [];
-		this.$.lqCollections.save();
-	},
-
-	/**
-	 * readCollections
-	 *
-	 * Request all the collections using an Ajax request to the API
-	 */
-	readCollections: function() {
-		if ( this.checkUserCookie() ) {
-			this.$.tileLoading.setAttribute( 'active', true );
-			console.log('spin activated');
-			this.$.ajax_collections.url = apiDir + "user/" + this.checkUserCookie() + "/collections";
-			this.$.ajax_collections.generateRequest();
-		}
-	},
-
-	/**
-	 * fetchCollections
-	 *
-	 * store all the collections, returned from the Ajax request,
-	 * to the browser's local storage
-	 */
-	fetchCollections: function( e ) {
-		var that = this;
-
-		if ( e.detail.response && e.detail.response.collections ) {
-			e.detail.response.collections.forEach( function( collection ) {
-				that.push( 'collections', collection );
-			});
-
-			// Activate the Infinite Scroll
-			this.$.infinite_scroll.startObserve();
-			// Render the first set of collections
-			this.loadMoreCollections();
-		}
-
-		this.$.tileLoading.removeAttribute( 'active' );
+		// Activate the Infinite Scroll
+		this.$.infinite_scroll.startObserve();
+		// Render the first set of collections
+		this.loadMoreCollections();
 	},
 
 	/**
@@ -389,7 +312,7 @@ Polymer({
 		}
 
 		// When all the collection have been rendered, stop searching more
-		if ( this.collectionsSelected.length >= this.collections.length ) {
+		if ( this.collectionsSelected.length >= lqMain.collections.length ) {
 			this.$.infinite_scroll.setAttribute( 'busy', true );
 			this.$.tileLoading.removeAttribute( 'active' );
 			return;
@@ -403,11 +326,11 @@ Polymer({
 
 		var that  = this;
 		var start = this.collectionsSelected.length;
-		var stop  = this.collectionsSelected.length + this.items_per_page;
-		stop      = stop < this.collections.length ? stop : this.collections.length;
+		var stop  = this.collectionsSelected.length + lqMain.items_per_page;
+		stop      = stop < lqMain.collections.length ? stop : lqMain.collections.length;
 
 		for ( var pos = start; pos < stop; pos++ ) {
-			var item = this.collections[pos];
+			var item = lqMain.collections[pos];
 			that.push( 'collectionsBuffer', item );
 		}
 
@@ -415,7 +338,6 @@ Polymer({
 			this.collectionsBuffer.forEach( function( item ) {
 				that.push( 'collectionsSelected', item );
 			});
-
 			this.$.infinite_scroll.removeAttribute( 'busy' );
 			this.$.tileLoading.removeAttribute( 'active' );
 		}, 1000);
@@ -438,7 +360,10 @@ Polymer({
 	searchToggle: function() {
 		this.search = ! this.search;
 
-		if ( ! this.search ) return;
+		if ( ! this.search ) {
+			this.searchString = '';
+			return;
+		}
 
 		this.async( function() {
 			this.$.searchBox.select();
@@ -446,32 +371,24 @@ Polymer({
 		}, 500 );
 	},
 
-	refreshFilter: function() {
+	_refreshFilter: function() {
 		this.$.collectionsList.render();
-	},
-
-	/**
-	 * Read the user cookie
-	 * @return [String] The user uid
-	 */
-	checkUserCookie: function() {
-		return lqApp.$.userCookie.readCookie() ? lqApp.$.userCookie.readCookie() : null;
-	},
-
-	/**
-	 * logOut
-	 *
-	 * Perform a secure log out
-	 */
-	logOut: function( e ) {
-		var status = e.detail.request.xhr.response ? e.detail.request.xhr.response : null;
-
-		if ( status && status.msg ) {
-			fireToast( status.msg );
+		if ( this.is_ready ) {
+			this.loadMoreCollections();
 		}
+	},
 
-		return lqApp.logOut();
+	_onClick: function( event ) {
+		this.fire( 'tile-click' );
+	},
+
+	_logOut: function() {
+		this.fire( 'log-out' );
+	},
+
+	_userProfile: function() {
+		this.fire( 'user-profile' );
 	}
+
 });
 </script>
-</dom-module>

@@ -1,14 +1,15 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../lq-card/lq-card.html">
 
 <dom-module id="lq-login">
 <style include="lq-shared-styles">
 .hero {
 	padding: 50px;
 }
-paper-card {
+lq-card {
 	width: 500px;
 
-	--paper-card-actions: {
+	--lq-card-actions: {
 		text-align: right;
 		@apply(--layout-center);
 	}
@@ -36,7 +37,7 @@ footer {
 
 <template>
 	<div class="horizontal-section-container hero">
-		<paper-card id="card_login" heading="Log In">
+		<lq-card id="card_login" heading="Log In">
 			<div class="card-content">
 				<paper-input id="login_email" name="username" required label="E-mail" autofocus type="email" error-message="enter a valid email address" value="{{email}}" tabindex="1"></paper-input>
 				<paper-input id="login_password" name="password" label="Password" required minlength=6 type="password" error-message="password must be 6 minimum characters" value="{{password}}" tabindex="2"></paper-input>
@@ -54,11 +55,11 @@ footer {
 				target="{{card_login}}"
 				on-keys-pressed="login">
 			</iron-a11y-keys>
-		</paper-card>
+		</lq-card>
 
 	</div>
 	<div class="horizontal-section-container hero">
-		<paper-card id="card_register" heading="Register">
+		<lq-card id="card_register" heading="Register">
 			<div class="card-content">
 				<paper-input id="reg_name" type="text" label="User name*" required pattern="[a-zA-Z0-9]+" minlength=5 value="{{reg.name}}" error-message="letters and number only. Minimun of 5 charaters" tabindex="4"></paper-input>
 				<paper-input id="reg_email" type="text" label="Email*" required value="{{reg.email}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="enter a valid email address" tabindex="5"></paper-input>
@@ -89,7 +90,7 @@ footer {
 				target="{{card_register}}"
 				on-keys-pressed="register">
 			</iron-a11y-keys>
-		</paper-card>
+		</lq-card>
 	</div>
 
 	<div class="horizontal-section-container">
