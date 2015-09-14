@@ -1,40 +1,47 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../lq-dropdown/lq-dropdown.html">
+<link rel="import" href="../lq-card/lq-card.html">
 
 <dom-module id="lq-login">
-<style include="lq-shared-styles">
-.hero {
-	padding: 50px;
-}
-paper-card {
-	width: 500px;
-
-	--paper-card-actions: {
-		text-align: right;
-		@apply(--layout-center);
-	}
-}
-.centered {
-	max-width: 400px;
-	margin-left: auto;
-	margin-right: auto;
-	text-align: center;
-}
-.secondary {
-	height: 500px;
-	width: 100%;
-	background-color: #fff;
-	overflow: auto;
-}
-footer {
-	height: 200px;
-}
-@media (max-width: 639px) {}
-</style>
-
 <template>
+	<style include="lq-shared-styles">
+	.hero {
+		padding: 50px;
+	}
+
+	lq-card {
+		width: 500px;
+
+		--lq-card-actions: {
+			text-align: right;
+			@apply(--layout-center);
+		}
+	}
+
+	paper-input, paper-dropdown-menu {
+		outline: none;
+	}
+
+	.centered {
+		max-width: 400px;
+		margin-left: auto;
+		margin-right: auto;
+		text-align: center;
+	}
+
+	.secondary {
+		height: 500px;
+		width: 100%;
+		background-color: #fff;
+		overflow: auto;
+	}
+
+	footer {
+		height: 200px;
+	}
+	</style>
+
 	<div class="horizontal-section-container hero">
-		<paper-card id="card_login" heading="Log In">
+		<lq-card id="card_login" heading="Log In">
 			<div class="card-content">
 				<paper-input id="login_email" name="username" required label="E-mail" autofocus type="email" error-message="enter a valid email address" value="{{email}}" tabindex="1"></paper-input>
 				<paper-input id="login_password" name="password" label="Password" required minlength=6 type="password" error-message="password must be 6 minimum characters" value="{{password}}" tabindex="2"></paper-input>
@@ -52,18 +59,27 @@ footer {
 				target="{{card_login}}"
 				on-keys-pressed="login">
 			</iron-a11y-keys>
-		</paper-card>
-
+		</lq-card>
 	</div>
+
 	<div class="horizontal-section-container hero">
-		<paper-card id="card_register" heading="Register">
+		<lq-card id="card_register" heading="Register">
 			<div class="card-content">
 				<paper-input id="reg_name" type="text" label="User name*" required pattern="[a-zA-Z0-9]+" minlength=5 value="{{reg.name}}" error-message="letters and number only. Minimun of 5 charaters" tabindex="4"></paper-input>
 				<paper-input id="reg_email" type="text" label="Email*" required value="{{reg.email}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="enter a valid email address" tabindex="5"></paper-input>
 				<paper-input id="reg_email_confirm" type="text" label="Re-enter email*" required value="{{reg.email_confirm}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" error-message="email address doesn't match" tabindex="6"></paper-input>
 				<paper-input id="reg_password" type="password" label="Password*" required pattern=".{6,}" value="{{reg.password}}" error-message="password must be 6 characters minimum." tabindex="7"></paper-input>
 				<paper-input id="reg_password_confirm" type="password" required label="Re-enter password*" minlength=6 value="{{reg.password_confirm}}" error-message="password doesn't match" tabindex="8"></paper-input>
-				<lq-dropdown id="language" title="I speak" selected-value={{reg.lang}} aria-disabled="false" tabindex="9"></lq-dropdown>
+				<paper-dropdown-menu id="language" no-animations="true" label="Your language" tabindex="9" selected-item-label="{{reg.lang}}">
+					<paper-menu class="dropdown-content">
+						<paper-item>English</paper-item>
+						<paper-item>Spanish</paper-item>
+						<paper-item>Franch</paper-item>
+						<paper-item>Italian</paper-item>
+						<paper-item>Japanese</paper-item>
+						<paper-item>Swedish</paper-item>
+					</paper-menu>
+				</paper-dropdown-menu>
 			</div>
 			<div class="card-actions">
 				<paper-button on-tap="register">
@@ -78,7 +94,7 @@ footer {
 				target="{{card_register}}"
 				on-keys-pressed="register">
 			</iron-a11y-keys>
-		</paper-card>
+		</lq-card>
 	</div>
 
 	<div class="horizontal-section-container">
@@ -126,28 +142,8 @@ footer {
 Polymer({
 	is: 'lq-login',
 
-	behaviors: [
-		Polymer.NeonAnimatableBehavior
-	],
-
 	properties: {
-		reg: Object,
-
-		animationConfig: {
-			type: Object,
-			value: function() {
-				return {
-					'entry': {
-						name: 'fade-in-animation',
-						node: this
-					},
-					'exit': {
-						name: 'fade-out-animation',
-						node: this
-					}
-				}
-			}
-		},
+		reg: Object
 	},
 
 	observers: [
@@ -173,7 +169,7 @@ Polymer({
 
 	getUser: function( e ) {
 		if ( e.detail.response.user ) {
-			document.querySelector( 'app-router' ).go( '/' + this.user_cookie + '/home', { replace: true} );
+			lqApp.$.router.go( '/' + this.user_cookie + '/', { replace: true } );
 		}
 	},
 
@@ -193,7 +189,7 @@ Polymer({
 			email_confirm:    '',
 			password:         '',
 			password_confirm: '',
-			lang:             'English'
+			lang:             ''
 		};
 
 		this.$.reg_name.invalid = false;
@@ -239,7 +235,7 @@ Polymer({
 	},
 
 	register: function() {
-		this.reg.lang = this.$.language.selectedValue;
+		this.reg.lang = this.$.language.selectedItemLabel;
 		this.$.reg_name.validate();
 		this.$.reg_email.validate();
 		this.$.reg_email_confirm.validate();
@@ -247,12 +243,12 @@ Polymer({
 		this.$.reg_password_confirm.validate();
 
 		if ( ! this.reg.lang ) {
-			fireToast( "Please, select your language first." );
+			lqApp.fireToast( "Please, select your language first." );
 			return;
 		}
 
 		if ( this.$.reg_name.invalid || this.$.reg_email.invalid || this.$.reg_email_confirm.invalid || this.$.reg_password.invalid || this.$.reg_password_confirm.invalid ) {
-			fireToast( "Please, fix the wrong information and try again." );
+			lqApp.fireToast( "Please, fix the wrong information and try again." );
 			return;
 		}
 
@@ -285,26 +281,26 @@ Polymer({
 
 			var ajax_url           = apiDir + "login";
 			this.$.ajax_login.url  = ajax_url;
-			this.$.ajax_login.body = "email=" + encodeURIComponent( this.email ) +
+			this.$.ajax_login.body = "email="     + encodeURIComponent( this.email ) +
 									 "&password=" + encodeURIComponent( this.password );
 
 			this.$.ajax_login.generateRequest();
 		}
 		else {
-			fireToast( "Please, check the entered details and try again." );
+			lqApp.fireToast( "Please, check the entered details and try again." );
 		}
 	},
 
 	registerSucceed: function() {
 		lqApp.$.spinner.active = false; //loading
 		this.resetFields();
-		fireToast( "You are now registered." );
+		lqApp.fireToast( "You are now registered." );
 	},
 
 	registerFailed: function() {
 		lqApp.$.spinner.active = false; //loading
 		this.resetFields();
-		fireToast( "Please, check the entered details and try again." );
+		lqApp.fireToast( "Please, check the entered details and try again." );
 	},
 
 	loginSucceed: function() {
@@ -318,7 +314,7 @@ Polymer({
 
 		if ( n_try >= 3 ) {
 			lqApp.$.spinner.active = false; //loading
-			fireToast( "It has been impossible to perform a log in. Please try again." );
+			lqApp.fireToast( "It has been impossible to perform a log in. Please try again." );
 
 			return;
 		}
@@ -326,7 +322,7 @@ Polymer({
 		var user_cookie = lqApp.$.userCookie.readCookie() ? lqApp.$.userCookie.readCookie() : null;
 
 		if ( user_cookie ) {
-			lqApp.$.router.go( '/' + user_cookie + '/home', { replace: true} );
+			lqApp.$.router.go( '/' + user_cookie + '/', { replace: true} );
 
 			return;
 		}
@@ -342,12 +338,12 @@ Polymer({
 		lqApp.$.spinner.active = false; //loading
 
 		if ( status && status.msg ) {
-			fireToast( status.msg );
+			lqApp.fireToast( status.msg );
 
 			return;
 		}
 
-		fireToast( "It has been impossible to receive any response from the server. Please, try again." );
+		lqApp.fireToast( "It has been impossible to receive any response from the server. Please, try again." );
 	}
 });
 </script>

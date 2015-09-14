@@ -1,0 +1,332 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../lq-card/lq-card.html">
+
+<dom-module id="lq-user-profile">
+<template>
+	<style include="lq-shared-styles">
+	:host {
+		display: block;
+		height: 100%;
+	}
+
+	.content {
+		max-width: 1400px;
+		margin: 0 auto;
+	}
+
+	iron-image {
+		border: 1px solid rgb(0, 0, 0);
+	}
+
+	.loading {
+		height: 28px;
+		position: relative;
+		display: inline-block;
+		vertical-align: middle;
+	}
+
+	paper-spinner {
+		--paper-spinner-layer-1-color: var(--paper-red-500);
+		--paper-spinner-layer-2-color: var(--paper-red-500);
+		--paper-spinner-layer-3-color: var(--paper-red-500);
+		--paper-spinner-layer-4-color: var(--paper-red-500);
+	}
+	</style>
+
+	<!-- Home -->
+	<paper-scroll-header-panel condenses header-height="160" condensed-header-height="128">
+
+		<!-- Main Toolbar -->
+		<paper-toolbar class="tall">
+
+			<paper-icon-button on-tap="_goBack" icon="arrow-back"></paper-icon-button>
+			<div class="title">The LanguageQUIZ</div>
+
+		</paper-toolbar>
+
+		<!-- Main Content -->
+		<div class="content">
+
+			<div class="horizontal-section-container">
+				<lq-card heading="avatar">
+					<div class="card-content">
+						<iron-image style="width:180px; height:180px;"
+							id="avatar_image" sizing="contain"
+							placeholder="data:image/gif;base64,R0lGODdhyADIAOMAAO7u/5aWlqGho9jY5OPj8cLCyqyssLe3vc3N1wAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAyADIAAAE/hDISau9OOvNu/9gKI5kaZ5oqq5s675wLM90bd94ru987//AoHBILBqPyKRyyWw6n9CodEqtWq/YrHbL7Xq/4LB4TC6bz+i0es1uu9/wuHxOr9vv+Lx+z+/7/4CBgoOEhYaHiImKi4yNjo+QkZKTlJWWl5iZmpucnZ6foKGio6SlpqeoqaqrrK2ur7CxsrO0tba3uLm6u7y9vr/AwcLDxMXGx8jJysvMzc7P0NHS06kB1tYqA9cUBQEFrgLWAgIqBOEBFNuu1gMs2ugT3d/rAe0r77bsFwMGAQLzEggc8AcQAIJwA+EBuKbQmgF+3iocDHBAXiZ9Fd6dAxhuo4R3/gwnGDgnkqE1BBM0XrN3CSOFgQYM+ouHEsFMAP1i2lQIAN8EhwS6kZPQ74BMnpZcTgiHkoA1AhKxAWDaU+pHqwvrVVVI1ScmpRIwYjxwTqo+r1vTafV6FmtSrRXEak0ooB+8tjzR4v251m0llwSgUnUaAOrJtFMDoESrty9XxYi/wk0sMEBMoRKo7iRK8SiFxu285vQMoIDR0qdNN+rmbxxJlRFLi7u22OG1mDjP4bYb2uFVf+r0CZ+cyOS1oRD/cUM4cN5EA3bDhszqWOHEhBLIZh+qHdnmaFABwIwm9BxLZxAtn6fGvr379/Djy59Pv779+/jz69/Pv7///wAGQyjggAQWaOCBCCao4IIMNujggxBGKOGEFFZo4YUYZqjhhhx26OGHIIYo4ogklmjiiSimqOKKLLbo4oswxijjjDRKEQEAOw=="
+							fade preload src={{user.avatar}}>
+						</iron-image>
+
+						<input type="file" id="file_input" on-change="_fileChange" hidden>
+					</div>
+					<div class="card-actions">
+						<div class="loading">
+							<paper-spinner id="avatar_spinner"></paper-spinner>
+						</div>
+						<paper-button on-click="_fileClick">
+							<iron-icon icon="icons:file-upload"></iron-icon>
+							Upload File
+						</paper-button>
+						<paper-button on-click="fetchAvatar">Reset</paper-button>
+						<paper-button on-click="avatarSave">Save</paper-button>
+					</div>
+				</lq-card>
+				<lq-card heading="{{user_title}}">
+					<div class="card-content">
+						<paper-input id="username" label="Username" value="{{user.username}}"></paper-input>
+						<paper-input id="email" label="Email" value="{{user.email}}" type="email"></paper-input>
+						<paper-input id="old_password" label="Old password" value="{{user.old_password}}"
+							type="password" minlength=6
+							error-message="password must be 6 minimum characters">
+						</paper-input>
+						<paper-input id="password" label="Password" value="{{user.password}}"
+							type="password" minlength=6
+							error-message="password must be 6 minimum characters">
+						</paper-input>
+						<paper-input id="password_confirm" label="Re-enter password" value="{{user.password_confirm}}"
+							type="password" minlength=6
+							error-message="password must be 6 minimum characters">
+						</paper-input>
+					</div>
+					<div class="card-actions">
+						<div class="loading">
+							<paper-spinner id="spinner"></paper-spinner>
+						</div>
+						<paper-button on-click="profileReset">Reset</paper-button>
+						<paper-button on-click="profileSave">Save</paper-button>
+					</div>
+				</lq-card>
+			</div>
+
+		<!-- content -->
+		</div>
+
+	</paper-scroll-header-panel>
+
+	<iron-ajax
+		id="ajax_profile"
+		headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
+		handle-as="json"
+		on-response="getProfile"
+		on-error="updateFailed">
+	</iron-ajax>
+	<iron-ajax
+		id="ajax_avatar"
+		headers='{"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"}'
+		handle-as="json"
+		on-response="getAvatar"
+		on-error="updateFailed">
+	</iron-ajax>
+</template>
+
+<script>
+Polymer({
+	is: "lq-user-profile",
+
+	properties: {
+		user: Object,
+		avatar: {
+			type: String,
+			value: ''
+		},
+		user_title: {
+			type: String,
+			value: "profile"
+		}
+	},
+
+	observers: [
+	  '_verifyPassword( user.old_password )',
+	  '_verifyPassword( user.password )',
+	  '_verifyPassword( user.password_confirm )'
+	],
+
+	ready: function() {
+		this.user = {
+			username: '',
+			email: '',
+			avatar: ''
+		};
+	},
+
+	_verifyPassword: function() {
+		this.$.old_password.validate();
+		this.$.password.validate();
+		this.$.password_confirm.validate();
+
+		// Verify if the entered password match the other one
+		this.$.password_confirm.invalid = true;
+		if ( this.user.password === this.user.password_confirm ) {
+			this.$.password_confirm.invalid = false;
+		}
+
+		if ( this.user.old_password && ! this.user.password ) {
+			this.$.password.invalid = true;
+			this.$.password_confirm.invalid = true;
+		}
+	},
+
+	fetchProfile: function() {
+		if ( lqApp.userCookie ) {
+			var _default = "";
+			this.set( 'user.username', _default );
+			this.set( 'user.email',    _default );
+
+			this.$.spinner.active      = true;
+			this.$.ajax_profile.method = "GET";
+			this.$.ajax_profile.url    = apiDir + "user/" + lqApp.userCookie + "/profile";
+			this.$.ajax_profile.generateRequest();
+		}
+	},
+
+	fetchAvatar: function() {
+		this.$.file_input.value  = "";
+		if ( lqApp.userCookie ) {
+			var _default = "";
+			this.set( 'user.avatar', _default );
+
+			this.$.avatar_spinner.active = true;
+			this.$.ajax_avatar.method    = "GET";
+			this.$.ajax_avatar.url       = apiDir + "user/" + lqApp.userCookie + "/profile/avatar";
+			this.$.ajax_avatar.generateRequest();
+		}
+	},
+
+	getProfile: function( e ) {
+		if ( e.detail.response && e.detail.response.profile ) {
+			this.set( 'user.username', e.detail.response.profile.username );
+			this.set( 'user.email',    e.detail.response.profile.email );
+			this.user_title = e.detail.response.profile.username + " profile";
+		}
+		// show a toast if any
+		if ( e.detail.response && e.detail.response.msg ) {
+			lqApp.fireToast( e.detail.response.msg );
+		}
+
+		this.$.spinner.active = false;
+	},
+
+	getAvatar: function( e ) {
+		var placeholder = 'http://placehold.it/180x180?text=No+Image';
+		var _default    = "";
+		this.set( 'user.avatar', _default );
+
+		if ( e.detail.response && e.detail.response.profile && e.detail.response.profile.avatar ) {
+			this.set( 'user.avatar', e.detail.response.profile.avatar + "?" + new Date().getTime() );
+		}
+		else {
+			this.set( 'user.avatar', placeholder );
+		}
+
+		// show a toast if any
+		if ( e.detail.response && e.detail.response.msg ) {
+			lqApp.fireToast( e.detail.response.msg );
+		}
+
+		this.$.avatar_spinner.active = false;
+	},
+
+	updateFailed: function( e ) {
+		// show a toast if any
+		if ( e.detail.request.xhr.response && e.detail.request.xhr.response.msg ) {
+			lqApp.fireToast( e.detail.request.xhr.response.msg );
+		}
+
+		this.$.spinner.active        = false;
+		this.$.avatar_spinner.active = false;
+	},
+
+	profileReset: function() {
+		this.$.spinner.active           = true;
+		this.user.password              = "";
+		this.user.password_confirm      = "";
+		this.$.password.invalid         = false;
+		this.$.password_confirm.invalid = false;
+		this.fetchProfile();
+	},
+
+	avatarReset: function() {
+		this.$.avatar_spinner.active = true;
+		this.user.avatar             = "";
+		this.fetchAvatar();
+	},
+
+	profileSave: function() {
+		this.$.username.validate();
+		this.$.email.validate();
+		this.$.password.validate();
+		this.$.password_confirm.validate();
+
+		if ( this.$.username.invalid || this.$.email.invalid || this.$.password.invalid || this.$.password_confirm.invalid ) {
+			this._verifyPassword();
+			return;
+		}
+
+		if ( this.user.password !== this.user.password_confirm ) {
+			this._verifyPassword();
+			return;
+		}
+
+		this.$.ajax_profile.body   = "username=" + encodeURIComponent( this.user.username ) +
+									 "&email=" + encodeURIComponent( this.user.email );
+		// reset the user password only if a password has been set
+		if ( this.user.password && this.user.old_password && this.user.password_confirm ) {
+			this.$.ajax_profile.body += "&old_password=" + encodeURIComponent( this.user.old_password ) +
+										"&password=" + encodeURIComponent( this.user.password ) +
+										"&password_confirm=" + encodeURIComponent( this.user.password_confirm );
+		}
+		this.$.ajax_profile.url    = apiDir + "user/" + lqApp.userCookie + "/profile";
+		this.$.spinner.active      = true;
+		this.$.ajax_profile.method = "POST";
+		this.$.ajax_profile.generateRequest();
+	},
+
+	avatarSave: function() {
+		this.$.avatar_spinner.active  = true;
+		var file                      = this.$.file_input.files[0];
+		var formData                  = new FormData();
+
+		formData.append( 'file', file );
+
+		this.$.ajax_avatar.body   = formData;
+		this.$.ajax_avatar.url    = apiDir + "user/" + lqApp.userCookie + "/profile/avatar";
+		this.$.ajax_avatar.method = "POST";
+
+		this.$.ajax_avatar.generateRequest();
+	},
+
+	_fileClick: function( event ) {
+		var elem = this.$.file_input;
+		if ( elem && document.createEvent ) {
+		  var evt = document.createEvent( "MouseEvents" );
+		  evt.initEvent( "click", true, false );
+		  elem.dispatchEvent( evt );
+		}
+
+	},
+
+	_fileChange: function( event ) {
+		var imgPreview = "";
+		var img        = this.$.avatar_image;
+		var file       = event.target.files[0];
+		var reader     = new FileReader();
+
+		this.set( 'user.avatar', imgPreview );
+
+		reader.onload = ( function( aImg ) {
+			return function( e ) {
+				aImg.src   = e.target.result;
+				imgPreview = aImg;
+			};
+		})( img );
+
+		reader.readAsDataURL( file );
+		this.set( 'user.avatar', imgPreview );
+	},
+
+	_goBack: function( event ) {
+		this.fire( 'go-back' );
+	}
+
+});
+</script>
+</dom-module>

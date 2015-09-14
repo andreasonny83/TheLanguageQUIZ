@@ -421,15 +421,12 @@ $app->post(
 			'image/tiff' => '.tif',
 		);
 
-		// $file_ext = array_search( $_FILES['file']['type'], $file_types );
 		$userUID   = $app->getCookie( 'lq_user_id' );
 		$file      = $_FILES['file'];
 		$file_type = $_FILES['file']['type'];
 
-		print_r($_FILES);
 		$image_info = getimagesize ( $_FILES['file']['tmp_name'] );
-		$mime_type = $image_info['mime'] ? $image_info['mime'] : null;
-		var_dump($mime_type);
+		$mime_type  = $image_info['mime'] ? $image_info['mime'] : null;
 
 		if ( ! array_key_exists( $file_type, $mime_types ) || ! $mime_type ) {
 			$response['error'] = true;
@@ -465,27 +462,22 @@ $app->post(
 $app->get(
 	'/user/:userid/collections/', 'authenticate', function( $userid ) use ( $app ) {
 		sleep(2);
-		// $page     = $app->request()->get( 'page' );
-		// $page     = isset( $page ) ? $page : 0;
 		$db       = new DbHandler();
 		$response = array(
 			'request' => 'collections'
 		);
 
-		// $collections = $db->getCollections( 0, $userid, $page );
 		$collections = $db->getCollections( 0, $userid );
 
 		if ( ! empty( $collections['collections'] ) ) {
 			$response['error']       = false;
 			$response['collections'] = $collections['collections'];
-			// $response['loadMore']    = $collections['loadMore'];
 			$response['msg']         = 'Collections correctly fetched.';
 			echoRespnse( 200, $response );
 			$app->stop();
 		}
 
 		$response['error']    = true;
-		// $response['loadMore'] = $collections['loadMore'];
 		$response['msg']      = 'Cannot retrieve new collections.';
 		echoRespnse( 200, $response );
 		$app->stop();

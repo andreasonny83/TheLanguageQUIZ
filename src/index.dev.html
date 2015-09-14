@@ -50,34 +50,89 @@
 		<span class="secondary">Please wait...</span>
 	</div>
 
-	<template is="dom-bind">
-		<lq-app id="lqApp"></lq-app>
+	<template is="dom-bind" id="lqApp">
+		<app-router id="router" mode="hash">
+			<app-route path="/login/" import="components/lq-pages/lq-login.html"></app-route>
+			<app-route path="/:uid/" import="components/lq-pages/lq-main.html"></app-route>
+			<app-route path="*" redirect="/login/"></app-route>
+		</app-router>
+
+		<paper-toast id="toast"></paper-toast>
+
+		<lq-page-loading id="spinner"></lq-page-loading>
+
+		<polymer-cookie
+			id="userCookie"
+			name="lq_user_id"
+			time="14"
+			format="d">
+		</polymer-cookie>
+
+		<iron-ajax
+			id="ajax_logout"
+			method="GET"
+			handle-as="json"
+			on-error="loggedOut"
+			on-response="loggedOut">
+		</iron-ajax>
 	</template>
 
 	<script>
-	var appDir         = "http://localhost:8888/TheLanguageQUIZ/dist/";
-	var apiDir         = "http://localhost:8888/TheLanguageQUIZ/dist/api/v1/";
-	var lqApiKey       = {"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"};
-	// var collectionPage = 0;
+	window.appDir   = "http://localhost:8888/TheLanguageQUIZ/dist/";
+	window.apiDir   = "http://localhost:8888/TheLanguageQUIZ/dist/api/v1/";
+	window.lqApiKey = {"LQ-API-KEY": "406cc6ed2c7471d7593461264c0db966"};
+
+	window.addEventListener( 'WebComponentsReady', function() {
+		var splash   = document.querySelector( '#browser-sync-binding' );
+		var elapsed  = Date.now() - readyTime;
+		window.toast = document.querySelector( '#toast' );
+		window.lqApp = document.querySelector( '#lqApp' );
+
+		// Hide the splashscreen
+		Polymer.Base.toggleAttribute( 'unresolved', true, splash );
+		console.log( 'APP is ready. Loading time: ' + elapsed );
+	});
 
 	/**
 	 * Fire a toast message
 	 * If busy, queue the request and retry after 500 milliseconds.
 	 * @param String message
 	 */
-	function fireToast( message ) {
-		var toast = document.querySelector( '#toast' );
-
+	lqApp.fireToast = function( message ) {
 		if ( ! toast.visible ) {
 			toast.text = message;
 			toast.show();
 		}
 		else {
 			setTimeout( function() {
-				fireToast( message );
+				lqApp.fireToast( message );
 			}, 500);
 		}
-	}
+	};
+
+	/**
+	 * Read the user cookie
+	 * @return [String] The user uid
+	 */
+	lqApp.checkUserCookie = function() {
+		return lqApp.$.userCookie.readCookie() ? lqApp.$.userCookie.readCookie() : null;
+	},
+
+	lqApp.logOut = function( message ) {
+		if ( message ) lqApp.fireToast( message );
+
+		lqApp.$.ajax_logout.url = apiDir + "logout";
+		lqApp.$.userCookie.eraseCookie();
+		lqApp.$.ajax_logout.generateRequest();
+	};
+
+	lqApp.loggedOut = function( e ) {
+		lqApp.$.router.go( '/login/', { replace: true} );
+
+		if ( lqApp.$.spinner.active ) lqApp.$.spinner.active = false; //loading
+
+		lqApp.fireToast( e.detail.response.msg );
+	};
 	</script>
 </body>
 </html>
