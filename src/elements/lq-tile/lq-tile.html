@@ -2,54 +2,54 @@
 <link rel="import" href="../lq-card/lq-card.html">
 
 <dom-module id="lq-tile">
-<style>
-:host {
-	display: block;
-	opacity: 0;
-	margin: 12px;
-	transition: all linear .4s;
-
-	@apply(--lq-tile);
-}
-
-:host([loading]) {
-	@apply(--layout-horizontal);
-	@apply(--layout-center);
-	@apply(--layout-center-justified);
-	@apply(--layout-flex-auto);
-}
-
-lq-card {
-	width: 100%;
-	--paper-card-header-color: var(--paper-pink-500);
-}
-
-::content .description {
-	height: 97px;
-	overflow: hidden;
-}
-
-.card-actions {
-	display: flex;
-}
-
-paper-icon-button.red {
-	color: var(--paper-red-500);
-
-	--paper-icon-button-ink-color: var(--paper-red-500);
-}
-
-paper-icon-button.red:hover {
-	background: var(--paper-red-50);
-	border-radius: 50%;
-}
-
-iron-image {
-	@apply(--layout-flex);
-}
-</style>
-
 <template>
+	<style>
+	:host {
+		display: block;
+		opacity: 0;
+		margin: 12px;
+		transition: all linear .4s;
+
+		@apply(--lq-tile);
+	}
+
+	:host([loading]) {
+		@apply(--layout-horizontal);
+		@apply(--layout-center);
+		@apply(--layout-center-justified);
+		@apply(--layout-flex-auto);
+	}
+
+	lq-card {
+		width: 100%;
+		--paper-card-header-color: var(--paper-pink-500);
+	}
+
+	::content .description {
+		height: 97px;
+		overflow: hidden;
+	}
+
+	.card-actions {
+		display: flex;
+	}
+
+	paper-icon-button.red {
+		color: var(--paper-red-500);
+
+		--paper-icon-button-ink-color: var(--paper-red-500);
+	}
+
+	paper-icon-button.red:hover {
+		background: var(--paper-red-50);
+		border-radius: 50%;
+	}
+
+	iron-image {
+		@apply(--layout-flex);
+	}
+	</style>
+
 	<template is="dom-if" if="[[loading]]">
 		<paper-spinner active$="[[active]]"></paper-spinner>
 	</template>
@@ -74,17 +74,6 @@ Polymer({
 	is: 'lq-tile',
 
 	properties: {
-		image: {
-			type: String,
-			value: null,
-			reflectToAttribute: true
-		},
-
-		name: {
-			type: String,
-			reflectToAttribute: true
-		},
-
 		loading: {
 			type: Boolean,
 			value: false,
@@ -101,6 +90,11 @@ Polymer({
 			type: Boolean,
 			value: false,
 			reflectToAttribute: true
+		},
+
+		image: {
+			type: String,
+			value: appDir + "img/sample.jpg",
 		},
 
 		animationConfig: {
@@ -132,26 +126,15 @@ Polymer({
 		'neon-animation-finish': '_onNeonAnimationFinish'
 	},
 
-	ready: function() {
-		if ( ! this.image ) {
-			var path = "http://lorempixel.com/";
-			path = path + this.getRandomArbitrary( 400, 500 ) + '/' + this.getRandomArbitrary( 200, 300 );
-			this.image = path;
-		}
+	attached: function() {
+		this.async( function() {
+			this.show();
+		}, 250 );
 
-		this.show();
-	},
-
-	// Returns a random number between min (inclusive) and max (exclusive)
-	getRandomArbitrary: function( min, max ) {
-		return Math.floor(Math.random() * (max - min)) + min;
 	},
 
 	show: function() {
-		this.async( function() {
-			this.playAnimation( 'entry' );
-		}, 750 );
-
+		this.playAnimation( 'entry' );
 	},
 
 	_onNeonAnimationFinish: function() {

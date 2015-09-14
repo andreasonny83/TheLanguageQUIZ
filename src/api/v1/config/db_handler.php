@@ -422,7 +422,7 @@ class DbHandler {
 	}
 
 	public function logOut( $user_session ) {
-		$now = time() + 2;
+		$now = time() + 1;
 
 		//Expire the current session
 		if ( $stmt = $this->conn->prepare( "UPDATE LQ_users

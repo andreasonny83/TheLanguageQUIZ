@@ -5,12 +5,6 @@
 
 <dom-module id="lq-main">
 <template>
-	<style>
-	neon-animated-pages {
-		height: 100%;
-	}
-	</style>
-
 	<neon-animated-pages id="pages" class="flex" selected="[[selected]]" entry-animation="[[entryAnimation]]" exit-animation="[[exitAnimation]]">
 
 		<lq-home-page id="lqHome" avatar="[[avatar]]" collections="[[collections]]" on-tile-click="_onCollection" on-log-out="_logOut" on-user-profile="_userProfile"></lq-home-page>
@@ -29,7 +23,8 @@
 		method="GET"
 		headers={{apiKey}}
 		handle-as="json"
-		on-response="fetchCollections">
+		on-response="fetchCollections"
+		on-error="fetchCollectionsError">
 	</iron-ajax>
 
 	<iron-ajax
@@ -49,8 +44,6 @@ Polymer({
 	is: 'lq-main',
 
 	properties: {
-		page: '',
-
 		selected: 0,
 
 		collections: {
@@ -61,35 +54,25 @@ Polymer({
 		items_per_page: {
 			type: Number,
 			value: 6
+		},
+
+		user: {
+			type: Object
+		},
+
+		avatar: {
+			type: String,
+			value: appDir + "img/avatar.jpg"
 		}
 	},
 
 	attached: function() {
-		this.page ? this.page : null;
-		window.lqMain          = this;
-		this.avatar            = appDir + "img/avatar.jpg";
 		lqApp.$.spinner.active = true; //loading
+		window.lqMain          = this;
+		this.selected = 0;
 
-		switch( this.page ) {
-			case 'home':
-				this.selected = 0;
-				break;
-			case 'profile':
-				this.selected = 2;
-				break;
-			case 'collection':
-				if ( this.collid ) {
-					this.selected = 3;
-				} else {
-					lqApp.$.router.go( '/' + this.checkUserCookie() + '/home' );
-				}
-				break;
-			default:
-				lqApp.$.router.go( '/' + this.checkUserCookie() + '/home' );
-		}
-
-		if ( ! this.checkUserCookie() ) {
-			return lqApp.$.router.go( '/login', { replace: true} );
+		if ( ! lqApp.checkUserCookie() ) {
+			return lqApp.$.router.go( '/login/', { replace: true} );
 		}
 
 		this.apiKey = lqApiKey;
@@ -108,14 +91,14 @@ Polymer({
 
 		if ( n_try >= 3 ) {
 			// If it has been not possible to verify the user, log out.
-			fireToast( "It has been impossible to verify the user information. Logging out." );
+			lqApp.fireToast( "It has been impossible to verify the user information. Logging out." );
 
 			return lqApp.logOut();
 		}
 
 		this.cleanCollection();
 
-		user_cookie = this.checkUserCookie();
+		user_cookie = lqApp.checkUserCookie();
 		user_id     = this.uid ? this.uid : null;
 
 		if ( user_cookie && user_id && user_cookie === user_id ) {
@@ -129,7 +112,7 @@ Polymer({
 
 		this.async( function() {
 			this.update( n_try + 1 );
-		}, 100 );
+		}, 500 );
 	},
 
 	getUser: function( e ) {
@@ -139,9 +122,11 @@ Polymer({
 		// complete rendering the home page
 		if ( e.detail.response.user ) {
 			this.user = e.detail.response.user;
-			fireToast( "Welcome back " + this.user.username );
+			lqApp.fireToast( "Welcome back " + this.user.username );
 			// Read the global collections once the user is logged id and verified
 			this.readCollections();
+		} else {
+			lqApp.logOut( 'Cannot verify the user credentials. Logging out.' );
 		}
 	},
 
@@ -160,12 +145,21 @@ Polymer({
 	 *
 	 * Request all the collections using an Ajax request to the API
 	 */
-	readCollections: function() {
-		if ( this.checkUserCookie() ) {
-			// this.$.lqHome.tileLoading.setAttribute( 'active', true );
+	readCollections: function( try_again ) {
+		try_again = typeof try_again == 'undefined' ? false : try_again;
+		var user_cookie = lqApp.checkUserCookie();
+		console.log('reading collections');
 
-			this.$.ajax_collections.url = apiDir + "user/" + this.checkUserCookie() + "/collections";
+		if ( user_cookie ) {
+			this.$.ajax_collections.url = apiDir + "user/" + user_cookie + "/collections";
 			this.$.ajax_collections.generateRequest();
+		}
+		else if ( ! try_again ) {
+			this.async( function() {
+				this.readCollections( true );
+			}, 500 );
+		} else {
+			lqApp.logOut( 'Cannot verify the user credentials. Logging out.' );
 		}
 	},
 
@@ -184,17 +178,18 @@ Polymer({
 			});
 		}
 
-		// this.$.lqHome.tileLoading.removeAttribute( 'active' );
-		console.log('Main ready, moving on');
+		this.$.lqHome.$.tileLoading.removeAttribute( 'active' );
+		console.log('Collections fetched, moving on');
 		this.$.lqHome.update();
 	},
 
-	/**
-	 * Read the user cookie
-	 * @return [String] The user uid
-	 */
-	checkUserCookie: function() {
-		return lqApp.$.userCookie.readCookie() ? lqApp.$.userCookie.readCookie() : null;
+	fetchCollectionsError: function( e ) {
+		this.$.lqHome.$.tileLoading.setAttribute( 'active', true );
+		lqApp.fireToast( 'Cannot fetch the collections from the server. Trying again in a while.' );
+
+		this.async( function() {
+			this.readCollections();
+		}, 10000 );
 	},
 
 	/**
@@ -206,7 +201,7 @@ Polymer({
 		var status = e.detail.request.xhr.response ? e.detail.request.xhr.response : null;
 
 		if ( status && status.msg ) {
-			fireToast( status.msg );
+			lqApp.fireToast( status.msg );
 		}
 
 		return lqApp.logOut();

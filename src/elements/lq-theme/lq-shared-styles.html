@@ -4,9 +4,6 @@
 	:host {
 		background-color: var(--lq-primary-2);
 	}
-	neon-animated-pages {
-		height: 100%;
-	}
 	.horizontal-section-container {
 		@apply(--layout-horizontal);
 		@apply(--layout-center-justified);
@@ -43,6 +40,25 @@
 	.flex-section {
 		@apply(--layout-flex);
 	}
+	paper-scroll-header-panel {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background-color: var(--paper-grey-200, #eee);
+	}
+	paper-toolbar {
+		background-color: var(--lq-primary-0);
+		height: 160px;
+	}
+	paper-toolbar.tall .title {
+		font-size: 32px;
+		line-height: 40px;
+		text-align: center;
+		margin-left: 0;
+	}
+
 	@media (max-width: 639px) {
 		paper-toast {
 			left: 0;
@@ -52,6 +68,11 @@
 			height: auto;
 			border-radius: 0;
 			padding: 20px;
+		}
+
+		paper-toolbar.tall .title {
+			font-size: 21px;
+			line-height: 40px;
 		}
 	}
 	</style>

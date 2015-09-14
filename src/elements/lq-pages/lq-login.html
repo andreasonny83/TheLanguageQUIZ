@@ -2,40 +2,44 @@
 <link rel="import" href="../lq-card/lq-card.html">
 
 <dom-module id="lq-login">
-<style include="lq-shared-styles">
-.hero {
-	padding: 50px;
-}
-lq-card {
-	width: 500px;
-
-	--lq-card-actions: {
-		text-align: right;
-		@apply(--layout-center);
-	}
-}
-paper-input, paper-dropdown-menu {
-	outline: none;
-}
-.centered {
-	max-width: 400px;
-	margin-left: auto;
-	margin-right: auto;
-	text-align: center;
-}
-.secondary {
-	height: 500px;
-	width: 100%;
-	background-color: #fff;
-	overflow: auto;
-}
-footer {
-	height: 200px;
-}
-@media (max-width: 639px) {}
-</style>
-
 <template>
+	<style include="lq-shared-styles">
+	.hero {
+		padding: 50px;
+	}
+
+	lq-card {
+		width: 500px;
+
+		--lq-card-actions: {
+			text-align: right;
+			@apply(--layout-center);
+		}
+	}
+
+	paper-input, paper-dropdown-menu {
+		outline: none;
+	}
+
+	.centered {
+		max-width: 400px;
+		margin-left: auto;
+		margin-right: auto;
+		text-align: center;
+	}
+
+	.secondary {
+		height: 500px;
+		width: 100%;
+		background-color: #fff;
+		overflow: auto;
+	}
+
+	footer {
+		height: 200px;
+	}
+	</style>
+
 	<div class="horizontal-section-container hero">
 		<lq-card id="card_login" heading="Log In">
 			<div class="card-content">
@@ -56,8 +60,8 @@ footer {
 				on-keys-pressed="login">
 			</iron-a11y-keys>
 		</lq-card>
-
 	</div>
+
 	<div class="horizontal-section-container hero">
 		<lq-card id="card_register" heading="Register">
 			<div class="card-content">
@@ -138,28 +142,8 @@ footer {
 Polymer({
 	is: 'lq-login',
 
-	behaviors: [
-		Polymer.NeonAnimatableBehavior
-	],
-
 	properties: {
-		reg: Object,
-
-		animationConfig: {
-			type: Object,
-			value: function() {
-				return {
-					'entry': {
-						name: 'fade-in-animation',
-						node: this
-					},
-					'exit': {
-						name: 'fade-out-animation',
-						node: this
-					}
-				}
-			}
-		},
+		reg: Object
 	},
 
 	observers: [
@@ -185,7 +169,7 @@ Polymer({
 
 	getUser: function( e ) {
 		if ( e.detail.response.user ) {
-			document.querySelector( 'app-router' ).go( '/' + this.user_cookie + '/home', { replace: true} );
+			lqApp.$.router.go( '/' + this.user_cookie + '/', { replace: true } );
 		}
 	},
 
@@ -252,7 +236,6 @@ Polymer({
 
 	register: function() {
 		this.reg.lang = this.$.language.selectedItemLabel;
-		console.log(this.$.language.selectedItemLabel);
 		this.$.reg_name.validate();
 		this.$.reg_email.validate();
 		this.$.reg_email_confirm.validate();
@@ -260,12 +243,12 @@ Polymer({
 		this.$.reg_password_confirm.validate();
 
 		if ( ! this.reg.lang ) {
-			fireToast( "Please, select your language first." );
+			lqApp.fireToast( "Please, select your language first." );
 			return;
 		}
 
 		if ( this.$.reg_name.invalid || this.$.reg_email.invalid || this.$.reg_email_confirm.invalid || this.$.reg_password.invalid || this.$.reg_password_confirm.invalid ) {
-			fireToast( "Please, fix the wrong information and try again." );
+			lqApp.fireToast( "Please, fix the wrong information and try again." );
 			return;
 		}
 
@@ -304,20 +287,20 @@ Polymer({
 			this.$.ajax_login.generateRequest();
 		}
 		else {
-			fireToast( "Please, check the entered details and try again." );
+			lqApp.fireToast( "Please, check the entered details and try again." );
 		}
 	},
 
 	registerSucceed: function() {
 		lqApp.$.spinner.active = false; //loading
 		this.resetFields();
-		fireToast( "You are now registered." );
+		lqApp.fireToast( "You are now registered." );
 	},
 
 	registerFailed: function() {
 		lqApp.$.spinner.active = false; //loading
 		this.resetFields();
-		fireToast( "Please, check the entered details and try again." );
+		lqApp.fireToast( "Please, check the entered details and try again." );
 	},
 
 	loginSucceed: function() {
@@ -331,7 +314,7 @@ Polymer({
 
 		if ( n_try >= 3 ) {
 			lqApp.$.spinner.active = false; //loading
-			fireToast( "It has been impossible to perform a log in. Please try again." );
+			lqApp.fireToast( "It has been impossible to perform a log in. Please try again." );
 
 			return;
 		}
@@ -339,7 +322,7 @@ Polymer({
 		var user_cookie = lqApp.$.userCookie.readCookie() ? lqApp.$.userCookie.readCookie() : null;
 
 		if ( user_cookie ) {
-			lqApp.$.router.go( '/' + user_cookie + '/home', { replace: true} );
+			lqApp.$.router.go( '/' + user_cookie + '/', { replace: true} );
 
 			return;
 		}
@@ -355,12 +338,12 @@ Polymer({
 		lqApp.$.spinner.active = false; //loading
 
 		if ( status && status.msg ) {
-			fireToast( status.msg );
+			lqApp.fireToast( status.msg );
 
 			return;
 		}
 
-		fireToast( "It has been impossible to receive any response from the server. Please, try again." );
+		lqApp.fireToast( "It has been impossible to receive any response from the server. Please, try again." );
 	}
 });
 </script>

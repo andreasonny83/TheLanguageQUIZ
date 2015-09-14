@@ -4,32 +4,10 @@
 
 <dom-module id="lq-home-page">
 <template>
-
 	<style include="lq-shared-styles">
 	:host {
 		display: block;
 		height: 100%;
-	}
-
-	paper-scroll-header-panel {
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		background-color: var(--paper-grey-200, #eee);
-	}
-
-	paper-toolbar {
-		background-color: var(--lq-primary-0);
-		height: 160px;
-	}
-
-	paper-toolbar.tall .title {
-		font-size: 32px;
-		line-height: 40px;
-		text-align: center;
-		margin-left: 0;
 	}
 
 	#searchBox {
@@ -107,13 +85,11 @@
 		--lq-tile: {
 			width: calc(33.33% - 24px);
 		};
-
 		--lq-card-header-image: {
 			width: 100%;
 			max-width: 440px;
 			height: 250px;
 		};
-
 		--lq-card-header-text: {
 			padding: 8px 12px;
 			background-color: rgba(255,255,255,0.5);
@@ -132,11 +108,6 @@
 	}
 
 	@media all and (max-width: 639px) {
-		paper-toolbar.tall .title {
-			font-size: 21px;
-			line-height: 40px;
-		}
-
 		#searchBox {
 			height: 48px;
 			line-height: 48px;
@@ -208,7 +179,7 @@
 				<h2>Collections from the world</h2>
 			</div>
 			<div class="horizontal-section-container">
-				<array-selector id="selector" items="[[collections]]" selected="{{collectionsSelected}}" multi toggle></array-selector>
+				<array-selector id="selector" items="[[collections]]" selected="[[collectionsSelected]]" multi toggle></array-selector>
 
 				<template id="collectionsList" is="dom-repeat" items="[[collectionsSelected]]" as="collection" filter="filterCollections">
 					<lq-tile small id="[[collection.uid]]"
@@ -219,9 +190,7 @@
 				</template>
 
 				<lq-tile id="tileLoading" loading></lq-tile>
-
 			</div>
-
 		</div>
 
 		<event-infinite-scroll
@@ -306,12 +275,12 @@ Polymer({
 	 * Render more collections when the bottom is reached
 	 */
 	loadMoreCollections: function() {
+		// Exit, if another loadMoreCollections is working
 		if ( this.$.infinite_scroll.getAttribute( 'busy') ) {
-			// console.log('busy');
 			return;
 		}
 
-		// When all the collection have been rendered, stop searching more
+		// When all the collection have been rendered, stop searching for more
 		if ( this.collectionsSelected.length >= lqMain.collections.length ) {
 			this.$.infinite_scroll.setAttribute( 'busy', true );
 			this.$.tileLoading.removeAttribute( 'active' );
@@ -321,12 +290,13 @@ Polymer({
 		// empty buffer
 		this.collectionsBuffer = [];
 
+		// Keep the infinite_scroll busy until the new collections are rendered
 		this.$.infinite_scroll.setAttribute( 'busy', true );
 		this.$.tileLoading.setAttribute( 'active', true );
 
 		var that  = this;
 		var start = this.collectionsSelected.length;
-		var stop  = this.collectionsSelected.length + lqMain.items_per_page;
+		var stop  = start + lqMain.items_per_page;
 		stop      = stop < lqMain.collections.length ? stop : lqMain.collections.length;
 
 		for ( var pos = start; pos < stop; pos++ ) {
@@ -338,16 +308,15 @@ Polymer({
 			this.collectionsBuffer.forEach( function( item ) {
 				that.push( 'collectionsSelected', item );
 			});
+
+			// render the new collections
 			this.$.infinite_scroll.removeAttribute( 'busy' );
 			this.$.tileLoading.removeAttribute( 'active' );
-		}, 1000);
+		}, 500);
 	},
 
 	/**
-	 * filterCollections
-	 * Filter collections based on the input search, if any
-	 * @param  [Object] item
-	 * @return [Object]
+	 * Filter the collections according to the input search when available
 	 */
 	filterCollections: function( item ) {
 		return item.name.match( new RegExp( this.searchString, 'i' ) );
