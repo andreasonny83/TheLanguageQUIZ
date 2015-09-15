@@ -76,6 +76,7 @@ $app->post(
 		}
 
 		$db = new DbHandler();
+		echo 'cioa';
 
 		// check for correct email and password
 		if ( $db_uid = $db->checkUserExisits( $email ) ) {
@@ -618,4 +619,3 @@ function echoRespnse( $status_code, $response ) {
 }
 
 $app->run();
-?>

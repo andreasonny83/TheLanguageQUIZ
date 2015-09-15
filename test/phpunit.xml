@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="bootstrap.php"
+        colors="true">
+    <php>
+        <includePath>./api</includePath>
+    </php>
+    <testsuites>
+        <testsuite name="LanguageQUIZ Test Suite">
+            <directory>api/</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

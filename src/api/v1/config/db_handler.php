@@ -561,5 +561,4 @@ class DbHandler {
 
 		return true;
 	}
-
 }

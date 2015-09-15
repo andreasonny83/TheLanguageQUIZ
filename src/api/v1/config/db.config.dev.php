@@ -18,4 +18,3 @@ define( 'DEFAULT_ROLE', 'member' );
 
 define( 'APP_DIR', 'http://localhost:8888/TheLanguageQUIZ/dist/' );
 define( 'APP_ENV', 'development' );
-?>

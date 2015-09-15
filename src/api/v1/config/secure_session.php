@@ -154,4 +154,3 @@ class SecureSessionHandler extends SessionHandler {
 	}
 
 }
-?>
